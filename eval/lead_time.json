@@ -1,0 +1,42 @@
+{
+  "banner": "Synthetic data \u2014 not Opendoor data.",
+  "run_id": "injected",
+  "scenarios": [
+    {
+      "scenario": "A",
+      "kind": "demand_softening",
+      "scope": "M02",
+      "scope_type": "market",
+      "first_alert_week": null,
+      "start_week": 30,
+      "cm_first_visible_week": 39,
+      "delay_weeks": null,
+      "lead_weeks": null,
+      "before_cm": false
+    },
+    {
+      "scenario": "B",
+      "kind": "adverse_selection",
+      "scope": "B2",
+      "scope_type": "band",
+      "first_alert_week": 38,
+      "start_week": 30,
+      "cm_first_visible_week": 45,
+      "delay_weeks": 8,
+      "lead_weeks": 7,
+      "before_cm": true
+    },
+    {
+      "scenario": "C",
+      "kind": "reno_cost_drift",
+      "scope": "M05",
+      "scope_type": "market",
+      "first_alert_week": 40,
+      "start_week": 30,
+      "cm_first_visible_week": 46,
+      "delay_weeks": 10,
+      "lead_weeks": 6,
+      "before_cm": true
+    }
+  ]
+}

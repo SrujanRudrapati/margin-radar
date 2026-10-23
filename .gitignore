@@ -18,3 +18,8 @@ data/out/
 eval/runs/
 .worktrees/
 data/decision_scores.json
+web/dist/
+web/public/data/
+web/*.tsbuildinfo
+web/tsconfig.tsbuildinfo
+docs/screenshots/*.tmp
