@@ -1,0 +1,11 @@
+version: 2
+
+sources:
+  - name: raw
+    description: Generator output for one run (one DuckDB file per run). Synthetic data — not Opendoor data.
+    schema: raw
+    tables:
+      - name: homes
+        description: One row per offer; stage dates are NULL until the stage happens.
+      - name: price_cuts
+        description: One row per listing price cut.

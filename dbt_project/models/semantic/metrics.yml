@@ -1,0 +1,277 @@
+# Synthetic data — not Opendoor data.
+# meta.sample_size: mart count column whose windowed sum gates the metric (non-simple metrics only).
+# meta.role: trigger | context | lagging | volume | exposure | component (building block, never alerts).
+metrics:
+  - name: offers
+    type: simple
+    type_params:
+      measure: offers
+    config:
+      meta:
+        role: volume
+  - name: closes
+    type: simple
+    type_params:
+      measure: closes
+    config:
+      meta:
+        role: volume
+  - name: acquisition_usd
+    type: simple
+    type_params:
+      measure: acquisition_usd
+    config:
+      meta:
+        role: volume
+  - name: resale_usd
+    type: simple
+    type_params:
+      measure: resale_usd
+    config:
+      meta:
+        role: volume
+  - name: unsold_inventory_usd
+    type: simple
+    type_params:
+      measure: unsold_inventory_usd
+    config:
+      meta:
+        role: exposure
+  - name: spread_sum
+    type: simple
+    type_params:
+      measure: spread_sum
+    config:
+      meta:
+        role: component
+  - name: contracts
+    type: simple
+    type_params:
+      measure: contracts
+    config:
+      meta:
+        role: component
+  - name: fell_through
+    type: simple
+    type_params:
+      measure: fell_through
+    config:
+      meta:
+        role: component
+  - name: company_declined
+    type: simple
+    type_params:
+      measure: company_declined
+    config:
+      meta:
+        role: component
+  - name: awaiting_offer
+    type: simple
+    type_params:
+      measure: awaiting_offer
+    config:
+      meta:
+        role: component
+  - name: first_offers
+    type: simple
+    type_params:
+      measure: first_offers
+    config:
+      meta:
+        role: component
+  - name: dtfo_sum
+    type: simple
+    type_params:
+      measure: dtfo_sum
+    config:
+      meta:
+        role: component
+  - name: showings_sum
+    type: simple
+    type_params:
+      measure: showings_sum
+    config:
+      meta:
+        role: component
+  - name: price_cuts
+    type: simple
+    type_params:
+      measure: price_cuts
+    config:
+      meta:
+        role: component
+  - name: reno_estimate_sum
+    type: simple
+    type_params:
+      measure: reno_estimate_sum
+    config:
+      meta:
+        role: component
+  - name: reno_actual_sum
+    type: simple
+    type_params:
+      measure: reno_actual_sum
+    config:
+      meta:
+        role: component
+  - name: resales
+    type: simple
+    type_params:
+      measure: resales
+    config:
+      meta:
+        role: component
+  - name: model_valuation_sold_sum
+    type: simple
+    type_params:
+      measure: model_valuation_sold_sum
+    config:
+      meta:
+        role: component
+  - name: cm_usd
+    type: simple
+    type_params:
+      measure: cm_usd
+    config:
+      meta:
+        role: component
+  - name: holding_cost_sum
+    type: simple
+    type_params:
+      measure: holding_cost_sum
+    config:
+      meta:
+        role: component
+  - name: hold_days_sum
+    type: simple
+    type_params:
+      measure: hold_days_sum
+    config:
+      meta:
+        role: component
+  - name: contract_rate
+    type: ratio
+    type_params:
+      numerator: contracts
+      denominator: offers
+    config:
+      meta:
+        role: trigger
+        sample_size: offers
+  - name: avg_spread_pct
+    type: ratio
+    type_params:
+      numerator: spread_sum
+      denominator: offers
+    config:
+      meta:
+        role: context
+        sample_size: offers
+  - name: first_offer_rate
+    type: ratio
+    type_params:
+      numerator: first_offers
+      denominator: awaiting_offer
+    config:
+      meta:
+        role: trigger
+        sample_size: awaiting_offer
+  - name: price_cut_rate
+    type: ratio
+    type_params:
+      numerator: price_cuts
+      denominator: awaiting_offer
+    config:
+      meta:
+        role: context
+        sample_size: awaiting_offer
+  - name: showing_rate_per_week
+    type: derived
+    type_params:
+      expr: showings_sum / dtfo_sum * 7
+      metrics:
+        - name: showings_sum
+        - name: dtfo_sum
+    config:
+      meta:
+        role: context
+        sample_size: first_offers
+  - name: avg_days_to_first_offer
+    type: ratio
+    type_params:
+      numerator: dtfo_sum
+      denominator: first_offers
+    config:
+      meta:
+        role: context
+        sample_size: first_offers
+  - name: reno_overrun_pct
+    type: derived
+    type_params:
+      expr: reno_actual_sum / reno_estimate_sum - 1
+      metrics:
+        - name: reno_actual_sum
+        - name: reno_estimate_sum
+    config:
+      meta:
+        role: trigger
+        sample_size: renos_completed
+  - name: fall_through_rate
+    type: ratio
+    type_params:
+      numerator: fell_through
+      denominator: contracts
+    config:
+      meta:
+        role: context
+        sample_size: contracts
+  - name: company_decline_rate
+    type: ratio
+    type_params:
+      numerator: company_declined
+      denominator: contracts
+    config:
+      meta:
+        role: context
+        sample_size: contracts
+  - name: resale_vs_model_bps
+    type: derived
+    type_params:
+      expr: (resale_usd / model_valuation_sold_sum - 1) * 10000
+      metrics:
+        - name: resale_usd
+        - name: model_valuation_sold_sum
+    config:
+      meta:
+        role: lagging
+        sample_size: resales
+  - name: contribution_margin_pct
+    type: ratio
+    type_params:
+      numerator: cm_usd
+      denominator: resale_usd
+    config:
+      meta:
+        role: lagging
+        sample_size: resales
+  - name: avg_resale_price
+    type: ratio
+    type_params:
+      numerator: resale_usd
+      denominator: resales
+    config:
+      meta:
+        role: component
+        sample_size: resales
+  - name: holding_cost_bps_per_day
+    type: derived
+    type_params:
+      expr: holding_cost_sum / hold_days_sum / avg_resale_price * 10000
+      metrics:
+        - name: holding_cost_sum
+        - name: hold_days_sum
+        - name: avg_resale_price
+    config:
+      meta:
+        role: context
+        sample_size: resales

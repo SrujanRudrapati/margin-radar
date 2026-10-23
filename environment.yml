@@ -11,3 +11,7 @@ dependencies:
       - duckdb==2.0.0
       - pytest==9.1.1
       - pytest-cov==7.1.0
+      - dbt-duckdb==1.11.0
+      - dbt-metricflow==0.15.0
+      - pyyaml==6.0.3
+      - statsmodels==0.15.0

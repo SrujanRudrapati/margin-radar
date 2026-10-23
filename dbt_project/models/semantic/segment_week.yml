@@ -1,0 +1,78 @@
+# Synthetic data — not Opendoor data.
+# Semantic model on mart_segment_week; the same YAML serves both targets (injected, control).
+semantic_models:
+  - name: segment_week
+    description: One row per segment x week of point-in-time funnel counts and sums.
+    model: ref('mart_segment_week')
+    defaults:
+      agg_time_dimension: week_thursday
+    entities:
+      - name: segment_week
+        type: primary
+        expr: segment || '|' || cast(week as varchar)
+      - name: segment
+        type: foreign
+        expr: segment
+    dimensions:
+      # ISO rule: a week belongs to the period containing its Thursday (week_start is Monday).
+      - name: week_thursday
+        type: time
+        expr: cast(week_start + 3 as date)
+        type_params:
+          time_granularity: day
+      - name: week_start
+        type: time
+        type_params:
+          time_granularity: day
+      - name: market
+        type: categorical
+      - name: band
+        type: categorical
+      - name: product
+        type: categorical
+    measures:
+      - name: offers
+        agg: sum
+      - name: spread_sum
+        agg: sum
+      - name: contracts
+        agg: sum
+      - name: fell_through
+        agg: sum
+      - name: company_declined
+        agg: sum
+      - name: closes
+        agg: sum
+      - name: acquisition_usd
+        agg: sum
+      - name: awaiting_offer
+        agg: sum
+      - name: first_offers
+        agg: sum
+      - name: dtfo_sum
+        agg: sum
+      - name: showings_sum
+        agg: sum
+      - name: price_cuts
+        agg: sum
+      - name: reno_estimate_sum
+        agg: sum
+      - name: reno_actual_sum
+        agg: sum
+      - name: resales
+        agg: sum
+      - name: resale_usd
+        agg: sum
+      - name: model_valuation_sold_sum
+        agg: sum
+      - name: cm_usd
+        agg: sum
+      - name: holding_cost_sum
+        agg: sum
+      - name: hold_days_sum
+        agg: sum
+      - name: unsold_inventory_usd
+        agg: sum
+        non_additive_dimension:
+          name: week_thursday
+          window_choice: max

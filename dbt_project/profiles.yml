@@ -1,0 +1,13 @@
+margin_radar:
+  target: "{{ env_var('MR_TARGET', 'injected') }}"
+  outputs:
+    injected:
+      type: duckdb
+      path: "{{ env_var('MR_DB_PATH', 'data/radar_injected.duckdb') }}"
+      schema: main
+      threads: 1
+    control:
+      type: duckdb
+      path: "{{ env_var('MR_DB_PATH', 'data/radar_control.duckdb') }}"
+      schema: main
+      threads: 1
