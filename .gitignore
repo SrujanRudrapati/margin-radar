@@ -14,3 +14,5 @@ dbt_project/logs/
 dbt_project/dbt_packages/
 dbt_project/.user.yml
 briefs/dev/
+data/out/
+eval/runs/
