@@ -93,3 +93,10 @@ Pre-flight table rulings: fixtures pass --truth-path to tmp; test_business_const
 - Final: minor (deferred): unused `feedback` parameter in run_agent/user_prompt
 - Final: minor (deferred): hyphen ranges "$444K [q:…]-$1.3M" read as negative (fail closed → retry); "3 actions" in a heading rejected
 - Final: minor (deferred): missing tests for live-call cost math and CLI exit code 3 on ReplayMiss
+
+## Phase 5 decisions
+
+| # | Phase | Decision | Reasoning |
+|---|---|---|---|
+| D16 | 5 | Drift baseline is expanding (every valid week after an 8-week burn-in and at least `EVAL_WEEKS` earlier), with no frozen baseline. Config stays `Z_ALERT` 3.25, `CUSUM_K` 0.75, `CUSUM_H` 6 (best on tuning seeds 1–5). | Root cause of the 10-seed failure (systematic debugging): an episode froze a baseline built from about 12 overlapping ramp-up weeks (seed 4, M04: median −0.07, sigma 0.025). Every later normal week then read as +3σ, and the episode never closed (CUSUM 21). Expanding baselines cut control alert-weeks from 374/560 to 78/510 and wrong-scope episodes from 12 to 8. Lower K or H (sweep on seeds 1–5) bought B recall only with many more control alerts. |
+| D17 | 5 | Detector gates FAIL and are reported as measured, not loosened. All seeds: control false alerts 0.153 per week (78/510), 8 wrong-scope episodes, recall before margin A 0/10, B 5/10, C 9/10. Holdout seeds 6–10: B 4/5 (median lead 9 weeks), C 5/5 (median lead 8 weeks). | User instruction: never loosen a gate, report honest numbers, and stop after ~30 minutes on one problem. At ~20k offers over 78 weeks (median 2 sales per segment-week), peer-relative noise is about the size of the B effect, and A is below the noise floor. |

@@ -60,10 +60,6 @@ def test_c_detected_before_cm_visible(injected, truth):
     assert first is not None and first <= truth["C"]["cm_first_visible_week"] - 1, first
 
 
-@pytest.mark.xfail(strict=True, reason=(
-    "Known on seed 42: one wrong-scope alert, reno_cost_drift on band B2 at week 64 of the injected run (a late "
-    "noise excursion; the control run is clean at the same thresholds). Precision is gated across 10 seeds in "
-    "Phase 5 (<= 2 wrong alerts), not on a single seed."))
 def test_injected_alerts_only_on_true_scopes(injected):
     wrong = {(w, a.kind, a.scope) for w, r in _evaluable(injected).items() for a in r.alerts
              if (a.kind, a.scope) not in TRUE_ALERTS}

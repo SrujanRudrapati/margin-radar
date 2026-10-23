@@ -130,3 +130,53 @@ def test_no_network_in_pytest(tmp_path):
     llm = LLM(model="claude-haiku-5-5", purpose="dev", cache_dir=tmp_path / "c", token_log=tmp_path / "l.jsonl")
     with pytest.raises(ReplayMiss):
         llm.create(system=SYSTEM, messages=msgs("uncached"), tools=TOOLS, max_tokens=10)
+
+
+class FakeBatchClient(FakeClient):
+    def __init__(self, fail_index=None):
+        super().__init__()
+        self.batches, self.fail_index = [], fail_index
+
+    def run_batch(self, params_list, timeout_s):
+        self.batches.append(len(params_list))
+        out = []
+        for i, p in enumerate(params_list):
+            out.append(None if i == self.fail_index else
+                       {"id": f"b{i}", "type": "message", "role": "assistant", "model": p["model"],
+                        "content": [{"type": "text", "text": f"batch {i}"}], "stop_reason": "end_turn",
+                        "usage": {"input_tokens": 100, "output_tokens": 20}})
+        return out
+
+
+def _req(text):
+    return {"system": SYSTEM, "messages": msgs(text), "tools": TOOLS, "max_tokens": 10}
+
+
+def test_create_many_batches_misses_and_skips_hits(tmp_path, monkeypatch):
+    live(monkeypatch)
+    fake = FakeBatchClient()
+    llm = make(tmp_path, fake)
+    llm.create(**_req("cached"))  # one sequential call, cached
+    out = llm.create_many([_req("cached"), _req("a"), _req("b")])
+    assert fake.batches == [2] and len(fake.calls) == 1  # the hit never reached the batch
+    assert [o["content"][0]["text"] for o in out[1:]] == ["batch 0", "batch 1"]
+    lines = [json.loads(l) for l in (tmp_path / "log.jsonl").read_text().splitlines()]
+    batched = [l for l in lines if l.get("batch")]
+    assert len(batched) == 2 and batched[0]["est_cost_usd"] == pytest.approx(0.5 * (100 * 0.10 + 20 * 0.50) / 1e6)
+
+
+def test_create_many_falls_back_per_item(tmp_path, monkeypatch):
+    live(monkeypatch)
+    fake = FakeBatchClient(fail_index=1)
+    out = make(tmp_path, fake).create_many([_req("x"), _req("y")])
+    assert out[0]["content"][0]["text"] == "batch 0" and out[1]["content"][0]["text"] == "ok"
+    assert len(fake.calls) == 1  # the failed item ran sequentially
+
+
+def test_create_many_replay_miss_and_budget(tmp_path, monkeypatch):
+    monkeypatch.setenv("REPLAY", "1")
+    with pytest.raises(ReplayMiss):
+        make(tmp_path, FakeBatchClient()).create_many([_req("never")])
+    live(monkeypatch)
+    with pytest.raises(BudgetExceeded):
+        make(tmp_path, FakeBatchClient(), max_calls=1).create_many([_req("p"), _req("q")])

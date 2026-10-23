@@ -103,6 +103,8 @@ def test_valid_brief_written(built_runs, tmp_path):
     assert path.name == "week_40.md" and md.splitlines()[0] == SYNTHETIC_BANNER
     payload = json.loads((tmp_path / "week_40.json").read_text())
     assert payload["status"] == "valid" and payload["grounding"]["errors"] == []
+    assert payload["actions"] and {"scope", "kind", "direction", "metric"} <= set(payload["actions"][0])
+    assert payload["grounding"]["first_draft"]["numbers_checked"] >= 1
     assert payload["grounding"]["numbers_checked"] >= 1 and re.search(r"\[q:D[0-9a-f]{10}\]", md)
 
 

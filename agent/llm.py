@@ -48,8 +48,13 @@ def with_prompt_caching(system: list[dict], tools: list[dict]) -> tuple[list[dic
     return system, tools
 
 
+BATCH_POLL_S = 20
+BATCH_TIMEOUT_S = int(os.environ.get("BATCH_TIMEOUT_S", 1800))
+
+
 class _SDKClient:
-    """Thin adapter over the official SDK. Sonnet 5.5 gets the server-side refusal fallback by default."""
+    """Thin adapter over the official SDK. Sonnet 5.5 gets the server-side refusal fallback by default
+    (sequential calls only: the Batches API rejects the fallback parameter)."""
 
     def __init__(self, api_key: str):
         import anthropic
@@ -61,6 +66,26 @@ class _SDKClient:
         else:
             response = self._client.messages.create(**kwargs)
         return response.model_dump(mode="json")
+
+    def run_batch(self, params_list: list[dict], timeout_s: int) -> list[dict | None]:
+        """Message Batches API (50% price). Returns one response per request, or None for any that did not succeed
+        before the timeout (the caller re-runs those sequentially)."""
+        batch = self._client.messages.batches.create(
+            requests=[{"custom_id": f"r{i}", "params": p} for i, p in enumerate(params_list)])
+        deadline = time.time() + timeout_s
+        while self._client.messages.batches.retrieve(batch.id).processing_status != "ended":
+            if time.time() > deadline:
+                self._client.messages.batches.cancel(batch.id)
+                break
+            time.sleep(BATCH_POLL_S)
+        out: list[dict | None] = [None] * len(params_list)
+        try:
+            for item in self._client.messages.batches.results(batch.id):
+                if item.result.type == "succeeded":
+                    out[int(item.custom_id[1:])] = item.result.message.model_dump(mode="json")
+        except Exception:  # results unavailable (e.g. cancelled before any finished): fall back for all
+            pass
+        return out
 
 
 class LLM:
@@ -97,6 +122,43 @@ class LLM:
         self._log(response.get("usage", {}), replay=False)
         return response
 
+    def create_many(self, requests: list[dict]) -> list[dict]:
+        """Like create() for many independent requests; cache misses go out as one Message Batch when the client
+        supports it (50% price), with per-request sequential fallback."""
+        keys = [cache_key(self.model, r["system"], r["messages"], r["tools"]) for r in requests]
+        out: list[dict | None] = [None] * len(requests)
+        misses = []
+        for i, key in enumerate(keys):
+            path = self.cache_dir / f"{key}.json"
+            if path.exists():
+                out[i] = json.loads(path.read_text())
+                self._log(out[i].get("usage", {}), replay=True)
+            else:
+                misses.append(i)
+        if misses and os.environ.get("REPLAY", "0") == "1":
+            raise ReplayMiss(f"no recorded response for cache key {keys[misses[0]]} ({self.model}, {self.purpose}); "
+                             "record it with: REPLAY=0 python -m eval --live (live calls, cost tokens)")
+        if misses and self.live_calls + len(misses) > self.max_calls:
+            raise BudgetExceeded(f"MAX_API_CALLS={self.max_calls}: {len(misses)} more live calls would exceed it")
+        if not misses:
+            return out  # type: ignore[return-value]
+        client = self._client_instance()
+        params = [{"model": self.model, "max_tokens": requests[i]["max_tokens"], "system": requests[i]["system"],
+                   "messages": requests[i]["messages"], "tools": requests[i]["tools"]} for i in misses]
+        batched = client.run_batch(params, BATCH_TIMEOUT_S) if hasattr(client, "run_batch") and \
+            os.environ.get("USE_BATCH", "1") == "1" else [None] * len(misses)
+        for i, p, response in zip(misses, params, batched):
+            self.live_calls += 1
+            via_batch = response is not None
+            if response is None:
+                response = client.create(**p)
+                if not isinstance(response, dict):
+                    response = response.model_dump(mode="json")
+            self._write_cache(self.cache_dir / f"{keys[i]}.json", response)
+            self._log(response.get("usage", {}), replay=False, batch=via_batch)
+            out[i] = response
+        return out  # type: ignore[return-value]
+
     def _client_instance(self):
         if self._client is None:
             if self._factory is not None:
@@ -119,16 +181,17 @@ class LLM:
         tmp.write_text(json.dumps(response, sort_keys=True, indent=1))
         tmp.replace(path)
 
-    def _log(self, usage: dict, replay: bool) -> None:
+    def _log(self, usage: dict, replay: bool, batch: bool = False) -> None:
         self.token_log.parent.mkdir(parents=True, exist_ok=True)
         record = {
             "ts": time.strftime("%Y-%m-%dT%H:%M:%S"), "model": self.model, "purpose": self.purpose,
-            "run_tag": self.run_tag, "replay": replay,
+            "run_tag": self.run_tag, "replay": replay, "batch": batch,
             "input_tokens": 0 if replay else usage.get("input_tokens", 0),
             "output_tokens": 0 if replay else usage.get("output_tokens", 0),
             "cache_creation_input_tokens": 0 if replay else (usage.get("cache_creation_input_tokens") or 0),
             "cache_read_input_tokens": 0 if replay else (usage.get("cache_read_input_tokens") or 0),
         }
-        record["est_cost_usd"] = 0.0 if replay else estimate_cost(self.model, usage)
+        cost = None if replay else estimate_cost(self.model, usage)
+        record["est_cost_usd"] = 0.0 if replay else (None if cost is None else cost * (0.5 if batch else 1.0))
         with self.token_log.open("a") as f:
             f.write(json.dumps(record) + "\n")
