@@ -50,3 +50,29 @@ def test_report_fields_smoke(tmp_path):
                 "recall_before_cm", "scenarios"} <= set(s)
     assert {f"{split}_{gate}" for split in ("all", "holdout")
             for gate in ("control_zero_alerts", "recall_before_cm", "wrong_alerts")} <= set(report["gates"])
+
+
+def test_fixed_design_seeds_use_generator_defaults():
+    from eval.detector_eval import scenario_args
+    assert scenario_args(1) == {} and scenario_args(10) == {}
+
+
+def test_true_holdout_seeds_draw_scopes_and_onsets():
+    from eval.detector_eval import ONSET_WEEK_RANGE, TRUE_HOLDOUT_SEEDS, scenario_args
+    from generator.config import BANDS, MARKETS
+    assert TRUE_HOLDOUT_SEEDS == tuple(range(11, 21))
+    draws = [scenario_args(s) for s in TRUE_HOLDOUT_SEEDS]
+    assert draws == [scenario_args(s) for s in TRUE_HOLDOUT_SEEDS]  # deterministic per seed
+    lo, hi = ONSET_WEEK_RANGE
+    for d in draws:
+        assert d["a_market"] in MARKETS and d["c_market"] in MARKETS and d["a_market"] != d["c_market"]
+        assert d["b_band"] in BANDS
+        assert all(lo <= d[k] <= hi for k in ("a_start_week", "b_start_week", "c_start_week"))
+    assert len({(d["a_market"], d["b_band"], d["c_market"]) for d in draws}) > 1
+    assert len({d["b_start_week"] for d in draws}) > 1
+
+
+def test_generator_cli_args_from_draw():
+    from eval.detector_eval import generator_cli_args
+    assert generator_cli_args({}) == []
+    assert generator_cli_args({"a_market": "M01", "b_start_week": 33}) == ["--a-market", "M01", "--b-start-week", "33"]

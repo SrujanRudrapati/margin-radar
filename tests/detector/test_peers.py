@@ -96,3 +96,18 @@ def test_rollup_needs_two_segments_and_min_weight():
     panel = make_panel(base, denom=3)  # 6 segments x 3 = 18 < MIN_DENOMINATOR["contract_rate"] (30)
     roll = rollup(peer_residuals(panel, "market"), "market")
     assert roll["residual"].isna().all()
+
+
+def test_shrinkage_pulls_thin_residuals_toward_peers():
+    panel = make_panel(lambda m, b, p, w: 0.90 if m == "M01" else base(m, b, p, w), denom=100)
+    plain = _row(peer_residuals(panel, "market", shrink_k=0), "M01-B2-CNML", 7)["residual"]
+    shrunk = _row(peer_residuals(panel, "market", shrink_k=100), "M01-B2-CNML", 7)["residual"]
+    assert shrunk == pytest.approx(plain * 100 / (100 + 100))
+
+
+def test_shrinkage_defaults_to_config(monkeypatch):
+    import detector.peers as peers
+    panel = make_panel(lambda m, b, p, w: 0.90 if m == "M01" else base(m, b, p, w), denom=100)
+    monkeypatch.setattr(peers, "SHRINK_K", {"contract_rate": 300})
+    r = _row(peer_residuals(panel, "market"), "M01-B2-CNML", 7)["residual"]
+    assert r == pytest.approx(_row(peer_residuals(panel, "market", shrink_k=0), "M01-B2-CNML", 7)["residual"] / 4)

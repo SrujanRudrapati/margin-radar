@@ -38,3 +38,28 @@ def test_scanner_catches_violations(tmp_path):
     )
     found = boundary_violations(tmp_path)
     assert len(found) == 3
+
+
+def test_governed_store_cannot_reach_another_run(built_runs):
+    """/detector and /agent read data only through GovernedStore; its connection can't attach or scan other files."""
+    import duckdb
+
+    from detector.governed import GovernedStore
+    control = built_runs["control"]
+    with GovernedStore(str(built_runs["injected"]), "injected") as store:
+        attached = [r[0] for r in store._con.execute(
+            "select path from duckdb_databases() where not internal and path is not null").fetchall()]
+        assert attached == [str(built_runs["injected"])]
+        for sql in (f"attach '{control}' as other (read_only)",
+                    f"select count(*) from read_parquet('{control.parent / 'parquet' / 'control' / '*.parquet'}')"):
+            with pytest.raises(duckdb.Error):
+                store._con.execute(sql)
+
+
+def test_agent_tools_take_no_path_or_run_argument():
+    """The model's tools can't name a database, file or run: the brief's store is fixed by the CLI's --db."""
+    from agent.tools import SCHEMAS
+    for schema in SCHEMAS:
+        props = set(schema["input_schema"]["properties"])
+        assert not {p for p in props if any(w in p for w in ("db", "path", "file", "run"))}, schema["name"]
+        assert schema["input_schema"]["additionalProperties"] is False

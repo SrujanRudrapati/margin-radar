@@ -9,7 +9,7 @@ import math
 import numpy as np
 import pandas as pd
 
-from detector.config import MIN_SEGMENT_SAMPLE, WINDOW_WEEKS, Z_EXPLAIN
+from detector.config import MIN_SEGMENT_SAMPLE, SEGMENT_SAMPLE_FLOOR, WINDOW_WEEKS, Z_EXPLAIN
 from detector.drift import DriftScore, Insufficient, score
 from detector.governed import GovernedStore
 from detector.models import Abstention, Alert, DetectorResult, Signal, Watch
@@ -74,7 +74,8 @@ def _metrics_needed() -> tuple[str, ...]:
 
 
 def _score_metric(store: GovernedStore, metric: str, dim: str, as_of_week: int) -> Scored:
-    panel = store.panel(metric, "segment", as_of_week, WINDOW_WEEKS, min_denominator=MIN_SEGMENT_SAMPLE)
+    floor = SEGMENT_SAMPLE_FLOOR.get(metric, MIN_SEGMENT_SAMPLE)
+    panel = store.panel(metric, "segment", as_of_week, WINDOW_WEEKS, min_denominator=floor)
     roll = rollup(peer_residuals(panel, dim), dim)
     out: Scored = {}
     for scope, frame in roll.groupby("scope"):

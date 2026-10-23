@@ -82,6 +82,17 @@ From `eval/results.json`. Detector thresholds were tuned on seeds 1–5; seeds 6
 - **claude-api**: record/replay cache, prompt caching, strict tool schemas, Message Batches for evals.
 - **frontend-design** and **webapp-testing**: dashboard design, plus Playwright screenshots in light, dark and mobile (`docs/screenshots/`).
 
+The skills are not vendored in this repo (`.claude/skills/` is gitignored). To install them:
+
+| Skill(s) | Source | Install |
+|---|---|---|
+| claude-api, webapp-testing | [anthropics/skills](https://github.com/anthropics/skills) (Apache-2.0) | `git clone https://github.com/anthropics/skills /tmp/skills && mkdir -p .claude/skills && cp -R /tmp/skills/skills/{claude-api,webapp-testing} .claude/skills/` |
+| brainstorming, writing-plans, executing-plans, subagent-driven-development, test-driven-development, systematic-debugging, requesting-code-review | `superpowers` plugin, official marketplace | in Claude Code: `/plugin install superpowers@claude-plugins-official` |
+| frontend-design | `frontend-design` plugin, official marketplace | `/plugin install frontend-design@claude-plugins-official` |
+| dbt (analytics engineering, semantic layer) | [dbt-labs/dbt-agent-skills](https://github.com/dbt-labs/dbt-agent-skills) | `/plugin marketplace add dbt-labs/dbt-agent-skills`, then `/plugin install dbt@dbt-agent-marketplace` |
+
+Playwright (screenshots only) is a pinned dev dependency in `environment.yml`; run `playwright install chromium` once.
+
 Decisions and their reasoning are in `docs/DECISIONS.md`.
 
 **Synthetic data — not Opendoor data.**

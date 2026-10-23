@@ -13,14 +13,22 @@ import subprocess
 import sys
 from pathlib import Path
 
+import numpy as np
+
 from detector.governed import GovernedStore
 from detector.rules import detect
 from eval.kpis import false_alert_stats, scenario_kpis, true_pairs
+from generator.config import BANDS, MARKETS
 
 ROOT = Path(__file__).resolve().parents[1]
 DBT_BIN = Path(sys.executable).parent / "dbt"
 TUNING_SEEDS = tuple(range(1, 6))
 HOLDOUT_SEEDS = tuple(range(6, 11))
+# True holdout (DECISIONS D28): never used for tuning; scopes and onset weeks are drawn per seed.
+TRUE_HOLDOUT_SEEDS = tuple(range(11, 21))
+# Onsets after the first week the drift baseline can score (burn-in 8 + 12 history + 8 eval gap) and early enough
+# for sold-home margin to show the problem before week 78.
+ONSET_WEEK_RANGE = (28, 46)
 MIN_RECALL = 8  # of 10 seeds, per scenario
 MAX_WRONG = 2   # wrong-scope alert episodes across all injected runs
 log = logging.getLogger("eval")
@@ -36,23 +44,41 @@ def source_hash() -> str:
     return digest.hexdigest()[:16]
 
 
+def scenario_args(seed: int) -> dict:
+    """Seeds 1–10 keep the fixed design (M02, B2, M05, onset week 30). True-holdout seeds draw their own."""
+    if seed not in TRUE_HOLDOUT_SEEDS:
+        return {}
+    rng = np.random.default_rng([seed, 20261023])
+    a_market, c_market = (str(m) for m in rng.choice(MARKETS, size=2, replace=False))
+    lo, hi = ONSET_WEEK_RANGE
+    a_start, b_start, c_start = (int(w) for w in rng.integers(lo, hi + 1, size=3))
+    return {"a_market": a_market, "a_start_week": a_start, "b_band": str(rng.choice(list(BANDS))),
+            "b_start_week": b_start, "c_market": c_market, "c_start_week": c_start}
+
+
+def generator_cli_args(args: dict) -> list[str]:
+    return [item for name, value in args.items() for item in (f"--{name.replace('_', '-')}", str(value))]
+
+
 def run_seed(seed: int, root: Path) -> dict:
     work = root / f"seed_{seed}"
     cache = work / "detections.json"
     key = source_hash()
+    args = scenario_args(seed)
     if cache.exists():
         cached = json.loads(cache.read_text())
-        if cached.get("source_hash") == key:
+        if cached.get("source_hash") == key and cached.get("scenario_args", {}) == args:
             return cached
     work.mkdir(parents=True, exist_ok=True)
     truth_path = work / "ground_truth.json"
-    _run([sys.executable, "-m", "generator", "--seed", str(seed), "--out-dir", str(work), "--truth-path", str(truth_path)])
+    _run([sys.executable, "-m", "generator", "--seed", str(seed), "--out-dir", str(work), "--truth-path", str(truth_path),
+          *generator_cli_args(args)])
     runs = {}
     for run_id in ("injected", "control"):
         db = work / f"radar_{run_id}.duckdb"
         _dbt_build(db, run_id, work)
         runs[run_id] = _detect_all(db, run_id)
-    result = {"seed": seed, "source_hash": key, "truth": json.loads(truth_path.read_text())["scenarios"], "runs": runs}
+    result = {"seed": seed, "source_hash": key, "scenario_args": args, "truth": json.loads(truth_path.read_text())["scenarios"], "runs": runs}
     cache.write_text(json.dumps(result))
     return result
 
