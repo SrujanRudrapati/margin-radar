@@ -1,7 +1,7 @@
 PY := conda run --no-capture-output -n margin-radar python
 SEED ?= 42
 
-.PHONY: setup data test build detect briefs eval record-final decisions
+.PHONY: setup data test build detect briefs eval record-final decisions markers api
 
 setup:
 	conda env update -n margin-radar -f environment.yml
@@ -54,3 +54,11 @@ record-final: data/radar_injected.duckdb
 decisions: data/radar_injected.duckdb
 	$(PY) -m agent decisions seed --db data/radar_injected.duckdb --log data/decisions.duckdb > /dev/null
 	$(PY) -m agent decisions score --db data/radar_injected.duckdb --log data/decisions.duckdb > data/decision_scores.json
+
+# Lead-time markers for the dashboard (eval is the only reader of ground truth).
+markers: data/radar_injected.duckdb
+	$(PY) -m eval.markers
+
+# Dashboard API: always replay-only (never calls Claude).
+api: data/radar_injected.duckdb data/radar_control.duckdb
+	REPLAY=1 conda run --no-capture-output -n margin-radar uvicorn api.main:app --port 8000
