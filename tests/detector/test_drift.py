@@ -60,3 +60,21 @@ def test_sampling_se_floor_damps_z():
     damped = score(series(vals), as_of_week=45, metric="contract_rate", se=series([0.05] * 46))
     assert abs(damped.z_latest) < abs(loose.z_latest)
     assert not damped.fired
+
+
+def test_onset_stays_fixed_during_episode():
+    rng = np.random.default_rng(5)
+    vals = list(rng.normal(0, 0.02, 40)) + list(0.2 + rng.normal(0, 0.01, 25))
+    onsets = {w: score(series(vals), as_of_week=w, metric="contract_rate").onset_week for w in (45, 50, 60)}
+    assert set(onsets.values()) == {40}, onsets
+    assert all(score(series(vals), as_of_week=w, metric="contract_rate").fired for w in (45, 50, 60))
+
+
+def test_sustained_shift_fires_via_cusum_without_streak():
+    from statsmodels.robust.scale import mad
+    rng = np.random.default_rng(6)
+    base = list(rng.normal(0, 1, 40))
+    history = np.array(base[7:33])  # the baseline the episode freezes at week 40: last 26 weeks <= 40 - 8
+    vals = base + [float(np.median(history)) + 3.0 * float(mad(history))] * 14  # z = 3.0 < Z_ALERT: CUSUM only
+    result = score(series(vals), as_of_week=53, metric="contract_rate")
+    assert result.fired and result.direction == "+" and result.z_streak == 0

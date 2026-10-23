@@ -36,48 +36,85 @@ class Insufficient:
 
 
 def score(residual: pd.Series, as_of_week: int, metric: str, se: pd.Series | None = None) -> DriftScore | Insufficient:
+    """Replay the series up to as_of_week (no look-ahead) as episodes.
+
+    Outside an episode each week is scored against a baseline built from history ending EVAL_WEEKS earlier.
+    A CUSUM run (in either direction) is an episode: while it lasts the baseline is frozen at its start, so a
+    persistent drift keeps scoring against the pre-drift level and the onset stays fixed (stable alert IDs).
+    An episode fires on a z-streak (|z| >= Z_ALERT for Z_CONSECUTIVE weeks) or when its CUSUM reaches CUSUM_H,
+    and stays fired until its CUSUM returns to zero.
+    """
     residual = residual.loc[:as_of_week]
     if pd.isna(residual.get(as_of_week, np.nan)):
         return Insufficient(f"no usable value in week {as_of_week} (thin data)")
-    eval_start = as_of_week - EVAL_WEEKS + 1
-    history = residual.loc[: eval_start - 1].dropna().tail(HISTORY_WEEKS)
+    state = _Episode()
+    for week in residual.index:
+        base = state.frozen or _baseline(residual, week, metric)
+        if base is None:
+            continue
+        sigma = base[1]
+        if se is not None and pd.notna(se.get(week, np.nan)):
+            sigma = max(sigma, float(se.get(week)))
+        value = residual.loc[week]
+        state.step(week, 0.0 if pd.isna(value) else (value - base[0]) / sigma, base)
+    if state.weeks_scored == 0:
+        return Insufficient(f"fewer than {MIN_HISTORY_WEEKS} weeks of history")
+    return state.result(as_of_week)
+
+
+def _baseline(residual: pd.Series, week: int, metric: str) -> tuple[float, float] | None:
+    history = residual.loc[: week - EVAL_WEEKS].dropna().tail(HISTORY_WEEKS)
     if len(history) < MIN_HISTORY_WEEKS:
-        return Insufficient(f"only {len(history)} weeks of history (need {MIN_HISTORY_WEEKS})")
-    baseline = float(np.median(history))
-    hist_sigma = max(float(mad(history.to_numpy())), SIGMA_FLOOR.get(metric, DEFAULT_SIGMA_FLOOR))
-    window = residual.loc[eval_start:as_of_week]
-    sigmas = pd.Series(hist_sigma, index=window.index)
-    if se is not None:
-        sigmas = np.maximum(sigmas, se.reindex(window.index).fillna(0.0))
-    z = ((window - baseline) / sigmas).fillna(0.0)
-    return _summarize(z, baseline, hist_sigma, as_of_week)
+        return None
+    sigma = max(float(mad(history.to_numpy())), SIGMA_FLOOR.get(metric, DEFAULT_SIGMA_FLOOR))
+    return float(np.median(history)), sigma
 
 
-def _summarize(z: pd.Series, baseline: float, sigma: float, as_of_week: int) -> DriftScore:
-    pos, neg = 0.0, 0.0
-    pos_start, neg_start = None, None
-    for week, value in z.items():
-        pos_start = week if pos == 0 else pos_start
-        neg_start = week if neg == 0 else neg_start
-        pos = max(0.0, pos + value / CUSUM_SCALE - CUSUM_K)
-        neg = max(0.0, neg - value / CUSUM_SCALE - CUSUM_K)
-        pos_start = None if pos == 0 else pos_start
-        neg_start = None if neg == 0 else neg_start
-    z_latest = float(z.loc[as_of_week])
-    sign = 1 if z_latest >= 0 else -1
-    streak = 0
-    for value in reversed(z.to_numpy()):
-        if value * sign >= Z_ALERT:
-            streak += 1
+class _Episode:
+    """Two-sided CUSUM with a z-streak rule; tracks the current run (episode) in each direction."""
+
+    def __init__(self):
+        self.pos = self.neg = 0.0
+        self.pos_start = self.neg_start = None
+        self.pos_fired = self.neg_fired = False
+        self.frozen = None
+        self.streak, self.streak_sign, self.z, self.weeks_scored = 0, 0, 0.0, 0
+        self.baseline = (0.0, 0.0)
+
+    def step(self, week: int, z: float, base: tuple[float, float]) -> None:
+        self.weeks_scored += 1
+        self.z, self.baseline = z, base
+        pos = max(0.0, self.pos + z / CUSUM_SCALE - CUSUM_K)
+        neg = max(0.0, self.neg - z / CUSUM_SCALE - CUSUM_K)
+        if self.pos == 0 and pos > 0:
+            self.pos_start = week
+        if self.neg == 0 and neg > 0:
+            self.neg_start = week
+        if pos == 0:
+            self.pos_start, self.pos_fired = None, False
+        if neg == 0:
+            self.neg_start, self.neg_fired = None, False
+        sign = 1 if z >= Z_ALERT else (-1 if z <= -Z_ALERT else 0)
+        self.streak = self.streak + 1 if sign != 0 and sign == self.streak_sign else (1 if sign else 0)
+        self.streak_sign = sign
+        if self.streak >= Z_CONSECUTIVE:
+            self.pos_fired |= sign > 0 and pos > 0
+            self.neg_fired |= sign < 0 and neg > 0
+        self.pos_fired |= pos >= CUSUM_H
+        self.neg_fired |= neg >= CUSUM_H
+        self.frozen = base if (pos > 0 or neg > 0) else None
+        self.pos, self.neg = pos, neg
+
+    def result(self, as_of_week: int) -> DriftScore:
+        if self.pos_fired and (not self.neg_fired or self.pos >= self.neg):
+            direction, start, fired = "+", self.pos_start, True
+        elif self.neg_fired:
+            direction, start, fired = "-", self.neg_start, True
         else:
-            break
-    fired_streak = streak >= Z_CONSECUTIVE
-    fired_cusum = max(pos, neg) >= CUSUM_H
-    if fired_streak:
-        direction = "+" if sign > 0 else "-"
-    else:
-        direction = "+" if pos >= neg else "-"
-    start = pos_start if direction == "+" else neg_start
-    onset = int(start) if start is not None else as_of_week - streak + 1
-    return DriftScore(z_latest=z_latest, z_streak=streak, cusum_pos=pos, cusum_neg=neg, direction=direction,
-                      onset_week=onset, fired=fired_streak or fired_cusum, baseline=baseline, sigma=sigma)
+            direction = "+" if self.pos >= self.neg else "-"
+            start, fired = (self.pos_start if direction == "+" else self.neg_start), False
+        onset = int(start) if start is not None else as_of_week
+        streak = self.streak if (self.streak_sign > 0) == (direction == "+") else 0
+        return DriftScore(z_latest=float(self.z), z_streak=streak, cusum_pos=self.pos, cusum_neg=self.neg,
+                          direction=direction, onset_week=onset, fired=fired, baseline=self.baseline[0],
+                          sigma=self.baseline[1])

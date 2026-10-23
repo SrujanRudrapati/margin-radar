@@ -84,11 +84,31 @@ def test_short_history_global_abstention(injected):
     assert any(isinstance(a, Abstention) and a.scope == "all" for a in result.abstentions)
 
 
+def _summary(result, ranked):
+    alerts = [(a.alert_id, a.kind, a.scope, a.onset_week, round(a.signals[0].z, 9)) for a in result.alerts]
+    watch = [(w.scope, w.metric) for w in result.watch]
+    abst = [(x.scope, x.metric) for x in result.abstentions]
+    impacts = [(r.alert_id, r.rank, r.impact.basis, None if r.impact.usd_mid is None else round(r.impact.usd_mid, 2))
+               for r in ranked]
+    return alerts, watch, abst, impacts
+
+
 def test_alerts_stable_under_truncation(cutoff_run, built_runs):
+    from detector.impact import rank_actions
     with GovernedStore(str(cutoff_run), "injected") as cut, GovernedStore(str(built_runs["injected"]), "injected") as full:
         a, b = detect(cut, 39), detect(full, 39)
-    assert [(x.kind, x.scope, x.onset_week) for x in a.alerts] == [(x.kind, x.scope, x.onset_week) for x in b.alerts]
-    assert [x.alert_id for x in a.alerts] == [x.alert_id for x in b.alerts]
+        sa, sb = _summary(a, rank_actions(a, cut)), _summary(b, rank_actions(b, full))
+    assert len(a.alerts) > 0  # never vacuous: the B2 episode is active at week 39
+    assert sa == sb
+
+
+def test_alert_ids_stable_across_an_episode(injected):
+    ids = {}
+    for _, r in sorted(injected.items()):
+        for a in r.alerts:
+            ids.setdefault((a.kind, a.scope), set()).add(a.alert_id)
+    for key in (("adverse_selection", "B2"), ("reno_cost_drift", "M05")):
+        assert len(ids[key]) == 1, (key, ids[key])
 
 
 def _score(z, direction):

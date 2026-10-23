@@ -8,7 +8,7 @@ from common.business import SAMPLE_SCALE_LABEL
 from detector.__main__ import main
 from detector.governed import GovernedStore
 from detector.impact import (
-    Impact, RankedAction, compute_impact, confirmed_by_resales, measured, rank, scenario_estimate,
+    Impact, RankedAction, compute_impact, confirmed_by_resales, exposed_homes, measured, rank, scenario_estimate,
 )
 from detector.models import Alert, Signal
 from detector.rules import detect
@@ -87,9 +87,18 @@ def test_b2_first_alert_has_scenario_estimate(store):
 
 
 def test_adverse_selection_switches_to_measured_after_resales(store):
-    _, alert = _first_b2(store)
-    impact = compute_impact(store, alert, 70)
-    assert impact.basis == "measured" and impact.status == "confirmed by resales"
+    # In the real pipeline: the B2 episode stays active long enough for its cohort to resell.
+    first_week, first = _first_b2(store)
+    measured_weeks = []
+    for week in range(first_week, store.max_week + 1):
+        for a in detect(store, week).alerts:
+            if (a.kind, a.scope) == ("adverse_selection", "B2"):
+                assert a.alert_id == first.alert_id
+                if compute_impact(store, a, week).basis == "measured":
+                    measured_weeks.append(week)
+    assert measured_weeks, "B2 never reached 'confirmed by resales' while its alert was active"
+    impact = compute_impact(store, first, measured_weeks[0])
+    assert impact.status == "confirmed by resales"
 
 
 def test_every_impact_number_has_ref_id(store):
@@ -117,3 +126,30 @@ def test_cli_writes_outputs_with_banner_and_sample_label(built_runs, tmp_path):
     assert payload["as_of_week"] == 40 and payload["ranked_actions"]
     assert (out / "queries.jsonl").read_text().strip()
     assert "9,000,000,000" not in (out / "alerts.json").read_text()
+
+
+def test_exposed_homes_excludes_pre_onset_resales():
+    # 160 homes closed since onset, none of them old enough to resell yet: the 140 resales since onset
+    # belong to pre-onset cohorts and must not reduce exposure.
+    assert exposed_homes(closes_since_onset=160, cohort_resales=0, forward_closes=520) == 680
+    assert exposed_homes(closes_since_onset=160, cohort_resales=40, forward_closes=520) == 640
+
+
+def test_every_impact_number_is_a_registered_fact(store):
+    week, alert = _first_b2(store)
+    impact = compute_impact(store, alert, week)
+    facts = [store.get(i) for i in impact.ref_ids if i.startswith("D")]
+    values = [f.value for f in facts]
+    for name in ("usd_low", "usd_mid", "usd_high", "scope_bps_mid", "portfolio_cm_bps_mid", "exposure_usd"):
+        assert any(v == pytest.approx(getattr(impact, name)) for v in values), name
+    labels = " ".join(f.label for f in facts)
+    for part in ("excess_share", "exposed_homes", "avg_price", "portfolio_share"):
+        assert part in labels, part
+
+
+def test_thin_data_degrades_to_sensitivity_without_zeros(store):
+    _, alert = _first_b2(store)
+    impact = compute_impact(store, alert, 2)  # partial windows: no usable exposure data yet
+    assert impact.basis == "sensitivity"
+    assert impact.exposure_usd is None and impact.usd_per_100bps is None
+    assert "insufficient" in impact.status
