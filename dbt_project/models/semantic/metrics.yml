@@ -1,4 +1,5 @@
 # Synthetic data — not Opendoor data.
+# meta.sample_size: mart count column whose windowed sum gates the metric (non-simple metrics only).
 # meta.role: trigger | context | lagging | volume | exposure | component (building block, never alerts).
 metrics:
   - name: offers
@@ -156,6 +157,7 @@ metrics:
     config:
       meta:
         role: trigger
+        sample_size: offers
   - name: avg_spread_pct
     type: ratio
     type_params:
@@ -164,6 +166,7 @@ metrics:
     config:
       meta:
         role: context
+        sample_size: offers
   - name: first_offer_rate
     type: ratio
     type_params:
@@ -172,6 +175,7 @@ metrics:
     config:
       meta:
         role: trigger
+        sample_size: awaiting_offer
   - name: price_cut_rate
     type: ratio
     type_params:
@@ -180,6 +184,7 @@ metrics:
     config:
       meta:
         role: context
+        sample_size: awaiting_offer
   - name: showing_rate_per_week
     type: derived
     type_params:
@@ -190,6 +195,7 @@ metrics:
     config:
       meta:
         role: context
+        sample_size: first_offers
   - name: avg_days_to_first_offer
     type: ratio
     type_params:
@@ -198,6 +204,7 @@ metrics:
     config:
       meta:
         role: context
+        sample_size: first_offers
   - name: reno_overrun_pct
     type: derived
     type_params:
@@ -208,6 +215,7 @@ metrics:
     config:
       meta:
         role: trigger
+        sample_size: renos_completed
   - name: fall_through_rate
     type: ratio
     type_params:
@@ -216,6 +224,7 @@ metrics:
     config:
       meta:
         role: context
+        sample_size: contracts
   - name: company_decline_rate
     type: ratio
     type_params:
@@ -224,6 +233,7 @@ metrics:
     config:
       meta:
         role: context
+        sample_size: contracts
   - name: resale_vs_model_bps
     type: derived
     type_params:
@@ -234,6 +244,7 @@ metrics:
     config:
       meta:
         role: lagging
+        sample_size: resales
   - name: contribution_margin_pct
     type: ratio
     type_params:
@@ -242,6 +253,7 @@ metrics:
     config:
       meta:
         role: lagging
+        sample_size: resales
   - name: avg_resale_price
     type: ratio
     type_params:
@@ -250,6 +262,7 @@ metrics:
     config:
       meta:
         role: component
+        sample_size: resales
   - name: holding_cost_bps_per_day
     type: derived
     type_params:
@@ -261,3 +274,4 @@ metrics:
     config:
       meta:
         role: context
+        sample_size: resales
