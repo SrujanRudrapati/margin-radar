@@ -12,3 +12,18 @@ Decisions made on Srujan's behalf during the autonomous run (2026-10-22 →), pe
 | D6 | 3 | The detector computes peer residuals from segment panels with its own per-segment minimum sample (`MIN_SEGMENT_SAMPLE`, default 8). `GovernedStore.panel` gains an optional `min_denominator` override, which is part of the query ID. Reported numbers keep the store's stricter `MIN_DENOMINATOR`. | A spike on seed 42 showed the store's 30-offer gate per segment-week blanks the B2 band test for weeks 34–44 (fall volume). Volume weighting in the rollup already down-weights thin segments, and the pooled rollup still requires ≥ `MIN_DENOMINATOR`. |
 | D7 | 3 | Robust z uses sigma = max(1.4826·MAD of trailing history, sampling standard error). For proportion metrics the SE is sqrt(p(1−p)/n) from the peer rate and pooled sample. Other metrics use a per-metric floor (`SIGMA_FLOOR`). | With only about 16–26 overlapping 4-week windows, the history MAD alone is unstable: the control run showed |z| > 3 on 4–7% of scope-weeks. The SE floor keeps the user's "z vs own trailing history" design while capping false alarms from a lucky-quiet history. |
 | D8 | 3 | Scenario A (buyer demand slowdown in one market) is expected to be the weakest detection, and the detector is not tuned to it beyond the plan. | Spikes at this data volume (~15 M02 listings a week): first-offer-rate rollup z ≈ −2.9; quick-offer share z ≈ −1.8; listing-age z ≈ 4.0, but the control run hits 6.3. Over-tuning to A would raise control false alerts, and the gates come first. Results are reported honestly in Phase 5. |
+
+## Phase 2 execution rulings (from the SDD ledger)
+
+Pre-flight table rulings: fixtures pass --truth-path to tmp; test_business_constants updated with the constant removal; the 9B scan reuses the scaffold skip-dirs; deps pinned to the newest compatible set (duckdb stays 2.0.0, dbt-duckdb 1.11.0, dbt-metricflow 0.15.0); MetricFlow primary entity segment_week; derived metrics in mappable forms.
+
+- Task 6: Ruling: restore brief's 425–575 bound; bin weeks by ISO Thursday (agg_time_dimension week_thursday = week_start+3d) — a weekly bucket belongs to the quarter holding most of its days; never loosen a pinned bound — cost if wrong: one extra time dimension; if dip still <425, test xfail(strict) with measured value reported honestly
+- Task 7: Ruling: run_id is a label matching ^[a-z][a-z0-9_]*$; unknown run = invalid label or missing db file — cost if wrong: trivial
+- Task 7: Ruling: per-metric sample size via meta.sample_size in metrics.yml (count measure); MIN_DENOMINATOR applied to it — dollar-denominated metrics need a count threshold — cost if wrong: thresholds re-pointed in YAML
+- Task 7: Ruling: unsold_inventory_usd windowed = last week of window; summed across scopes
+- Task 7: Ruling: build fixtures may move to tests/conftest.py for sharing
+- Ruling: Important #4 (cohort data for adverse-selection exposure/resale confirmation) deferred to Phase 3 Task 10, where a point-in-time cohort mart or a stated approximation is added — it blocks no Phase 2 code — cost if wrong: Task 10 scope grows
+- Ruling: query ids not depending on DB contents — accepted; Phase 5 uses per-seed run labels and per-seed log paths so ids never collide in one log — cost if wrong: confusing cross-seed logs only
+- Ruling: full output values in query log (for grounding) deferred to Phase 4 — checker can re-read values via store.get(id) — cost if wrong: Phase 4 adds logging
+- Final: parked — Makefile radar_control.duckdb has no recipe if only control file missing — Ruling: real but minor; both files always produced together by `make data` — deferred
+- Final: parked — STATE_COLUMNS hard-coded list for max_week — Ruling: real, minor; documented constant — deferred
