@@ -1,4 +1,4 @@
-"""Write simulation output to Parquet and load it into DuckDB (schema `raw`)."""
+"""Write simulation output to Parquet and load each run into its own DuckDB file (schema `raw`)."""
 from pathlib import Path
 
 import duckdb
@@ -14,17 +14,14 @@ def write_parquet(out: SimOutput, run_dir: Path) -> None:
     out.price_cuts.to_parquet(run_dir / "price_cuts.parquet", index=False)
 
 
-def load_duckdb(db_path: Path, run_dirs: dict[str, Path]) -> None:
-    """Replace raw.<table> with the union of all runs, tagged by run_id."""
+def load_duckdb(db_path: Path, run_dir: Path) -> None:
+    """Replace raw.<table> in this run's own database. One database per run, so runs can't be joined."""
     with duckdb.connect(str(db_path)) as con:
         con.execute("begin transaction")
         con.execute("create schema if not exists raw")
         for table in TABLES:
-            selects = [
-                f"select {_literal(run_id)} as run_id, * from read_parquet({_literal(str(run_dir / f'{table}.parquet'))})"
-                for run_id, run_dir in run_dirs.items()
-            ]
-            con.execute(f"create or replace table raw.{table} as " + " union all by name ".join(selects))
+            source = _literal(str(run_dir / f"{table}.parquet"))
+            con.execute(f"create or replace table raw.{table} as select * from read_parquet({source})")
         con.execute("commit")
 
 

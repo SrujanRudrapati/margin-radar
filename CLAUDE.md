@@ -98,3 +98,4 @@ Python 3.11 (conda env "margin-radar"), DuckDB, dbt-duckdb + dbt-metricflow, sta
 
 ## LAYOUT
 /generator /dbt_project /detector /agent /eval /api /web /briefs /tests /docs, Makefile with `make demo`, `make eval`, `make test`.
+Data: one DuckDB file per run, data/radar_injected.duckdb and data/radar_control.duckdb (two dbt targets). eval/ground_truth.json is the answer key; only /eval may read it or open both databases. /detector and /agent never import /generator or /eval.

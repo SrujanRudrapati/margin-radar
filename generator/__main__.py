@@ -1,4 +1,8 @@
-"""python -m generator: write injected + control runs (same seed) to Parquet and data/radar.duckdb."""
+"""python -m generator: write injected + control runs (same seed) to Parquet and one DuckDB file per run.
+
+Outputs: data/radar_injected.duckdb, data/radar_control.duckdb, eval/ground_truth.json.
+The runs share random draws, so they live in separate files and only /eval reads both.
+"""
 import argparse
 import json
 import logging
@@ -33,6 +37,7 @@ def _parse(argv: Sequence[str] | None) -> argparse.Namespace:
     p = argparse.ArgumentParser(prog="generator", description=SYNTHETIC_BANNER)
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--out-dir", type=Path, default=Path("data"))
+    p.add_argument("--truth-path", type=Path, default=Path("eval/ground_truth.json"))
     p.add_argument("--inject", type=_injections, default={"A", "B", "C"})
     p.add_argument("--a-market", choices=MARKETS, default="M02")
     p.add_argument("--a-start-week", type=_week, default=30)
@@ -51,10 +56,10 @@ def main(argv: Sequence[str] | None = None) -> None:
                                      args.c_market, args.c_start_week)
         if s.name in args.inject
     )
-    run_dirs = {"injected": args.out_dir / "parquet" / "injected", "control": args.out_dir / "parquet" / "control"}
-    write_parquet(simulate(args.seed, scenarios), run_dirs["injected"])
-    write_parquet(simulate(args.seed), run_dirs["control"])
-    load_duckdb(args.out_dir / "radar.duckdb", run_dirs)
+    for run_id, run_scenarios in (("injected", scenarios), ("control", ())):
+        run_dir = args.out_dir / "parquet" / run_id
+        write_parquet(simulate(args.seed, run_scenarios), run_dir)
+        load_duckdb(args.out_dir / f"radar_{run_id}.duckdb", run_dir)
     truth = {
         "banner": SYNTHETIC_BANNER,
         "seed": args.seed,
@@ -62,7 +67,8 @@ def main(argv: Sequence[str] | None = None) -> None:
         "n_weeks": N_WEEKS,
         "scenarios": compute_ground_truth(args.seed, scenarios),
     }
-    (args.out_dir / "ground_truth.json").write_text(json.dumps(truth, indent=2) + "\n")
+    args.truth_path.parent.mkdir(parents=True, exist_ok=True)
+    args.truth_path.write_text(json.dumps(truth, indent=2) + "\n")
     for t in truth["scenarios"]:
         log.info("%s %s=%s start week %s, visible in sold-cohort CM at week %s (lag %s weeks; solo run: week %s)",
                  t["scenario"], t["scope_type"], t["scope"], t["start_week"],
