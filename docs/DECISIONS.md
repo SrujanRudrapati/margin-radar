@@ -67,3 +67,10 @@ Pre-flight table rulings: fixtures pass --truth-path to tmp; test_business_const
 - Final: minor (deferred): impact values not rounded before registration (byte-for-byte replay risk in Phase 4)
 - Final: minor (deferred): scenario exposure_usd uses exposed homes × price; negative measured erosion has no label
 - Final: minor (deferred): test_impact_in_usd_and_bps only sees measured M05 alerts; Scored type alias inaccurate
+
+## Phase 4 decisions
+
+| # | Phase | Decision | Reasoning |
+|---|---|---|---|
+| D13 | 4 | `claude-sonnet-5-5` calls go through `client.beta.messages.create` with `betas=["server-side-fallback-2026-07-01"]` and `fallbacks="default"`. Haiku calls use the plain `messages.create`. | The claude-api skill says to include the server-side refusal fallback by default for Sonnet 5.5 on the Claude API and to tell the user. A refused request is re-run on a fallback model inside the same call, so a classifier refusal does not silently kill the sample brief. |
+| D14 | 4 | anthropic SDK 2.1.0 (newest at install), pinned. The skill's Python docs describe 1.x. Only the surfaces verified by introspection are used: `messages.create`, `beta.messages.create`, `model_dump`. | The skill says not to guess SDK usage. The methods used exist with the documented parameters (`system`, `tools`, `cache_control`, `max_tokens`). |
