@@ -1,7 +1,7 @@
 PY := conda run --no-capture-output -n margin-radar python
 SEED ?= 42
 
-.PHONY: setup data test build detect briefs
+.PHONY: setup data test build detect briefs eval record-final
 
 setup:
 	conda env update -n margin-radar -f environment.yml
@@ -41,3 +41,11 @@ briefs: data/radar_injected.duckdb
 	REPLAY=1 $(PY) -m agent brief --db data/radar_injected.duckdb --as-of-week 6 --out briefs
 	REPLAY=1 $(PY) -m agent brief --db data/radar_injected.duckdb --as-of-week 33 --out briefs
 	REPLAY=1 $(PY) -m agent brief --db data/radar_injected.duckdb --as-of-week 40 --purpose final --out briefs
+
+# Evaluation: replay-only (recorded LLM responses; never a live call). Writes eval/results.json + eval/results.md.
+eval: data/radar_injected.duckdb
+	REPLAY=1 $(PY) -m eval
+
+# Record missing eval LLM responses with CLAUDE_MODEL_FINAL. Prints the planned call count and asks first.
+record-final: data/radar_injected.duckdb
+	$(PY) -m eval --live

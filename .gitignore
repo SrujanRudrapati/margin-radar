@@ -16,3 +16,4 @@ dbt_project/.user.yml
 briefs/dev/
 data/out/
 eval/runs/
+.worktrees/

@@ -1,0 +1,47 @@
+{
+ "container": null,
+ "content": [
+  {
+   "signature": "CAQS3wQKEAgTGAI4AUIIdGhpbmtpbmcSDE/+pP7lWk3ehs2/4BoM6AMSnHdDJBG2hjoUIjCTiKsOJyp5G8txpp++PPW7KdP/lCvn8t++c8zPLSfj+JcoGnfBdatFKWedP5yCnxQq/AOFf8Dp+LSsdT3ss1l3PSSYCivniTBr03J/2+Eg+I2p4fbPgWsYA11vU4bASYHLfsWzktXXGok9aTbgTJmYEFxlYrkIhfyj0yh+pLESI4TUtmlqzBLrHcr3+HU3pRqwN8i26iYd6WThcHjW5bjyw133I3d8SHRCQ5PxfyhPjZPQ6NYTTWlg4dIKO85DMXGK0qspFg59VqvzW6m7a8tqHHURxoW1pWNQaFgVzctOidefYkE7AlN199ArhoqkMrEGKUwLEPlvfVFYeqcN/VSOVxA/4JE5F96szyUJD+betZisUo/h3DPrV2fEPblTd6V2fSiIQLONwBNTEQz+0x36yhEidUyr9IGUilaO71ilQY6HOnAZzI2hzLVODuB0dHGsF92BdrAMiX2fy4BnDG828SbJaEmfCab9OIckUKCVZwFduFdRln4B8mzLeSznOkBHMZfZibeIibJ11HdodJBRGkTNcU4Qrh679uK7BOxvAKZUGaiVlbIUrEu541/WIWkgi3SxwzUUivirACTcEC98c2rTq+eeCBTs0PfHqVPXYsoYOojyWuSIPnTlIvm77+flvC2bY7Ue2/hiio5zf/FUHUQOntWIejYGJVt82ptgSjbkKA2Q8nlfikIJPq/YPwFIhP+SmybobWvhL9mV684uCn5MG+kksyWHoS1VX1YSGAE=",
+   "thinking": "",
+   "type": "thinking"
+  },
+  {
+   "caller": {
+    "type": "direct"
+   },
+   "id": "toolu_01MgzBe7fnJrQBAbwFpSrCtt",
+   "input": {
+    "sql": "select count(*) from main.mart_segment_week where market='M09'"
+   },
+   "name": "run_sql",
+   "toolset_name": null,
+   "type": "tool_use"
+  }
+ ],
+ "diagnostics": null,
+ "id": "msg_011CgJwkVbMCf8C2RvcPtv1J",
+ "model": "claude-sonnet-5-5",
+ "role": "assistant",
+ "stop_details": null,
+ "stop_reason": "tool_use",
+ "stop_sequence": null,
+ "type": "message",
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 0,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 1534,
+  "inference_geo": "global",
+  "input_tokens": 93,
+  "output_tokens": 100,
+  "output_tokens_details": {
+   "thinking_tokens": 30
+  },
+  "server_tool_use": null,
+  "service_tier": "batch",
+  "speed": "standard"
+ }
+}

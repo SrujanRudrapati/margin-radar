@@ -1,0 +1,47 @@
+{
+ "container": null,
+ "content": [
+  {
+   "signature": "CAQSqwYKEAgTGAI4AUIIdGhpbmtpbmcSDGWgF4u/dV0xtbRllBoMDjMRzrDUl0HEFuXKIjAG9LpMwI9iWg4Q5FqulgG5p5H/syaI4XHNHnlLAVL8wM5PERxQvkO2g3bqly/Jl64qyAX873ogi6kvi99rQbBQne87aDYbZrCEf7PPWOQ/s9nBEAGDhkhzb3bkxi7jNoMvRCz1B6APmHq04MoyDQKP57HwLIgyeeSbwBerZGPxU6h9ef/fUwgkgE1A3FeejQI2u7AfONcUKHgNoHfQtHVhpvZMeHSrKxdjZniOhJh1vS5B0IUJfQ0eeu7j5XLlgWQ+B0qClFK1ZKZKI7ojWjpXfx6Xmdfp+X2bADC9oZhPJ8ZvcOVvUujAnBM38Y0m7H1JGs+Fb6ciuutxcGTaBx78M7VYrGm/FhpAEQ6UkZ9rh1s4aDx75rPFPsSrKFy0n1lOjQDhx1Gjd1iOZhqdahcrBpP4xOlKL6k5bdGfpLw04ZrpG4wL1ipndYgn85RfYkp1/nHVXAnfEoKxJS9M+UDtRLUj2/sOt1TrWGILWU1RRIwvPS+LwlO8gJK+EhyxZuX5ZG8mO9PwqWNyFGB7U2P8EC/A4JfjhMOgNh2v8Vlbj92JcQvnqbQVPWxqrD2INLRDJhyGooACqFtegwRCYwOWkSo3ZwoE2YscPbDUsapBXhQjCysk/4C/Wzcqj7s9Rj4/scV+7pz5aPWW1xGAoDpU/vufV5l2CNYd89XZZyG+VpM46DYK8J3OUXMPQAx5Jb7c+Q1g71y0DBHOvfLLLCoW2SpA3pe5DYVw2UcWkzLMxnUfMO+6ZzwP6/SY1kDMAkKc+rsAl7zyFcNfJc+EMvrXGsVTQdG2S2egYnYiSElCaZTxvGRnY3OiiSDyKSoidsPtZ4KK8m95esh84RxZbZLG5egz0JfLvfJXSsKC5xxM/fZ6vIQaH3YlW8piVrZLVQshtm+XDhGKx/p9WO/CS7cPyyIxakAE3IlIsVGaoVTZmiIS/jztyLvxCiNbTu2gFl8Z0SONQehgm8UVtFfBglvt7235se1HCa4mGYM9+s74Cim8jlF9MAhy19LuGAE=",
+   "thinking": "",
+   "type": "thinking"
+  },
+  {
+   "caller": {
+    "type": "direct"
+   },
+   "id": "toolu_01CYVEXQ4L5m2hN2skiamMnv",
+   "input": {
+    "value": 0.060480530240265
+   },
+   "name": "answer",
+   "toolset_name": null,
+   "type": "tool_use"
+  }
+ ],
+ "diagnostics": null,
+ "id": "msg_011CgJykWTAwzTYotEfnyKAp",
+ "model": "claude-sonnet-5-5",
+ "role": "assistant",
+ "stop_details": null,
+ "stop_reason": "tool_use",
+ "stop_sequence": null,
+ "type": "message",
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 0,
+   "ephemeral_5m_input_tokens": 1534
+  },
+  "cache_creation_input_tokens": 1534,
+  "cache_read_input_tokens": 0,
+  "inference_geo": "global",
+  "input_tokens": 550,
+  "output_tokens": 139,
+  "output_tokens_details": {
+   "thinking_tokens": 86
+  },
+  "server_tool_use": null,
+  "service_tier": "batch",
+  "speed": "standard"
+ }
+}

@@ -66,6 +66,7 @@ def make_brief(db: str | Path, as_of_week: int, purpose: str = "dev", out_dir: s
         try:
             body = run_agent(llm, toolbox, as_of_week, week_start, max_turns=max_turns, transcript=transcript)
             errors, checked = _all_checks(body, toolbox, known)
+            first_draft = {"numbers_checked": checked, "errors": len(errors)}
             if errors:
                 body = revise(llm, toolbox, transcript, body, errors[:25])
                 errors, checked = _all_checks(body, toolbox, known | set(_store_ids(store)))
@@ -77,8 +78,11 @@ def make_brief(db: str | Path, as_of_week: int, purpose: str = "dev", out_dir: s
             raise BriefFailed(reason) from exc
         cited = list(dict.fromkeys(m.group(1) for m in CITE.finditer(body) if m.group(1) in toolbox.facts))
         status = "invalid" if errors else "valid"
+        actions = [{"scope": a["scope"], "kind": a["kind"], "direction": a["signal"]["direction"],
+                    "metric": a["signal"]["metric"]} for a in (toolbox.last_alerts or {}).get("actions", [])]
         md, payload = render(body, toolbox.facts, cited, as_of_week, week_start, status, model, purpose,
-                             _provenance(store, cited), {"numbers_checked": checked, "errors": errors})
+                             _provenance(store, cited),
+                             {"numbers_checked": checked, "errors": errors, "first_draft": first_draft}, actions)
         if errors:
             _write_invalid(out_dir, stem, md, payload)
             raise GroundingError(errors)

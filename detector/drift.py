@@ -10,7 +10,7 @@ import pandas as pd
 from statsmodels.robust.scale import mad
 
 from detector.config import (
-    CUSUM_H, CUSUM_K, CUSUM_SCALE, EVAL_WEEKS, HISTORY_WEEKS, MIN_HISTORY_WEEKS, SIGMA_FLOOR, Z_ALERT, Z_CONSECUTIVE,
+    BURN_IN_WEEKS, CUSUM_H, CUSUM_K, CUSUM_SCALE, EVAL_WEEKS, MIN_HISTORY_WEEKS, SIGMA_FLOOR, Z_ALERT, Z_CONSECUTIVE,
 )
 from detector.models import Direction
 
@@ -38,18 +38,19 @@ class Insufficient:
 def score(residual: pd.Series, as_of_week: int, metric: str, se: pd.Series | None = None) -> DriftScore | Insufficient:
     """Replay the series up to as_of_week (no look-ahead) as episodes.
 
-    Outside an episode each week is scored against a baseline built from history ending EVAL_WEEKS earlier.
-    A CUSUM run (in either direction) is an episode: while it lasts the baseline is frozen at its start, so a
-    persistent drift keeps scoring against the pre-drift level and the onset stays fixed (stable alert IDs).
-    An episode fires on a z-streak (|z| >= Z_ALERT for Z_CONSECUTIVE weeks) or when its CUSUM reaches CUSUM_H,
-    and stays fired until its CUSUM returns to zero.
+    Each week is scored against an expanding baseline: the median and robust scale of every valid residual after
+    the burn-in and at least EVAL_WEEKS earlier. A long baseline is robust to a drift until the drift dominates
+    it, so a persistent drift keeps scoring high without freezing anything, and early noise cannot lock in
+    (DECISIONS D16). A CUSUM run (in either direction) is an episode with a fixed onset (stable alert IDs). An
+    episode fires on a z-streak (|z| >= Z_ALERT for Z_CONSECUTIVE weeks) or when its CUSUM reaches CUSUM_H, and
+    stays fired until its CUSUM returns to zero.
     """
     residual = residual.loc[:as_of_week]
     if pd.isna(residual.get(as_of_week, np.nan)):
         return Insufficient(f"no usable value in week {as_of_week} (thin data)")
     state = _Episode()
     for week in residual.index:
-        base = state.frozen or _baseline(residual, week, metric)
+        base = _baseline(residual, week, metric)
         if base is None:
             continue
         sigma = base[1]
@@ -63,7 +64,7 @@ def score(residual: pd.Series, as_of_week: int, metric: str, se: pd.Series | Non
 
 
 def _baseline(residual: pd.Series, week: int, metric: str) -> tuple[float, float] | None:
-    history = residual.loc[: week - EVAL_WEEKS].dropna().tail(HISTORY_WEEKS)
+    history = residual.loc[BURN_IN_WEEKS: week - EVAL_WEEKS].dropna()
     if len(history) < MIN_HISTORY_WEEKS:
         return None
     sigma = max(float(mad(history.to_numpy())), SIGMA_FLOOR.get(metric, DEFAULT_SIGMA_FLOOR))
@@ -77,7 +78,6 @@ class _Episode:
         self.pos = self.neg = 0.0
         self.pos_start = self.neg_start = None
         self.pos_fired = self.neg_fired = False
-        self.frozen = None
         self.streak, self.streak_sign, self.z, self.weeks_scored = 0, 0, 0.0, 0
         self.baseline = (0.0, 0.0)
 
@@ -102,7 +102,6 @@ class _Episode:
             self.neg_fired |= sign < 0 and neg > 0
         self.pos_fired |= pos >= CUSUM_H
         self.neg_fired |= neg >= CUSUM_H
-        self.frozen = base if (pos > 0 or neg > 0) else None
         self.pos, self.neg = pos, neg
 
     def result(self, as_of_week: int) -> DriftScore:

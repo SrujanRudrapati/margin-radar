@@ -1,0 +1,59 @@
+{
+ "container": null,
+ "content": [
+  {
+   "signature": "CAQS2QgKEAgTGAI4AUIIdGhpbmtpbmcSDMnhUagZT5fig+XdbxoMCjDCj/OOB0HZzYuhIjC5+7JbXUFEjv2wFp4C8BDdp7QYuuIK/H640GK10qAHpNrp3QYmB28/tj72QlX396gq9gfy1bpfUBbUSDCE4wAEKZncTzxzKxptOLMfbBFFxcyvk57dFRuIK8Z03oaabIC8SenMEJxITmbgSdzVo2n/rUfEgAm7OwVKaH8wNGYYuv7NnGnbP0SByqsMYyd1SeHE2dFOOS2T5zfwS/gkVOT8Zs4d/hLP4FFdeIFtLDmmoI39kOaaB82xiy+zn6a4reAgNdGmN1uD1oiKocMIjHb8kd5rhrnLBZiJK1EGsMn5Av8s5bn/VEklryO8cIsQ0Ir6TVtmJEeNJW7b3LYYOHgHO2TkrovxHXxVxcEPAidIqO8Z6XTCOU1A3nI82kEIhTxYWZPNaQi7GA6udkO66SQTeO8lWOcFOUBGSSi6g00U3lj4are821y2U3xIShXbGO/fgNmeOfSMrV5zxZrTfJ6aVcGH00rTDNDPSJUBueFC64rRG0U8tUHe1R6VE2kUshRNceWLnfzmM+C9h1eWLxWORnU6sOvsqMKYKdOp47Owbg0PPS7gwZ1mX+Njh8DuhuaS5k7ypTd0BPwKWE1hoCPmM7S9bZVsD+4+BCXWNbQP8dlQdgMEVqrnYrxIJ+13jyW+VJj9yxAV2hxm0UVFpW0bzCzFx8xjCZaRkG8FNI0IdIGpFGmGDw1qnkbZMeAKs18c92ikvKPTOn2pxmF516vYLnlj19y6May3LIWDcOugjxLXdBMLmUk695r6964iQTgk+dSr3JXJagVDDtpDdjQIhxL6prRLwNEtLRSytPYE6+90d/NAm8n//NsBZBk0DmFt9sppaEP/0HgLhiLuHrKE+x1fKAI9zHzvpaXs7TGIWX2YqXTmjCp+J9K6cjjZ99rltwPbocMzupfQBJla2LSsk6WkzTQ71t2wz7Pk9G9Y+xXCl5vod163gufjPr4hfF5MPAlU+utH+TgjnfTGRgUE98Or+oM4EX3j35rjpItI2Icj9CN5R1mb39NPOu5yW9GKPAQg5idsygRYgmE4fKxMZSCnPXtq6rrv2C3BrwrzlsifiFcCMyk0rL4gfH5jBhdj7foPrTPpB1nz7hdJi+0xHhCZvTYkSv0HYHSUK2xQNLcLmx989Chq+LI1+ukQ0GpDZIlKxqCQKVKjEzFNCSfVF6F2GGqnHyU4yeVAfJ/QUnw6UyKLo6r8C5j5nXKm3261OnHUFb6HTCK5lpHGQPZB6tOuK9/PA/ZgnHpZ6uVPGelr5yIH0cfu+4ahr8D0HToHT3spJi68yJ4zF/HZCAU1x53cdciWmmh1GFHSqnhLglNYk6qgYOy5jWyDNOBf0crzMquayDRY/a+poxzKIrVp0m8lo8S3OmomHPCD4tpYeqlnIQKDEZbbsZDWlWcnGeXey2tm64TLX8gYAQ==",
+   "thinking": "",
+   "type": "thinking"
+  },
+  {
+   "caller": {
+    "type": "direct"
+   },
+   "id": "toolu_0199ZnR3mq7ySA6d7ggxXPMc",
+   "input": {
+    "sql": "select sum(offer_price+coalesce(fee_usd,0)), sum(offer_price), count(*) from raw.homes where close_date < timestamp '2025-01-06' + interval 287 day and (resale_date is null or resale_date >= timestamp '2025-01-06' + interval 287 day) and close_date is not null and offer_week<=40"
+   },
+   "name": "run_sql",
+   "toolset_name": null,
+   "type": "tool_use"
+  },
+  {
+   "caller": {
+    "type": "direct"
+   },
+   "id": "toolu_013JPSaTeZUWVzxHQuKcxSJb",
+   "input": {
+    "sql": "select sum(acquisition_usd) from main.mart_segment_week where week<=40"
+   },
+   "name": "run_sql",
+   "toolset_name": null,
+   "type": "tool_use"
+  }
+ ],
+ "diagnostics": null,
+ "id": "msg_011CgJxKKKdURx5pbE674E4Z",
+ "model": "claude-sonnet-5-5",
+ "role": "assistant",
+ "stop_details": null,
+ "stop_reason": "tool_use",
+ "stop_sequence": null,
+ "type": "message",
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 0,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 1534,
+  "inference_geo": "global",
+  "input_tokens": 703,
+  "output_tokens": 417,
+  "output_tokens_details": {
+   "thinking_tokens": 181
+  },
+  "server_tool_use": null,
+  "service_tier": "batch",
+  "speed": "standard"
+ }
+}

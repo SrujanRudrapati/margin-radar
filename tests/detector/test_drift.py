@@ -78,3 +78,12 @@ def test_sustained_shift_fires_via_cusum_without_streak():
     vals = base + [float(np.median(history)) + 3.0 * float(mad(history))] * 14  # z = 3.0 < Z_ALERT: CUSUM only
     result = score(series(vals), as_of_week=53, metric="contract_rate")
     assert result.fired and result.direction == "+" and result.z_streak == 0
+
+
+def test_baseline_ignores_burn_in_and_is_not_frozen_by_early_noise():
+    # Seed-4 failure mode: odd first weeks (burn-in) must not become a baseline that flags every later
+    # normal week. Early weeks at -0.08 (burn-in), then 40 normal weeks around 0: no alert at the end.
+    rng = np.random.default_rng(7)
+    vals = [-0.08] * 8 + list(rng.normal(0, 0.02, 40))
+    result = score(series(vals), as_of_week=47, metric="contract_rate")
+    assert not result.fired

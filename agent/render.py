@@ -6,7 +6,7 @@ from common.business import SAMPLE_SCALE_LABEL
 
 def render(body: str, facts: dict[str, Fact], cited: list[str], as_of_week: int, week_start: str, status: str,
            model: str | None, purpose: str | None, provenance: dict[str, dict] | None = None,
-           grounding: dict | None = None) -> tuple[str, dict]:
+           grounding: dict | None = None, actions: list[dict] | None = None) -> tuple[str, dict]:
     provenance = provenance or {}
     lines = [
         SYNTHETIC_BANNER, "",
@@ -29,5 +29,6 @@ def render(body: str, facts: dict[str, Fact], cited: list[str], as_of_week: int,
         lines.append("")
     payload = {"banner": SYNTHETIC_BANNER, "sample_scale_label": SAMPLE_SCALE_LABEL, "week": as_of_week,
                "week_start": week_start, "status": status, "model": model, "purpose": purpose, "body": body.strip(),
-               "citations": citations, "grounding": grounding or {"numbers_checked": 0, "errors": []}}
+               "citations": citations, "grounding": grounding or {"numbers_checked": 0, "errors": []},
+               "actions": actions or []}
     return "\n".join(lines), payload

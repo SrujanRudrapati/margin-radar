@@ -1,0 +1,47 @@
+{
+ "container": null,
+ "content": [
+  {
+   "signature": "CAQSrwUKEAgTGAI4AUIIdGhpbmtpbmcSDMOOfje5lq92kpxzXhoMsGxhlMBPpEftEUX3IjCd8rHyQA2xYdcVgowm9+ib00DB7ym+tWnKG4hr7bHja6/C9yn2ExjmVjKhyyfAb4gqzATQ9l+cLKaVHCCQpEqcuarsLJq55dTYqoGcsRcRx+SBbWJ3b3JMC5CWL3n934CfFhgk6lQufyy0KN6PiOKA2taEaMmK6Og4mxpcehfM4PTeBtL2pmk+emIUvdTtU0h0IWfaqwmugzpBloMYSnYblVG8lllk6fSd4ktJhjwbT9/5pBLTsAaG22aGg58JQ4kYJyxg4dgO7naJMtjg+LE3wKhhKJjigwGGj0DlN3B5AauDt442d0fM661sZR+ZnWIfCIQlr9Y2n9xqlaBF7/uLF6hBcJyCp7GbX8TJNoLp6GjtME/LThrfbR42YHMYCyuN4yfrTXaUM/NIYAmm3AR/hTuc78ItnPUv93MSyY3onZWvWJJh895hwpJQ9IGicC/AF+2vJHCKl/VOz1exLXCTJZAYsvs8G4s5Mco8qBMUocmgwxn0jpEkUbJUGu4S6w+X3wrl1VN9ohlWwjRgdCELw0KbsBqj7Qv67avCA8eGTJMgCesUxmVsttEyTgETVB7jOebe2uumdYXBYZEzOlfhL9a+Tqe0bEAhacV7dTG2hVe9X4epDM7Gl/aKqztqzfvBQUmUj6lqQx0+2AHQkuSKCQKNfpl//t4i1KxShW8eDDLPZbELXer0g1ndq8toXpTG4JsOQ4eZp0we9SE+W2SGWcCdVIPreJRkqGYSt63tHw2LksfcaqK2MVE+i1YbIIQeDDAkwee0Oe1dbqvdZU/+LbQ2JhyvHc8DXzNkqWF1mfOePYMGR92Ua3iDzfHZhc1uofJ9Fbzrvl2f6rOoeDEYAQ==",
+   "thinking": "",
+   "type": "thinking"
+  },
+  {
+   "caller": {
+    "type": "direct"
+   },
+   "id": "toolu_018ExbvH8qjubped83jgMPK8",
+   "input": {
+    "sql": "select sum(resales), sum(resale_usd), sum(model_valuation_sold_sum), (sum(resale_usd)/sum(model_valuation_sold_sum)-1)*10000 from main.mart_segment_week where band='B2' and week between 57 and 60"
+   },
+   "name": "run_sql",
+   "toolset_name": null,
+   "type": "tool_use"
+  }
+ ],
+ "diagnostics": null,
+ "id": "msg_011CgJwkb3mJTVx9o3gdkGnh",
+ "model": "claude-sonnet-5-5",
+ "role": "assistant",
+ "stop_details": null,
+ "stop_reason": "tool_use",
+ "stop_sequence": null,
+ "type": "message",
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 0,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 1534,
+  "inference_geo": "global",
+  "input_tokens": 151,
+  "output_tokens": 201,
+  "output_tokens_details": {
+   "thinking_tokens": 63
+  },
+  "server_tool_use": null,
+  "service_tier": "batch",
+  "speed": "standard"
+ }
+}
