@@ -1,0 +1,51 @@
+{
+ "container": null,
+ "content": [
+  {
+   "signature": "CAQSggUKEAgTGAI4AUIIdGhpbmtpbmcSDOs7YUPE3QzbG8wrkhoMORTsP2MG6eYVbEoPIjA6ZZf1PSRhMV70KMLPpLV6TatJbhgLxMLgwFURX/4Ix88HiUuSaXZrnRrQVFY34xQqnwRWBGoH3f9jcu+c4WF+UAbJhWR8TIrjCVP+hR5fyueS4wLGMSUyiT80MIC0JAFyffsykhwZ9C60CoYABLjWgE8naYeU1it4gDac6a5rV/1YMb2DEkema1kmY0yg8luw/ce9CyxEF0uN8ddzX88qtU+rWp9CJrqeKdg77BBxCyZcZeZkhcIa93yw9+5uwtw1+csVNB1w6lAbWfDtxor+NcY2dotnrhp6YZJvBCa4PHI4ZOegQFczwpPkgoRO1l19ieK+ZGvKUbsZbJ2r9KuaWqp2rvH4mDKvr9Odn2PV4utEiuq0m+Z/waMR2Hg6DkENXQMhBOOt5dRWJ0JOg/cy4Qek/7A6nXRL6l7+wX0HfOctn6s+7A68vFHMN/ZQC7rF3Y4I0zzSzPtVv7LYtvNx0VyfUPELRgj44moEHC8fWABlF0nfXdIM/XX/bk6F/dbZIYZhSu2fF96a6GgXBgycFtM2feJn1uXfGyrelW8MXIv8kSwVaqGHNZv9zJZVllStf0eBse77l+RrtA4Oyv2CEuktkIEocLPJez4LnV1pJo/2EI8gcLo+HMedOhBgAEvI0aJqwvmqnD8VQrmsQgewzk3VnEXPxrZAeMciX+VsRi+51yy/Uxd79JxRULRrehFLSWe3mnPSi51mXavKCnBm9CKVs3obNgDH0uFXp5FV8mTOwvhVWw4RawxAucnreSdsTiKBy2VPDklKOKLyOF1LMEcYAQ==",
+   "thinking": "",
+   "type": "thinking"
+  },
+  {
+   "caller": {
+    "type": "direct"
+   },
+   "id": "toolu_01La372a1eygBed2dQ6pw954",
+   "input": {
+    "level": "market",
+    "metric": "showing_rate_per_week",
+    "scope": "M02",
+    "week": 55,
+    "window_weeks": 4
+   },
+   "name": "query_metric",
+   "toolset_name": null,
+   "type": "tool_use"
+  }
+ ],
+ "diagnostics": null,
+ "id": "msg_011CgJvrkg1SnWB5GHvU1mbo",
+ "model": "claude-sonnet-5-5",
+ "role": "assistant",
+ "stop_details": null,
+ "stop_reason": "tool_use",
+ "stop_sequence": null,
+ "type": "message",
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 0,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 1101,
+  "inference_geo": "global",
+  "input_tokens": 151,
+  "output_tokens": 187,
+  "output_tokens_details": {
+   "thinking_tokens": 39
+  },
+  "server_tool_use": null,
+  "service_tier": "batch",
+  "speed": "standard"
+ }
+}

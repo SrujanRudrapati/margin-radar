@@ -1,0 +1,47 @@
+{
+ "container": null,
+ "content": [
+  {
+   "signature": "CAQS4wUKEAgTGAI4AUIIdGhpbmtpbmcSDI8Z5nZZlxYlNxF9KhoMlRlZfWCxBJLFCQubIjASi9ebNg9NxzQkbiYZp/tfwGGwdNUJu4TtpAMYEW2klI0WVTqcfdH+IqU75IeAnPsqgAX2w0pYX2ulQexE3M101DeCeZg7/G36aCrYv74wyv34zK3gqxV6DoMMCVDkMVDczILxkRY37+m/8p2EI1m/7C5KMH6cJH/pNH+AdDj4VsHwutG3MGIPImy/U5XNVoYRFBjb22TOyKgE+Kj7qs7rOgMv8vbMqRPSQ0iDYW9lH4EGD8cmyT4kjNVE5MEpwaYwfHp6z4jqjRZs/gsZaArsFOglwwNvB7OKJttWua1A60BpeUsHCF6qBGmWTWUDk/NWlwdY5UgZ/G2cvNN+OqY5uZfjYk79DfA3jmcdrCwcQgKijTNAZfcupzNGsNaVIrz4adihs+oRbs66nbz4oFwiqACdQgfaJNhAmcc3/Rfs3AbSfHBstMG4jPRY7Vhd8a2SqbDp1E9xgBCte8JJkfBGJFsCDNJEX+iYFZfbn8VeH+9OB8SX4e6groHQO7C8L/eDAPdbRqOUswM8nImQI6nXb+RS231/MedRObdhZF+yOBngaIhPQZOthNjN407Fjc4hP6XLAEmvFdxt9ufnoTT9/3C3tdV8y72DRk+cfDG4RehGKinV6rZAL7ZH5v6pbXvGOCCQML+RUJVzTUKo2yyyUKEohFF/bDDmBO0TTLiOZLSSqGcfqwKBP7XOYGuLc0R+EX+F4sVabh8Fy2fGtlCoP9HeZI3JzzMllzbXDDBDxhuplLgfMeTmGc63IDhL2trJWAvPGKknTdqRPENd+74zu1gH4wX9szKd57eascG9dk+3MwqN2gtelsOavzsdywjIRV4iFFM2fcJ5IW1SG0V9enX3L36U5zwEBZWKDsrRWHd+PwOnnb9+a0VwDxa6xyMYphbE/wqHyKi9WX7dLNvhHbcuGAE=",
+   "thinking": "",
+   "type": "thinking"
+  },
+  {
+   "caller": {
+    "type": "direct"
+   },
+   "id": "toolu_01DKQZNjtzi9w33rDdYZudoH",
+   "input": {
+    "reason": "The data is a synthetic iBuyer portfolio and is explicitly not Opendoor data. It can't show Opendoor's actual contribution margin for Q3 2025. I could compute the synthetic portfolio's contribution margin for that quarter if you want that instead."
+   },
+   "name": "abstain",
+   "toolset_name": null,
+   "type": "tool_use"
+  }
+ ],
+ "diagnostics": null,
+ "id": "msg_011CgJwpjgHVFbNCEpHHeNKo",
+ "model": "claude-sonnet-5-5",
+ "role": "assistant",
+ "stop_details": null,
+ "stop_reason": "tool_use",
+ "stop_sequence": null,
+ "type": "message",
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 0,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 1534,
+  "inference_geo": "global",
+  "input_tokens": 99,
+  "output_tokens": 204,
+  "output_tokens_details": {
+   "thinking_tokens": 69
+  },
+  "server_tool_use": null,
+  "service_tier": "batch",
+  "speed": "standard"
+ }
+}

@@ -1,0 +1,47 @@
+{
+ "container": null,
+ "content": [
+  {
+   "signature": "CAQSqwoKEAgTGAI4AUIIdGhpbmtpbmcSDD2dPtzDCEor8l8XixoMa9syBVS+A9bTDvKCIjBkZHE/jxy2nyumPRKH0bxEcptH20u922bRm1kQ+HSIQ91rA5oXojc8MkB4WEmYPOoqyAmd0KH7ObKgzrRnZpPv9ZG/RaFaT8hKddCXQhZMmcULFEtXzbdXJqfwhat27oscVRWg4OkiFzyPNwx2s6vGfPgm7XcR/CKqahn2nqefMO1eDEMJfiKm+UkA6se0tbTRAEWtY2qSg91StsSU0N2fQ/n2v7Xra7741QAqfS9P6mtky3wdZ9yZ4I73NMFrzFu+SM1DfjtramX3oYWQb1calnH8duAnrpxhAsZL17QdvrLUqCt4SF1fxQ159zRoh+Y02/OjXnw52mRygXNlt1SZEeVstaqI2hVxCsTWXVVpoUmmVIlp3GooVjHXt40jZn5aYOyjJt4L9yLwJ28PXbwTIuZX9th7+ewCZtoIK1x7wmo3RUKwLBpc/MG1Zv92QMiZf8Xn5OOEa137JpQfg1meu7XSmnDV80fqi4PHLrv5jhJhR+P3XMs3rxgj10BrItJ8vozSn2LelQkmGP1VZmrCrNiInAFYgVgB9rl1+8MCpgzFQpknF7jh/jzu31yAOv/SGfI3gpEtwLGfwyjSDNUmU2CP/QPOvDHL/CoiaBzTfHSXKNln1e/+MwLUOWUPQnPcdVcvMPsaXYLUzfD/KNrzI9q5i+8AFvzpvEsBRGOw/eXA8YVrV2ecpNQDzfJO3vaiHoOOw82/vk6ki2sw5w8iAjFY4P6Wv1C4sfZL0DlYyl6x59BNfdYhp+pYGZcSkAKlJ9TogocCVfi1o/8FhpTjbAIRVnyXFCE1RQ05c4s+SZj2k/XG3WX5rYOK0tahEQRPYeCZwCH6UdOKEUzK6ymVmTE89Iu85O0cLcqplV+DdaF/MhZuBri/inDHH62lQO8aV1mQqJtSMxb9LiWV5CP41kvJI9Lf6jeAGvoIyLsrwiP+y93NqNGyD9JyN8Wbucrs6xmGCbHrZ5pf2uIJ5btXthKryNwQ7Kw3uL8ll9BhGYlzQ0hE11LInSEhSN/i1jlvD3oO8I1MN3et1sbr6aHVR3cEaE8ZYt9NsYlv4X3DX/KXGQih77RtQJa0y3AdQYjSL2c7d+W9X1FTM5QwmE7SAFMlDq3/vr/qyCNIzIg2kZSzsTi5RFDN8091vmLhzL1Rti3rPDpOurF64qchEG4ixDMClyB5CZS0sk/QNyz5v8RAeuWyGw/9B0LZpQBB/hbJX0F7zWBpDj7Fn1SakRLXUWYJ6ShvX8ofuj5+VXzGvdFd7Cynq6A7Wlf9SwVmvlPc4UujdisXEaqp954hbzUD9XD673+GDDrBVn+Eqx2Gu/UPUN/5yBIcUW8R4kx0qybqMZ9bb5NHZ8PPbNc5arDbWxD3jjGCMeU1fWx/0UICbMBesjFq0BrmPCvKAa69yZTiMpb4mCIX+acGepOKThtmsPsTcaFshbBxvIutP+HXI+oayiDexiPTc52zyD6nDud4yyAvMiPpF961XpYZHfTKRalzPt8W99v/Lg4elEnEurLTLxmtfwSTzk5vxZdbWMcev56Ot/uJnMi6Bzc3l8o5EG2/yHgfaXrXehRMrXHE+fnnRHUM/CXhUqNXjFsb0Ox+7bqAPfX38C94as/xzH8DZmfwhryuw0XIZ28tb2VWgqCd4bAk2is7GX3C/X0+qfF9CFYJqO9O/5YFi6+k6vFvnSgdmMuAu1nBgJIYAQ==",
+   "thinking": "",
+   "type": "thinking"
+  },
+  {
+   "caller": {
+    "type": "direct"
+   },
+   "id": "toolu_012eLb12ZXBjKTStbHurNxwe",
+   "input": {
+    "sql": "select sum(holding_cost_sum) h, sum(hold_days_sum) d, sum(resale_usd) r, sum(resales) n, sum(holding_cost_sum)/sum(resale_usd)/(sum(hold_days_sum)*1.0/sum(resales))*10000 bps from main.mart_segment_week where week between 40 and 52"
+   },
+   "name": "run_sql",
+   "toolset_name": null,
+   "type": "tool_use"
+  }
+ ],
+ "diagnostics": null,
+ "id": "msg_011CgJwkUbaD44wEB935onjQ",
+ "model": "claude-sonnet-5-5",
+ "role": "assistant",
+ "stop_details": null,
+ "stop_reason": "tool_use",
+ "stop_sequence": null,
+ "type": "message",
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 0,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 1534,
+  "inference_geo": "global",
+  "input_tokens": 152,
+  "output_tokens": 517,
+  "output_tokens_details": {
+   "thinking_tokens": 350
+  },
+  "server_tool_use": null,
+  "service_tier": "batch",
+  "speed": "standard"
+ }
+}

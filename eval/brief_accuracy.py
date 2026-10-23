@@ -1,9 +1,10 @@
 """Brief accuracy (user gate: >= 90% of sections accurate AND zero direction errors). Synthetic data — not Opendoor data.
 
 A section (one '### ' heading per ranked action, ending at the next '##' or '###' heading) is accurate when its
-heading names its action's scope, it names no other action's scope, and the first direction verb in its "What changed"
-line matches the signal's direction. A direction error is a first verb pointing the opposite way (e.g. "fell" for a
-conversion rise); a line with no direction verb is inaccurate but not a direction error. A brief with no actions (or
+heading names its action's scope, it names no other action's scope, and the first direction cue in its "What changed"
+line matches the signal's direction. A cue is a direction verb ("rose"), a comparative against peers ("above peers")
+or a signed gap ("a gap of +8.2 pts"). A direction error is a first cue pointing the opposite way (e.g. "fell" for a
+conversion rise); a line with no cue is inaccurate but not a direction error. A brief with no actions (or
 one that never finished) scores 0.
 """
 import re
@@ -11,7 +12,10 @@ from dataclasses import dataclass
 
 UP = r"rose|rise|rising|increased?|higher|climb(?:ed|ing)?|jump(?:ed)?|grew|widen(?:ed|ing)?|up"
 DOWN = r"fell|fall|falling|declined?|lower|slow(?:ed|ing)?|decreased?|drop(?:ped)?|shrank|narrow(?:ed)?|down"
-DIRECTION = re.compile(rf"\b(?:(?P<up>{UP})|(?P<down>{DOWN}))\b", re.IGNORECASE)
+PEERS = r"\s+(?:its\s+|the\s+)?peer(?:s\b|\s+median\b)"  # "above peers", not "above the peer-expected rate"
+UP_CUE = rf"\b(?:{UP})\b|\babove{PEERS}|\bgap of \+"
+DOWN_CUE = rf"\b(?:{DOWN})\b|\bbelow{PEERS}|\bgap of [-−]"
+DIRECTION = re.compile(rf"(?P<up>{UP_CUE})|(?P<down>{DOWN_CUE})", re.IGNORECASE)
 
 
 @dataclass(frozen=True)

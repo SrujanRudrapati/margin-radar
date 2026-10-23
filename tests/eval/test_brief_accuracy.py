@@ -47,3 +47,28 @@ def test_missing_direction_word_is_inaccurate_not_a_direction_error():
 
 def test_no_actions_scores_zero():
     assert brief_accuracy("anything", []).section_accuracy == 0.0
+
+
+def test_comparative_against_peers_states_direction():
+    acc = brief_accuracy(body(b2_change="is above peers at", m02_change="sit below the peer median at"), ACTIONS)
+    assert acc.section_accuracy == 1.0 and acc.direction_errors == 0
+
+
+def test_comparative_pointing_the_wrong_way_is_a_direction_error():
+    acc = brief_accuracy(body(b2_change="is below peers at"), ACTIONS)
+    assert acc.section_accuracy == 0.5 and acc.direction_errors == 1
+
+
+def test_signed_gap_states_direction():
+    acc = brief_accuracy(body(b2_change="reached 46.6% against a peer median of 38.5%, a gap of +8.2 pts, so"), ACTIONS)
+    assert acc.section_accuracy == 1.0 and acc.direction_errors == 0
+
+
+def test_signed_gap_pointing_the_wrong_way_is_a_direction_error():
+    acc = brief_accuracy(body(b2_change="reached 30.0%, a gap of −8.2 pts, so"), ACTIONS)
+    assert acc.direction_errors == 1
+
+
+def test_peer_expected_definition_alone_is_not_a_direction():
+    acc = brief_accuracy(body(b2_change="had 17.5% of contracts above the peer-expected rate, so"), ACTIONS)
+    assert acc.section_accuracy == 0.5 and acc.direction_errors == 0

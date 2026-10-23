@@ -1,0 +1,59 @@
+{
+ "container": null,
+ "content": [
+  {
+   "signature": "CAQSkwUKEAgTGAI4AUIIdGhpbmtpbmcSDAcSPdWsl6cTX9QwKhoMupjask2WfK/JG3fhIjBQPB6VYpWqstqZ+dsSv+e43Z5xDnRRLr83So5bu58rXMirr0cnZQjf4g+Gr1IxykEqsAR+xXVONLVE8Jc3FE1D07qflBMaerj1xk056F4n3WvmkFqNkAjgffBPYx1uj6mCOrlq15cEyriw8Gpd3UcrkJBoubObu9Lm0Sa7G7/VWauLWc2Pn8uGpmNz1fBA4rYBnP/+4IrMUGcYe1QbSYvQlYrZrcAJWwqOjGIu16tlpgFghoU+kGqLbR7mxwtLynbc7kVbW7kulKhqQ2ilQyMl9wz0ScveYkMOPJ/CjAT0K5ODt2BgbsxQgphf87eGqPMK0HSSWy5ODr/DMs7g30N4aKQjHEwv5T7IXHz7M2yWYL0lRBc6sRGaKcUz3EH2olGFPgw4YyIS0zSLM2jidNhdbVUw3BJMpzskw8Amjl+soqYtpDFZb05gOYytHiMq3ougvgQKJ8I33tWIblf6gLHzquKRnz4IPGy9m7ZYyBex3FuuHjfXMBVoWurXcwe/Noc1+9xX6ZfBqUiOIoUS65TkaLrJqwrGl9+uD1tWjLxeYMi+hrLSfXrHm6GY+lMXauaVN4zIpsRx1G43As7sxSQxoLi2aFjvRZW7CEntL3UttP/WsUxCd18F2gi1HDvuxWQyXldh5EzNHlBp0kaEjEhG6nZmGX9qIX8Chd8WKpZqKIRRnQkjGfAwKul7wAkJdc+07gU3OFibBok5n56CeVXMJFv3rNfZjIkBi6rNp92tnRJlm1pspE7XwnolIbWF1sfRN+QMqBZHQpjRti2S1ukLSpUAx8WeDT96wdTtpdrx6zpydhgB",
+   "thinking": "",
+   "type": "thinking"
+  },
+  {
+   "caller": {
+    "type": "direct"
+   },
+   "id": "toolu_01Bp2H2KcqRMrwY1oZvQan7u",
+   "input": {
+    "sql": "select week, sum(unsold_inventory_usd), sum(acquisition_usd), sum(resale_usd), count(*) from main.mart_segment_week where week in (39,40,41) group by 1 order by 1"
+   },
+   "name": "run_sql",
+   "toolset_name": null,
+   "type": "tool_use"
+  },
+  {
+   "caller": {
+    "type": "direct"
+   },
+   "id": "toolu_0115vT81tMgSBtu9vYTkdVrv",
+   "input": {
+    "sql": "select sum(offer_price), count(*) from raw.homes where close_date < '2025-01-06'::timestamp + interval 287 day and (resale_date is null or resale_date >= '2025-01-06'::timestamp + interval 287 day) and close_date is not null"
+   },
+   "name": "run_sql",
+   "toolset_name": null,
+   "type": "tool_use"
+  }
+ ],
+ "diagnostics": null,
+ "id": "msg_011CgJwkWNyaKhQdis1V2VW5",
+ "model": "claude-sonnet-5-5",
+ "role": "assistant",
+ "stop_details": null,
+ "stop_reason": "tool_use",
+ "stop_sequence": null,
+ "type": "message",
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 0,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 1534,
+  "inference_geo": "global",
+  "input_tokens": 149,
+  "output_tokens": 295,
+  "output_tokens_details": {
+   "thinking_tokens": 44
+  },
+  "server_tool_use": null,
+  "service_tier": "batch",
+  "speed": "standard"
+ }
+}
