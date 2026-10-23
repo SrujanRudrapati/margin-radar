@@ -13,10 +13,8 @@ import pytest
 from .conftest import DBT_BIN, DBT_PROJECT, query
 
 MF_BIN = Path(sys.executable).parent / "mf"
-# Brief range is 425-575. Raw resale-date quarters give ~475 bps, but the mart is weekly and mf bins each
-# week into the quarter of its Monday week_start (the week of 2025-03-31 lands in Q1, 2025-06-30 in Q2),
-# which yields ~422 bps. The lower bound is therefore 400 rather than 425.
-CM_DIP_BPS_RANGE = (400, 575)
+# Weeks belong to the quarter containing their Thursday (ISO rule; agg time dimension week_thursday).
+CM_DIP_BPS_RANGE = (425, 575)
 
 
 def _env(db: Path, target: str) -> dict:
@@ -69,3 +67,11 @@ def test_mf_works_on_both_targets(mf_project, built_runs, tmp_path, target):
     rows = mf_csv(mf_project, db, target, tmp_path, "--metrics", "offers")
     expected = query(db, "select count(*) from raw.homes")[0][0]
     assert int(float(rows[1][0])) == expected
+
+
+def test_metric_time_week_is_monday_week_start(mf_project, built_runs, tmp_path):
+    db = built_runs["control"]
+    rows = mf_csv(mf_project, db, "control", tmp_path, "--metrics", "offers", "--group-by", "metric_time__week")
+    weeks = {r[0][:10] for r in rows[1:]}
+    expected = {str(r[0]) for r in query(db, "select distinct week_start from main.mart_segment_week")}
+    assert weeks == expected
