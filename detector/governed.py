@@ -8,8 +8,10 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
+import numbers
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Literal
 
@@ -26,6 +28,8 @@ DEFAULT_MIN_DENOMINATOR = 10
 MIN_DENOMINATOR: dict[str, int] = {"contract_rate": 30, "first_offer_rate": 20, "reno_overrun_pct": 10}
 SCOPE_SQL: dict[str, str] = {"segment": "segment", "market": "market", "band": "band", "portfolio": "'portfolio'"}
 UNITS = frozenset(("usd", "bps", "pct", "count", "days", "ratio"))
+# Point-in-time state columns (nonzero in every week after the data ends); excluded from max_week.
+STATE_COLUMNS = frozenset(("awaiting_offer", "unsold_inventory_usd"))
 RUN_ID_RE = re.compile(r"^[a-z][a-z0-9_]*$")
 _NAME = r"([A-Za-z_]\w*)"
 # The four derived forms the semantic layer uses; anything else fails loudly.
@@ -49,7 +53,11 @@ class MetricPanel:
     level: Level
     as_of_week: int
     window_weeks: int
-    values: pd.DataFrame  # columns: scope, week, value (None below MIN_DENOMINATOR), denominator
+    # values columns: scope, week, value, denominator (+ market, band, product when level == "segment").
+    # value is None below the sample threshold, and for weeks < window_weeks - 1 (partial windows), whose
+    # denominator is also None. denominator is the windowed sample-size count (meta.sample_size), not
+    # necessarily the ratio's formula denominator; None for metrics without a sample_size.
+    values: pd.DataFrame
     sql: str
 
 
@@ -69,6 +77,11 @@ class _Metric:
     type: str
     params: dict
     sample_size: str | None
+    role: str | None = None
+
+
+def _is_int(x) -> bool:
+    return isinstance(x, numbers.Integral) and not isinstance(x, bool)
 
 
 def _name_of(ref) -> str:
@@ -95,7 +108,7 @@ def load_definitions(semantic_dir: Path = SEMANTIC_DIR) -> tuple[dict[str, _Metr
         sample = (raw.get("config", {}).get("meta") or {}).get("sample_size")
         if kind != "simple" and not sample:
             raise ValueError(f"metric {name!r}: non-simple metric needs meta.sample_size")
-        defs[name] = _Metric(name, kind, params, sample)
+        defs[name] = _Metric(name, kind, params, sample, (raw.get("config", {}).get("meta") or {}).get("role"))
     for d in defs.values():
         if d.type == "derived":
             _derived_sql_parts(d, defs)  # validate form eagerly
@@ -148,9 +161,11 @@ class GovernedStore:
         self._log_path = Path(log_path) if log_path else None
         self._defs, self._non_additive = load_definitions()
         self._items: dict[str, MetricPanel | DerivedFact] = {}
+        self._frames: dict[str, pd.DataFrame] = {}  # private frames behind panel query IDs
         self._con = duckdb.connect(db_path, read_only=True)
         try:
             self._check_mart()
+            self.max_week = self._find_max_week()
         except Exception:
             self._con.close()
             raise
@@ -166,6 +181,20 @@ class GovernedStore:
         if missing:
             raise ValueError(f"mart lacks columns {sorted(missing)}")
 
+    def _find_max_week(self) -> int:
+        """Last week with any event activity: max week where any event-count/amount measure is
+        non-zero (state columns such as awaiting_offer stay nonzero after the data ends, so they are excluded)."""
+        cols = sorted({m for n, d in self._defs.items() if d.type == "simple" for m in _measures_of(n, self._defs)}
+                      - self._non_additive - STATE_COLUMNS)
+        active = " or ".join(f"coalesce({c}, 0) <> 0" for c in cols)
+        week = self._con.execute(f"select max(week) from {MART} where {active}").fetchone()[0]
+        if week is None:
+            raise ValueError(f"{MART} has no event data")
+        return int(week)
+
+    def metrics(self, role: str | None = None) -> tuple[str, ...]:
+        return tuple(sorted(n for n, d in self._defs.items() if role is None or d.role == role))
+
     def close(self) -> None:
         self._con.close()
 
@@ -175,7 +204,7 @@ class GovernedStore:
     def __exit__(self, *exc) -> None:
         self.close()
 
-    def _build_sql(self, metric: str, level: str, as_of: int, window: int, start: int) -> str:
+    def _build_sql(self, metric: str, level: str, as_of: int, window: int, start: int, floor: int) -> str:
         d = self._defs[metric]
         measures = sorted(set(_measures_of(metric, self._defs)) | ({d.sample_size} if d.sample_size else set()))
         agg_cols = ", ".join(f"cast(sum({m}) as double) as {m}" for m in measures)
@@ -185,51 +214,62 @@ class GovernedStore:
         )
         value = _metric_sql(metric, self._defs, lambda m: m)
         if d.sample_size:
-            floor = MIN_DENOMINATOR.get(metric, DEFAULT_MIN_DENOMINATOR)
             value = f"case when {d.sample_size} < {floor} then null else {value} end"
             denominator = d.sample_size
         else:
             denominator = "null"
+        if any(m not in self._non_additive for m in measures):  # partial windows are not comparable
+            ramp = f"week < {window - 1}"
+            value, denominator = f"case when {ramp} then null else {value} end", f"case when {ramp} then null else {denominator} end"
+        dims = ", market, band, product" if level == "segment" else ""
         return (
-            f"with agg as (select {SCOPE_SQL[level]} as scope, week, {agg_cols} from {MART} "
-            f"where week <= {as_of} group by 1, 2), "
-            f"win as (select scope, week, {win_cols} from agg) "
-            f"select scope, week, {value} as value, {denominator} as denominator from win "
+            f"with agg as (select {SCOPE_SQL[level]} as scope, week{dims}, {agg_cols} from {MART} "
+            f"where week <= {as_of} group by all), "
+            f"win as (select scope, week{dims}, {win_cols} from agg) "
+            f"select scope, week{dims}, {value} as value, {denominator} as denominator from win "
             f"where week >= {start} order by scope, week"
         )
 
-    def panel(self, metric: str, level: Level, as_of_week: int, window_weeks: int = 4, start_week: int = 0) -> MetricPanel:
-        if metric not in self._defs:
+    def panel(self, metric: str, level: Level, as_of_week: int, window_weeks: int = 4, start_week: int = 0,
+              min_denominator: int | None = None) -> MetricPanel:
+        if not isinstance(metric, str) or metric not in self._defs:
             raise ValueError(f"unknown metric {metric!r}")
-        if level not in SCOPE_SQL:
+        if not isinstance(level, str) or level not in SCOPE_SQL:
             raise ValueError(f"unknown level {level!r}")
-        ints = (as_of_week, window_weeks, start_week)
-        if not all(isinstance(i, int) and not isinstance(i, bool) for i in ints):
+        if not all(_is_int(i) for i in (as_of_week, window_weeks, start_week)):
             raise ValueError("as_of_week, window_weeks and start_week must be ints")
+        as_of_week, window_weeks, start_week = int(as_of_week), int(window_weeks), int(start_week)
         if window_weeks < 1 or start_week < 0 or as_of_week < start_week:
             raise ValueError("need window_weeks >= 1 and 0 <= start_week <= as_of_week")
-        sql = self._build_sql(metric, level, as_of_week, window_weeks, start_week)
-        key = "|".join(map(str, (self.run_id, metric, level, window_weeks, start_week, as_of_week, sql)))
+        if as_of_week > self.max_week:
+            raise ValueError(f"as_of_week {as_of_week} is beyond the last week with data ({self.max_week})")
+        if min_denominator is not None and not (_is_int(min_denominator) and min_denominator >= 0):
+            raise ValueError("min_denominator must be a non-negative int or None")
+        floor = int(min_denominator) if min_denominator is not None else MIN_DENOMINATOR.get(metric, DEFAULT_MIN_DENOMINATOR)
+        sql = self._build_sql(metric, level, as_of_week, window_weeks, start_week, floor)
+        key = "|".join(map(str, (self.run_id, metric, level, window_weeks, start_week, as_of_week, floor, sql)))
         query_id = "Q" + hashlib.sha256(key.encode()).hexdigest()[:10]
         if query_id in self._items:
-            return self._items[query_id]  # type: ignore[return-value]
+            return replace(self._items[query_id], values=self._frames[query_id].copy())  # type: ignore[type-var]
         frame = self._con.execute(sql).fetchdf()
         frame["value"] = frame["value"].astype(object).where(frame["value"].notna(), None)
         frame["denominator"] = frame["denominator"].astype(object).where(frame["denominator"].notna(), None)
         panel = MetricPanel(query_id, metric, self.run_id, level, as_of_week, window_weeks, frame, sql)
-        self._items[query_id] = panel
+        self._items[query_id], self._frames[query_id] = panel, frame.copy()
         self._log({"kind": "panel", "id": query_id, "metric": metric, "run_id": self.run_id, "level": level,
                    "window_weeks": window_weeks, "start_week": start_week, "as_of_week": as_of_week, "sql": sql,
                    **_summary(frame)})
-        return panel
+        return replace(panel, values=frame.copy())
 
     def register_derived(self, label: str, value: float, unit: str, inputs: tuple[str, ...], formula: str) -> str:
         if unit not in UNITS:
             raise ValueError(f"unknown unit {unit!r}")
+        if isinstance(value, bool) or not isinstance(value, numbers.Real) or not math.isfinite(value):
+            raise ValueError(f"derived value must be a finite number, got {value!r}")
         unknown = [i for i in inputs if i not in self._items]
         if unknown:
             raise ValueError(f"derived fact cites unregistered inputs {unknown}")
-        fact_id = "D" + hashlib.sha256(f"{formula}|{'|'.join(inputs)}".encode()).hexdigest()[:10]
+        fact_id = "D" + hashlib.sha256(f"{label}|{unit}|{formula}|{'|'.join(inputs)}".encode()).hexdigest()[:10]
         fact = DerivedFact(fact_id, label, value, unit, tuple(inputs), formula)  # type: ignore[arg-type]
         existing = self._items.get(fact_id)
         if existing is not None:
@@ -244,10 +284,11 @@ class GovernedStore:
     def get(self, ref_id: str) -> MetricPanel | DerivedFact:
         if ref_id not in self._items:
             raise ValueError(f"unknown reference {ref_id!r}")
-        return self._items[ref_id]
+        item = self._items[ref_id]
+        return replace(item, values=self._frames[ref_id].copy()) if isinstance(item, MetricPanel) else item
 
     def all(self) -> tuple[MetricPanel | DerivedFact, ...]:
-        return tuple(self._items.values())
+        return tuple(self.get(i) for i in self._items)
 
     def _log(self, record: dict) -> None:
         if self._log_path is None:

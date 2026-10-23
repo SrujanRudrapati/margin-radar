@@ -161,7 +161,7 @@ def test_derived_traces_inputs(store):
     fact = store.get(fact_id)
     assert isinstance(fact, DerivedFact) and fact_id.startswith("D") and len(fact_id) == 11
     assert fact.inputs == (p.query_id,)
-    assert store.get(p.query_id) is p
+    assert store.get(p.query_id).query_id == p.query_id
     assert isinstance(p, MetricPanel)
     assert {x.query_id if isinstance(x, MetricPanel) else x.fact_id for x in store.all()} == {p.query_id, fact_id}
     assert store.register_derived("offers last week", 12.0, "count", (p.query_id,), "offers[w40]") == fact_id
@@ -198,3 +198,93 @@ def test_log_written(db, tmp_path):
     assert lines[0]["metric"] == "contract_rate" and lines[0]["level"] == "market"
     assert lines[0]["window_weeks"] == 4 and lines[0]["as_of_week"] == 40 and lines[0]["sql"] == p.sql
     assert lines[1]["label"] == "x" and lines[1]["formula"] == "f"
+
+
+# --- Phase 2 final-review fixes ---
+
+def test_fact_ids_distinct_for_different_labels(store):
+    p = store.panel("contract_rate", "portfolio", 40)
+    a = store.register_derived("resid M01-B1-cash", 1.0, "ratio", (p.query_id,), "f")
+    b = store.register_derived("resid M02-B1-cash", 1.0, "ratio", (p.query_id,), "f")
+    assert a != b
+    assert store.get(a).label == "resid M01-B1-cash" and store.get(b).label == "resid M02-B1-cash"
+    with pytest.raises(ValueError):
+        store.register_derived("resid M01-B1-cash", 2.0, "ratio", (p.query_id,), "f")
+
+
+def test_returned_panels_are_copies(store):
+    p = store.panel("offers", "portfolio", 20)
+    original = p.values.copy()
+    p.values.loc[:, "value"] = -1
+    p.values.iloc[0:0].index  # noqa: B018
+    p.values.insert(0, "junk", 1)
+    assert store.get(p.query_id).values.equals(original)
+    assert store.panel("offers", "portfolio", 20).values.equals(original)
+    assert store.panel("offers", "portfolio", 20).values is not store.panel("offers", "portfolio", 20).values
+
+
+def test_partial_early_windows_are_none(store):
+    v = store.panel("contract_rate", "portfolio", 10, window_weeks=4).values.set_index("week")
+    assert all(v.loc[w, "value"] is None and v.loc[w, "denominator"] is None for w in (0, 1, 2))
+    offers = store.panel("offers", "portfolio", 10, window_weeks=4).values.set_index("week")
+    assert offers.loc[2, "value"] is None
+    raw = store.panel("offers", "portfolio", 10, window_weeks=1).values.set_index("week")["value"]
+    assert offers.loc[3, "value"] == raw.loc[0:3].sum()
+    assert v.loc[3, "denominator"] is not None
+
+
+def test_numpy_ints_accepted_and_wrong_types_raise_valueerror(store):
+    import numpy as np
+    a = store.panel("offers", "market", np.int64(20), window_weeks=np.int32(4), start_week=np.int64(5))
+    b = store.panel("offers", "market", 20, window_weeks=4, start_week=5)
+    assert a.query_id == b.query_id and isinstance(a.as_of_week, int)
+    for bad in (True, 1.5, "3"):
+        with pytest.raises(ValueError):
+            store.panel("offers", "market", bad)
+    with pytest.raises(ValueError):
+        store.panel(["offers"], "market", 10)
+    with pytest.raises(ValueError):
+        store.panel("offers", ["market"], 10)
+
+
+def test_register_derived_rejects_non_finite(store):
+    p = store.panel("offers", "portfolio", 20)
+    for bad in (float("nan"), float("inf"), float("-inf")):
+        with pytest.raises(ValueError):
+            store.register_derived("bad", bad, "count", (p.query_id,), "f")
+
+
+def test_max_week_bounds_as_of(store):
+    assert isinstance(store.max_week, int) and store.max_week >= 77
+    store.panel("offers", "portfolio", store.max_week)
+    with pytest.raises(ValueError):
+        store.panel("offers", "portfolio", store.max_week + 1)
+
+
+def test_max_week_ignores_empty_trailing_weeks(cutoff_run):
+    with GovernedStore(str(cutoff_run), "injected") as s:
+        assert s.max_week <= 40
+
+
+def test_metrics_by_role(store):
+    assert store.metrics("trigger") == ("contract_rate", "first_offer_rate", "reno_overrun_pct")
+    assert store.metrics() == tuple(sorted(store.metrics()))
+    assert "offers" in store.metrics() and "offers" in store.metrics("volume")
+
+
+def test_segment_panels_have_dimension_columns(store):
+    v = store.panel("offers", "segment", 20).values
+    row = v[v.scope == "M02-B2-CNML"].iloc[0]
+    assert (row["market"], row["band"], row["product"]) == ("M02", "B2", "CNML")
+    assert "market" not in store.panel("offers", "market", 20).values.columns
+
+
+def test_min_denominator_override(store):
+    default = store.panel("contract_rate", "segment", 77, window_weeks=1)
+    low = store.panel("contract_rate", "segment", 77, window_weeks=1, min_denominator=1)
+    assert low.query_id != default.query_id
+    assert default.values.value.isna().sum() > low.values.value.isna().sum()
+    assert store.panel("contract_rate", "segment", 77, window_weeks=1, min_denominator=30).query_id == default.query_id
+    for bad in (-1, 1.5, True, "5"):
+        with pytest.raises(ValueError):
+            store.panel("contract_rate", "segment", 77, min_denominator=bad)
