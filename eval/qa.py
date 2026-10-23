@@ -7,6 +7,10 @@ Message Batch. Synthetic data — not Opendoor data.
 """
 import json
 import re
+import shutil
+import tempfile
+import threading
+from contextlib import contextmanager
 from pathlib import Path
 
 import duckdb
@@ -15,7 +19,8 @@ from agent.llm import with_prompt_caching
 from detector.governed import GovernedStore
 
 RUN_ID = "injected"
-MAX_TURNS = 6
+MAX_TURNS = 5
+SQL_TIMEOUT_S = 10
 MAX_ROWS = 200
 REL_TOL = 0.005
 
@@ -30,7 +35,7 @@ _Q = [  # (id, metric, level, scope, week, window, wording)
     ("q08", "resale_usd", "portfolio", "portfolio", 60, 13, "the total resale revenue in dollars for the whole portfolio"),
     ("q09", "price_cut_rate", "market", "M02", 50, 4, "the price-cut rate (price cuts / listing-weeks awaiting an offer) for market M02"),
     ("q10", "avg_days_to_first_offer", "market", "M04", 52, 4, "the average days from listing to first buyer offer for market M04"),
-    ("q11", "unsold_inventory_usd", "portfolio", "portfolio", 40, 1, "the unsold inventory value in dollars (cash paid for homes bought and not yet resold) for the whole portfolio, at the end of"),
+    ("q11", "unsold_inventory_usd", "portfolio", "portfolio", 40, 1, "the unsold inventory value in dollars (cash paid for homes bought and not yet resold) for the whole portfolio at the end of the week"),
     ("q12", "fall_through_rate", "portfolio", "portfolio", 35, 13, "the fall-through rate (contracts cancelled by the seller / contracts signed) for the whole portfolio"),
     ("q13", "contract_rate", "segment", "M02-B2-cash", 40, 4, "the contract rate for segment M02-B2-cash (market M02, band B2, cash product)"),
     ("q14", "company_decline_rate", "portfolio", "portfolio", 30, 13, "the company-decline rate (contracts we declined after inspection / contracts signed) for the whole portfolio"),
@@ -104,6 +109,21 @@ def sql_guard(sql: str) -> str:
     return text
 
 
+@contextmanager
+def open_sql(db: str | Path):
+    """Read-only DuckDB connection for model-written SQL, with external access off: no replacement scans of
+    files ('path.json'), no read_*/sniff_csv, no ATTACH. It opens a private temp copy of the database, because
+    DuckDB will not open one file twice in a process with different settings."""
+    with tempfile.TemporaryDirectory() as tmp:
+        copy = Path(tmp) / Path(db).name
+        shutil.copy(db, copy)
+        con = duckdb.connect(str(copy), read_only=True, config={"enable_external_access": False})
+        try:
+            yield con
+        finally:
+            con.close()
+
+
 def grade(answer: float | None, gold: float | None) -> bool:
     if answer is None or gold is None:
         return False
@@ -150,7 +170,7 @@ class Conversation:
 
 
 def run_qa(llm, db: str | Path, mode: str, questions=QUESTIONS, unanswerable=UNANSWERABLE, max_turns: int = MAX_TURNS) -> dict:
-    with GovernedStore(str(db), RUN_ID) as store, duckdb.connect(str(db), read_only=True) as con:
+    with GovernedStore(str(db), RUN_ID) as store, open_sql(db) as con:
         gold = {q["id"]: _gold(store, q) for q in questions}
         system_text = SYSTEM[mode].format(metrics=", ".join(store.metrics()), schema=_schema(con))
         tools = [QUERY_METRIC if mode == "semantic" else RUN_SQL, ANSWER, ABSTAIN]
@@ -197,7 +217,12 @@ def _query_metric(store: GovernedStore, metric: str, level: str, scope: str, wee
 
 
 def _run_sql(con, sql: str) -> dict:
-    rows = con.execute(f"select * from ({sql_guard(sql)}) as q limit {MAX_ROWS}").fetchall()
+    timer = threading.Timer(SQL_TIMEOUT_S, con.interrupt)  # a runaway cross join must not stall the batch
+    timer.start()
+    try:
+        rows = con.execute(f"select * from ({sql_guard(sql)}) as q limit {MAX_ROWS}").fetchall()
+    finally:
+        timer.cancel()
     columns = [d[0] for d in con.description]
     return {"columns": columns, "rows": [list(r) for r in rows]}
 

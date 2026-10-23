@@ -7,6 +7,7 @@ logged or cached. Synthetic data — not Opendoor data.
 import copy
 import hashlib
 import json
+import logging
 import os
 import time
 from collections.abc import Callable
@@ -17,8 +18,22 @@ from dotenv import load_dotenv
 from agent.pricing import estimate_cost
 
 KEY_ENV = "MARGIN_RADAR_API_KEY"
+log = logging.getLogger("agent.llm")
 FALLBACK_BETA = "server-side-fallback-2026-07-01"
 FALLBACK_MODELS = frozenset({"claude-sonnet-5-5"})
+
+
+class Budget:
+    """A live-call budget shared by every LLM instance in one run (BUDGET RULE 7: hard cap per run)."""
+
+    def __init__(self, max_calls: int):
+        self.max_calls, self.used = max_calls, 0
+
+    def take(self, n: int = 1) -> None:
+        if self.used + n > self.max_calls:
+            raise BudgetExceeded(f"MAX_API_CALLS={self.max_calls}: {n} more live call(s) would exceed it "
+                                 f"({self.used} used); stopping cleanly")
+        self.used += n
 
 
 class ReplayMiss(RuntimeError):
@@ -72,31 +87,32 @@ class _SDKClient:
         before the timeout (the caller re-runs those sequentially)."""
         batch = self._client.messages.batches.create(
             requests=[{"custom_id": f"r{i}", "params": p} for i, p in enumerate(params_list)])
-        deadline = time.time() + timeout_s
+        deadline, cancelled = time.time() + timeout_s, False
         while self._client.messages.batches.retrieve(batch.id).processing_status != "ended":
-            if time.time() > deadline:
+            if time.time() > deadline and not cancelled:
+                log.warning("batch %s exceeded %ss; cancelling (finished requests are kept)", batch.id, timeout_s)
                 self._client.messages.batches.cancel(batch.id)
-                break
+                cancelled = True  # keep polling: a cancelled batch reaches "ended" with partial results
             time.sleep(BATCH_POLL_S)
         out: list[dict | None] = [None] * len(params_list)
         try:
             for item in self._client.messages.batches.results(batch.id):
                 if item.result.type == "succeeded":
                     out[int(item.custom_id[1:])] = item.result.message.model_dump(mode="json")
-        except Exception:  # results unavailable (e.g. cancelled before any finished): fall back for all
-            pass
+        except Exception as exc:  # noqa: BLE001 - reported, then every unfinished request runs sequentially
+            log.warning("could not read results of batch %s (%s); unfinished requests will run sequentially",
+                        batch.id, exc)
         return out
 
 
 class LLM:
     def __init__(self, model: str, purpose: str, cache_dir: str | Path = "data/llm_cache",
                  token_log: str | Path = "data/token_log.jsonl", max_calls: int | None = None,
-                 client_factory: Callable[[], object] | None = None, run_tag: str = ""):
+                 client_factory: Callable[[], object] | None = None, run_tag: str = "", budget: Budget | None = None):
         self.model, self.purpose, self.run_tag = model, purpose, run_tag
         self.cache_dir = Path(cache_dir) / purpose
         self.token_log = Path(token_log)
-        self.max_calls = int(os.environ.get("MAX_API_CALLS", 50)) if max_calls is None else max_calls
-        self.live_calls = 0
+        self.budget = budget or Budget(int(os.environ.get("MAX_API_CALLS", 50)) if max_calls is None else max_calls)
         self._factory = client_factory
         self._client = None
 
@@ -110,10 +126,8 @@ class LLM:
         if os.environ.get("REPLAY", "0") == "1":
             raise ReplayMiss(f"no recorded response for cache key {key} ({self.model}, {self.purpose}); "
                              f"record it with: REPLAY=0 python -m agent brief ... (live call, costs tokens)")
-        if self.live_calls >= self.max_calls:
-            raise BudgetExceeded(f"MAX_API_CALLS={self.max_calls} reached; stopping before another live call")
+        self.budget.take(1)
         client = self._client_instance()
-        self.live_calls += 1
         response = client.create(model=self.model, max_tokens=max_tokens, system=system, messages=messages,
                                  tools=tools)
         if not isinstance(response, dict):
@@ -138,8 +152,8 @@ class LLM:
         if misses and os.environ.get("REPLAY", "0") == "1":
             raise ReplayMiss(f"no recorded response for cache key {keys[misses[0]]} ({self.model}, {self.purpose}); "
                              "record it with: REPLAY=0 python -m eval --live (live calls, cost tokens)")
-        if misses and self.live_calls + len(misses) > self.max_calls:
-            raise BudgetExceeded(f"MAX_API_CALLS={self.max_calls}: {len(misses)} more live calls would exceed it")
+        if misses:
+            self.budget.take(len(misses))
         if not misses:
             return out  # type: ignore[return-value]
         client = self._client_instance()
@@ -148,7 +162,6 @@ class LLM:
         batched = client.run_batch(params, BATCH_TIMEOUT_S) if hasattr(client, "run_batch") and \
             os.environ.get("USE_BATCH", "1") == "1" else [None] * len(misses)
         for i, p, response in zip(misses, params, batched):
-            self.live_calls += 1
             via_batch = response is not None
             if response is None:
                 response = client.create(**p)

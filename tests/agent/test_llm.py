@@ -180,3 +180,33 @@ def test_create_many_replay_miss_and_budget(tmp_path, monkeypatch):
     live(monkeypatch)
     with pytest.raises(BudgetExceeded):
         make(tmp_path, FakeBatchClient(), max_calls=1).create_many([_req("p"), _req("q")])
+
+
+def test_budget_is_shared_across_instances(tmp_path, monkeypatch):
+    from agent.llm import Budget
+    live(monkeypatch)
+    budget = Budget(max_calls=2)
+    a, b = (make(tmp_path, FakeClient(), budget=budget) for _ in range(2))
+    a.create(**_req("one"))
+    b.create(**_req("two"))
+    with pytest.raises(BudgetExceeded):
+        a.create(**_req("three"))
+
+
+class CancelBatchClient(FakeClient):
+    """Simulates a batch that timed out: one request finished before the cancel, one did not."""
+
+    def run_batch(self, params_list, timeout_s):
+        done = {"id": "b0", "type": "message", "role": "assistant", "model": params_list[0]["model"],
+                "content": [{"type": "text", "text": "finished in batch"}], "stop_reason": "end_turn",
+                "usage": {"input_tokens": 10, "output_tokens": 1}}
+        return [done, None]
+
+
+def test_partial_batch_results_are_kept_and_logged(tmp_path, monkeypatch):
+    live(monkeypatch)
+    fake = CancelBatchClient()
+    out = make(tmp_path, fake).create_many([_req("p1"), _req("p2")])
+    assert out[0]["content"][0]["text"] == "finished in batch" and len(fake.calls) == 1
+    lines = [json.loads(l) for l in (tmp_path / "log.jsonl").read_text().splitlines()]
+    assert [l["batch"] for l in lines] == [True, False]

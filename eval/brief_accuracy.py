@@ -1,14 +1,17 @@
 """Brief accuracy (user gate: >= 90% of sections accurate AND zero direction errors). Synthetic data — not Opendoor data.
 
-A section (one '### ' heading per ranked action) is accurate when its heading names its action's scope, it names no
-other action's scope, and its "What changed" line has no direction error. A direction error is a "What changed"
-line that only uses words for the opposite of the signal's direction (e.g. "fell" for a conversion rise).
+A section (one '### ' heading per ranked action, ending at the next '##' or '###' heading) is accurate when its
+heading names its action's scope, it names no other action's scope, and the first direction verb in its "What changed"
+line matches the signal's direction. A direction error is a first verb pointing the opposite way (e.g. "fell" for a
+conversion rise); a line with no direction verb is inaccurate but not a direction error. A brief with no actions (or
+one that never finished) scores 0.
 """
 import re
 from dataclasses import dataclass
 
-UP = re.compile(r"\b(rose|rise|rising|increased?|up|higher|climb(?:ed|ing)?|jump(?:ed)?|grew|widen(?:ed|ing)?|above)\b", re.I)
-DOWN = re.compile(r"\b(fell|fall|falling|declined?|down|lower|slow(?:ed|ing)?|decreased?|drop(?:ped)?|shrank|narrow(?:ed)?|below)\b", re.I)
+UP = r"rose|rise|rising|increased?|higher|climb(?:ed|ing)?|jump(?:ed)?|grew|widen(?:ed|ing)?|up"
+DOWN = r"fell|fall|falling|declined?|lower|slow(?:ed|ing)?|decreased?|drop(?:ped)?|shrank|narrow(?:ed)?|down"
+DIRECTION = re.compile(rf"\b(?:(?P<up>{UP})|(?P<down>{DOWN}))\b", re.IGNORECASE)
 
 
 @dataclass(frozen=True)
@@ -20,7 +23,8 @@ class BriefAccuracy:
 
 def brief_accuracy(body: str, actions: list[dict]) -> BriefAccuracy:
     heads = list(re.finditer(r"^###\s.*$", body, re.MULTILINE))
-    ends = [h.start() for h in heads[1:]] + [len(body)]
+    boundaries = [m.start() for m in re.finditer(r"^#{2,3}\s", body, re.MULTILINE)] + [len(body)]
+    ends = [next(b for b in boundaries if b > h.start()) for h in heads]
     accurate, direction_errors = 0, 0
     scopes = [a["scope"] for a in actions]
     for action in actions:
@@ -30,9 +34,10 @@ def brief_accuracy(body: str, actions: list[dict]) -> BriefAccuracy:
         section = body[heads[idx].start(): ends[idx]]
         others = [s for s in scopes if s != action["scope"] and re.search(rf"\b{re.escape(s)}\b", section)]
         changed = next((l for l in section.splitlines() if "what changed" in l.lower()), "")
-        up, down = bool(UP.search(changed)), bool(DOWN.search(changed))
-        wrong_direction = (action["direction"] == "+" and down and not up) or (action["direction"] == "-" and up and not down)
+        first = DIRECTION.search(changed.split(":", 1)[-1])
+        said = None if first is None else ("+" if first.group("up") else "-")
+        wrong_direction = said is not None and said != action["direction"]
         direction_errors += wrong_direction
-        accurate += not others and not wrong_direction
+        accurate += not others and said == action["direction"]
     n = max(len(actions), len(heads))
-    return BriefAccuracy(accurate / n if n else 1.0, direction_errors, len(heads))
+    return BriefAccuracy(accurate / n if n else 0.0, direction_errors, len(heads))

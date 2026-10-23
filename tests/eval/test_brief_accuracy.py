@@ -28,3 +28,22 @@ def test_other_scope_in_section_is_inaccurate_but_not_direction_error():
 def test_missing_section_counts_against_accuracy():
     text = "## Top actions\n### B2 — x\n- **What changed:** rose\n## What we're not sure about\n"
     assert brief_accuracy(text, ACTIONS).section_accuracy == 0.5
+
+
+def test_uncertainty_section_naming_other_scopes_does_not_hurt_last_action():
+    text = body() .replace("## What we're not sure about\nx", "## What we're not sure about\nB2 and M02 are both early.")
+    assert brief_accuracy(text, ACTIONS).section_accuracy == 1.0
+
+
+def test_above_in_definition_does_not_mask_wrong_verb():
+    text = body(b2_change="fell (share of contracts above the peer-expected rate)")
+    assert brief_accuracy(text, ACTIONS).direction_errors == 1
+
+
+def test_missing_direction_word_is_inaccurate_not_a_direction_error():
+    acc = brief_accuracy(body(b2_change="was"), ACTIONS)
+    assert acc.section_accuracy == 0.5 and acc.direction_errors == 0
+
+
+def test_no_actions_scores_zero():
+    assert brief_accuracy("anything", []).section_accuracy == 0.0

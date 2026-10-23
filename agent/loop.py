@@ -7,6 +7,8 @@ from agent.tools import ToolError
 
 SYSTEM_PROMPT_PATH = Path(__file__).parent / "prompts" / "brief_system.md"
 MAX_TOKENS = 12000  # room for adaptive thinking plus a full brief
+MAX_TURNS_DEFAULT = 8  # tool turns + final brief
+REVISE_TURNS = 4  # turns allowed for the single grounding revision
 # Content-block keys to echo back per type (thinking blocks must go back unchanged on the same model).
 _KEEP = {"text": ("type", "text"), "tool_use": ("type", "id", "name", "input"),
          "thinking": ("type", "thinking", "signature"), "redacted_thinking": ("type", "data")}
@@ -29,7 +31,7 @@ def user_prompt(as_of_week: int, week_start: str, feedback: str | None = None) -
     return text
 
 
-def run_agent(llm, toolbox, as_of_week: int, week_start: str, max_turns: int = 8, feedback: str | None = None,
+def run_agent(llm, toolbox, as_of_week: int, week_start: str, max_turns: int = MAX_TURNS_DEFAULT, feedback: str | None = None,
               transcript: list | None = None) -> str:
     """Run the tool loop to a final brief body. Pass `transcript` (a list) to keep the conversation for revise()."""
     messages = transcript if transcript is not None else []
@@ -37,7 +39,7 @@ def run_agent(llm, toolbox, as_of_week: int, week_start: str, max_turns: int = 8
     return _converse(llm, toolbox, messages, max_turns)
 
 
-def revise(llm, toolbox, transcript: list, draft: str, errors: list[str], max_turns: int = 4) -> str:
+def revise(llm, toolbox, transcript: list, draft: str, errors: list[str], max_turns: int = REVISE_TURNS) -> str:
     """Ask for a corrected draft in the same conversation (the model sees its draft and the exact problems).
 
     The draft's assistant turn is already in the transcript, unedited (thinking blocks included), because edited

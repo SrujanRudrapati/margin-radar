@@ -86,6 +86,7 @@ def summarize(seed_results: list[dict], seeds: list[int]) -> dict:
     scenarios: dict[str, list[dict]] = {}
     control_weeks = control_alert_weeks = wrong_eps = wrong_weeks = injected_weeks = 0
     true_eps = all_eps = 0
+    per_seed_control = []
     for r in rows:
         pairs = true_pairs(r["truth"])
         inj = {int(w): [tuple(a) for a in v] for w, v in r["runs"]["injected"]["alerts"].items()}
@@ -102,6 +103,8 @@ def summarize(seed_results: list[dict], seeds: list[int]) -> dict:
         true_eps += sum(1 for pair in episodes.values() if pair in set(pairs.values()))
         ctl = {int(w): [tuple(a) for a in v] for w, v in r["runs"]["control"]["alerts"].items()}
         c = false_alert_stats(ctl, set(), r["runs"]["control"]["evaluable"])
+        per_seed_control.append({"seed": r["seed"], "alert_weeks": c["wrong_alert_weeks"], "episodes": c["wrong_episodes"],
+                                 "per_week": round(c["wrong_alert_weeks_per_week"], 3)})
         control_weeks += c["evaluable_weeks"]
         control_alert_weeks += c["wrong_alert_weeks"]
     per_scenario = {name: _scenario_summary(items) for name, items in sorted(scenarios.items())}
@@ -117,6 +120,7 @@ def summarize(seed_results: list[dict], seeds: list[int]) -> dict:
         "precision": true_eps / all_eps if all_eps else None,
         "recall_before_cm": detected / n_scen if n_scen else None,
         "scenarios": per_scenario,
+        "control_per_seed": per_seed_control,
     }
 
 
@@ -129,6 +133,20 @@ def _scenario_summary(items: list[dict]) -> dict:
             "max_lead_weeks": leads[-1] if leads else None, "median_delay_weeks": med(delays), "per_seed": items}
 
 
+def split_gates(s: dict, n_seeds: int, prefix: str) -> dict:
+    min_recall = MIN_RECALL * n_seeds / 10
+    max_wrong = MAX_WRONG * n_seeds / 10
+    return {
+        f"{prefix}_control_zero_alerts": {"pass": s["control_alert_weeks"] == 0, "value": s["control_alert_weeks"],
+                                          "rule": f"0 control alert-weeks ({prefix} seeds)"},
+        f"{prefix}_recall_before_cm": {"pass": all(v["detected_before_cm"] >= min_recall for v in s["scenarios"].values()),
+                                       "value": {k: f"{v['detected_before_cm']}/{v['seeds']}" for k, v in s["scenarios"].items()},
+                                       "rule": f">= {MIN_RECALL}/10 of {prefix} seeds per scenario alert on the true scope before margin shows it"},
+        f"{prefix}_wrong_alerts": {"pass": s["wrong_episodes"] <= max_wrong, "value": s["wrong_episodes"],
+                                   "rule": f"<= {max_wrong:g} wrong-scope alert episodes ({prefix} injected runs)"},
+    }
+
+
 def run_detector_eval(seeds=range(1, 11), root: Path = ROOT / "eval" / "runs", tuning_seeds=TUNING_SEEDS,
                       holdout_seeds=HOLDOUT_SEEDS) -> dict:
     root = Path(root)
@@ -138,16 +156,6 @@ def run_detector_eval(seeds=range(1, 11), root: Path = ROOT / "eval" / "runs", t
         results.append(run_seed(seed, root))
     by_split = {"tuning": summarize(results, list(tuning_seeds)), "holdout": summarize(results, list(holdout_seeds)),
                 "all": summarize(results, list(seeds))}
-    allsplit = by_split["all"]
-    gates = {
-        "control_zero_alerts": {"pass": allsplit["control_alert_weeks"] == 0, "value": allsplit["control_alert_weeks"],
-                                "rule": "0 control alert-weeks across all seeds"},
-        "recall_before_cm": {"pass": all(s["detected_before_cm"] >= MIN_RECALL * s["seeds"] / 10
-                                         for s in allsplit["scenarios"].values()),
-                             "value": {k: f"{v['detected_before_cm']}/{v['seeds']}" for k, v in allsplit["scenarios"].items()},
-                             "rule": f">= {MIN_RECALL}/10 seeds per scenario alert on the true scope before margin shows it"},
-        "wrong_alerts_max_2": {"pass": allsplit["wrong_episodes"] <= MAX_WRONG, "value": allsplit["wrong_episodes"],
-                               "rule": f"<= {MAX_WRONG} wrong-scope alert episodes across all injected runs"},
-    }
+    gates = {**split_gates(by_split["all"], len(list(seeds)), "all"), **split_gates(by_split["holdout"], len(list(holdout_seeds)), "holdout")}
     per_seed = [{"seed": r["seed"], "truth": r["truth"]} for r in results]
     return {"per_seed": per_seed, "by_split": by_split, "gates": gates}

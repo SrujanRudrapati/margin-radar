@@ -8,10 +8,10 @@ from common.business import SAMPLE_SCALE_LABEL
 LIVE_CALL_PROMPT_THRESHOLD = 20
 
 
-def confirm_live(planned_calls: int, yes: bool, input_fn=input) -> bool:
+def confirm_live(planned_calls: int, yes: bool, input_fn=None) -> bool:
     if planned_calls <= LIVE_CALL_PROMPT_THRESHOLD or yes:
         return True
-    return input_fn(f"Planned live calls: {planned_calls}. Proceed? [y/N] ").strip().lower() == "y"
+    return (input_fn or input)(f"Planned live calls: {planned_calls}. Proceed? [y/N] ").strip().lower() == "y"
 
 
 def token_totals(log_path: str | Path, prefix: str | None = None) -> dict:
@@ -48,6 +48,8 @@ def write_report(results: dict, md_path: str | Path, json_path: str | Path) -> s
                   f"({s['control_alert_weeks']} alert-weeks over {s['control_evaluable_weeks']} evaluable control weeks)",
                   f"- Wrong-scope alert episodes (injected runs): {s['wrong_episodes']}; per week "
                   f"{s['wrong_alert_weeks_per_week']:.3f}",
+                  "- Control alert-weeks per seed: " + ", ".join(
+                      f"s{c['seed']}: {c['alert_weeks']}" for c in s.get("control_per_seed", [])),
                   f"- Precision (true alert episodes / all episodes): {_fmt(s['precision'])}; "
                   f"recall before margin shows the problem: {_fmt(s['recall_before_cm'])}", "",
                   "| scenario | detected before margin | median lead (weeks) | min | max | median delay after onset (weeks) |",
@@ -64,6 +66,14 @@ def write_report(results: dict, md_path: str | Path, json_path: str | Path) -> s
         for name, t in cost.items():
             lines.append(f"| {name} | {t.get('live_calls', '')} | {t.get('input_tokens', '')} | {t.get('output_tokens', '')} | "
                          f"{t.get('cache_read_input_tokens', '')} | {t.get('est_cost_usd')} |")
+    lines += ["", "## Known limitations", "",
+              "- Simultaneous all-segment shifts cancel in peer comparisons; the portfolio check only catches abrupt ones.",
+              "- Scenario scopes (M02, B2, M05) and onset (week 30) are the same in every seed; seeds vary only the noise.",
+              "- The detector configuration was chosen with pooled seed counts (DECISIONS D16), so the holdout split is not "
+              "fully held out for that design decision.",
+              "- Demand-softening impact is a lower bound (holding cost only); adverse-selection impact is a scenario "
+              "estimate until resales confirm it.",
+              "- Dollar figures are sample-scale; scores are uncalibrated, not probabilities."]
     md = "\n".join(lines) + "\n"
     Path(md_path).write_text(md)
     return md

@@ -64,3 +64,15 @@ def test_run_qa_semantic_with_scripted_model(built_runs):
     assert result["accuracy"] == 1.0 and result["answered"] == 3
     assert result["abstention_rate"] == 1.0
     assert all(r["gold"] is not None for r in result["rows"] if r["answerable"])
+
+
+def test_raw_sql_cannot_read_files(built_runs, tmp_path):
+    from eval.qa import open_sql
+    secret = tmp_path / "secret.env"
+    secret.write_text("MARGIN_RADAR_API_KEY=sk-fake-123\n")
+    with open_sql(built_runs["injected"]) as con:
+        assert con.execute("select count(*) from raw.homes").fetchone()[0] > 0
+        for sql in (f"select * from '{secret}'", f"select * from sniff_csv('{secret}')",
+                    f"select * from read_csv('{secret}')"):
+            with pytest.raises(Exception):
+                con.execute(sql).fetchall()

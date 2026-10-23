@@ -81,7 +81,7 @@ def test_sustained_shift_fires_via_cusum_without_streak():
 
 
 def test_baseline_ignores_burn_in_and_is_not_frozen_by_early_noise():
-    # Seed-4 failure mode: an odd first few weeks must not become a frozen baseline that flags every later
+    # Seed-4 failure mode: odd first weeks (burn-in) must not become a baseline that flags every later
     # normal week. Early weeks at -0.08 (burn-in), then 40 normal weeks around 0: no alert at the end.
     rng = np.random.default_rng(7)
     vals = [-0.08] * 8 + list(rng.normal(0, 0.02, 40))
