@@ -9,9 +9,9 @@ WINDOW_WEEKS = 4
 MIN_PEERS = {"market": 3, "band": 2}
 MIN_SEGMENT_SAMPLE = 8  # per-segment sample floor for peer residuals (DECISIONS D6)
 # Per-metric override of that floor for the detector's trigger panels only (DECISIONS D29); reported numbers keep D6.
-SEGMENT_SAMPLE_FLOOR: dict[str, int] = {}
+SEGMENT_SAMPLE_FLOOR: dict[str, int] = {"reno_overrun_pct": 4}
 # Shrinkage pseudo-count k per metric: a segment residual is scaled by n / (n + k) (DECISIONS D29). 0 = off.
-SHRINK_K: dict[str, float] = {}
+SHRINK_K: dict[str, float] = {"reno_overrun_pct": 35.0}
 HISTORY_WEEKS = 26  # portfolio check only; the drift baseline expands (DECISIONS D16)
 BURN_IN_WEEKS = 8  # weeks excluded from baselines: the synthetic portfolio starts empty and ramps up
 MIN_HISTORY_WEEKS = 12

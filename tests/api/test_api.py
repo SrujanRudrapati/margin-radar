@@ -37,8 +37,9 @@ def test_meta(client):
     assert meta["max_week"] == 77 and "sample-scale" in meta["sample_scale_label"]
 
 
-def test_radar_injected_week40(client):
-    r = client.get("/api/radar", params={"run": "injected", "week": 40}).json()
+def test_radar_injected_week45(client):
+    # Week 45: B2 (from week 38) and M05 (from week 43, after D29 shrinkage) are both active on seed 42.
+    r = client.get("/api/radar", params={"run": "injected", "week": 45}).json()
     assert r["banner"] == SYNTHETIC_BANNER
     assert [a["scope"] for a in r["actions"]][:2] == ["B2", "M05"]
     assert r["kpis"]["active_alerts"] == 2 and r["kpis"]["cm_pct"] is not None

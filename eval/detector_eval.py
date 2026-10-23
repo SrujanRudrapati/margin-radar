@@ -23,14 +23,14 @@ from generator.config import BANDS, MARKETS
 ROOT = Path(__file__).resolve().parents[1]
 DBT_BIN = Path(sys.executable).parent / "dbt"
 TUNING_SEEDS = tuple(range(1, 6))
-HOLDOUT_SEEDS = tuple(range(6, 11))
+SEEN_SEEDS = tuple(range(6, 11))  # last night's holdout: its results were seen, so it no longer counts (D30)
 # True holdout (DECISIONS D28): never used for tuning; scopes and onset weeks are drawn per seed.
 TRUE_HOLDOUT_SEEDS = tuple(range(11, 21))
 # Onsets after the first week the drift baseline can score (burn-in 8 + 12 history + 8 eval gap) and early enough
 # for sold-home margin to show the problem before week 78.
 ONSET_WEEK_RANGE = (28, 46)
-MIN_RECALL = 8  # of 10 seeds, per scenario
-MAX_WRONG = 2   # wrong-scope alert episodes across all injected runs
+MIN_RECALL = 8  # of 10 seeds, per scenario (scaled to the split size)
+MAX_WRONG = 2   # wrong-scope alert episodes per 10 injected runs
 log = logging.getLogger("eval")
 
 
@@ -167,21 +167,26 @@ def split_gates(s: dict, n_seeds: int, prefix: str) -> dict:
                                           "rule": f"0 control alert-weeks ({prefix} seeds)"},
         f"{prefix}_recall_before_cm": {"pass": all(v["detected_before_cm"] >= min_recall for v in s["scenarios"].values()),
                                        "value": {k: f"{v['detected_before_cm']}/{v['seeds']}" for k, v in s["scenarios"].items()},
-                                       "rule": f">= {MIN_RECALL}/10 of {prefix} seeds per scenario alert on the true scope before margin shows it"},
+                                       "rule": f">= {min_recall:g}/{n_seeds} of {prefix} seeds per scenario alert on the true scope before margin shows it"},
         f"{prefix}_wrong_alerts": {"pass": s["wrong_episodes"] <= max_wrong, "value": s["wrong_episodes"],
                                    "rule": f"<= {max_wrong:g} wrong-scope alert episodes ({prefix} injected runs)"},
     }
 
 
-def run_detector_eval(seeds=range(1, 11), root: Path = ROOT / "eval" / "runs", tuning_seeds=TUNING_SEEDS,
-                      holdout_seeds=HOLDOUT_SEEDS) -> dict:
+def run_detector_eval(seeds=range(1, 21), root: Path = ROOT / "eval" / "runs", tuning_seeds=TUNING_SEEDS,
+                      seen_seeds=SEEN_SEEDS, holdout_seeds=TRUE_HOLDOUT_SEEDS) -> dict:
     root = Path(root)
     results = []
     for seed in seeds:
         log.info("seed %s ...", seed)
         results.append(run_seed(seed, root))
-    by_split = {"tuning": summarize(results, list(tuning_seeds)), "holdout": summarize(results, list(holdout_seeds)),
-                "all": summarize(results, list(seeds))}
-    gates = {**split_gates(by_split["all"], len(list(seeds)), "all"), **split_gates(by_split["holdout"], len(list(holdout_seeds)), "holdout")}
-    per_seed = [{"seed": r["seed"], "truth": r["truth"]} for r in results]
+    return assemble(results, tuning_seeds, seen_seeds, holdout_seeds)
+
+
+def assemble(results: list[dict], tuning_seeds, seen_seeds, holdout_seeds) -> dict:
+    """Gates use the true holdout only (D30); tuning and seen splits are shown for transparency, never quoted."""
+    splits = {"holdout": list(holdout_seeds), "tuning": list(tuning_seeds), "seen": list(seen_seeds)}
+    by_split = {name: summarize(results, seeds) for name, seeds in splits.items() if seeds}
+    gates = split_gates(by_split["holdout"], len(splits["holdout"]), "holdout")
+    per_seed = [{"seed": r["seed"], "truth": r["truth"], "scenario_args": r.get("scenario_args", {})} for r in results]
     return {"per_seed": per_seed, "by_split": by_split, "gates": gates}

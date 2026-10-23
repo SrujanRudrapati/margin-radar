@@ -1,6 +1,7 @@
 """python -m eval [--live] [--yes] [--skip-llm]  →  eval/results.json + eval/results.md
 
-Default is replay-only (REPLAY=1): the deterministic detector sweep (seeds 1–10, tuned on 1–5, holdout 6–10) plus
+Default is replay-only (REPLAY=1): the deterministic detector sweep (seeds 1–20: tuned on 1–5, 6–10 seen, gates on
+the true holdout 11–20 with drawn scopes and onsets) plus
 the seed-42 LLM evaluations from recorded responses. --live records missing LLM responses with CLAUDE_MODEL_FINAL,
 printing the planned call count first (more than 20 needs --yes or a "y"). Synthetic data — not Opendoor data.
 """
@@ -25,7 +26,7 @@ from eval.qa import QUESTIONS, UNANSWERABLE, run_qa
 from eval.report import confirm_live, token_totals, write_report
 
 SEED42_DB = ROOT / "data" / "radar_injected.duckdb"
-BRIEF_WEEKS = (40, 45, 50, 60)  # seed-42 weeks with active alerts (B2 weeks 38-52, M05 weeks 40-77)
+BRIEF_WEEKS = (40, 45, 50, 60)  # seed-42 weeks with active alerts (B2 weeks 38-52, M05 weeks 43-77)
 EVAL_DIR = ROOT / "eval"
 TOKEN_LOG = ROOT / "data" / "token_log.jsonl"
 RECORDING_COST = EVAL_DIR / "recording_cost.json"  # committed: what recording the eval's LLM responses cost

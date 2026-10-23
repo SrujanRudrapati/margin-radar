@@ -42,14 +42,13 @@ def test_false_alerts_per_week_math():
 @pytest.mark.slow
 def test_report_fields_smoke(tmp_path):
     from eval.detector_eval import run_detector_eval
-    report = run_detector_eval(seeds=[1, 2], root=tmp_path, tuning_seeds=[1], holdout_seeds=[2])
+    report = run_detector_eval(seeds=[1, 2], root=tmp_path, tuning_seeds=[1], seen_seeds=[], holdout_seeds=[2])
     assert {"per_seed", "by_split", "gates"} <= set(report)
-    for split in ("tuning", "holdout", "all"):
+    for split in ("tuning", "holdout"):
         s = report["by_split"][split]
         assert {"control_alert_weeks", "control_false_alerts_per_week", "wrong_episodes", "precision",
                 "recall_before_cm", "scenarios"} <= set(s)
-    assert {f"{split}_{gate}" for split in ("all", "holdout")
-            for gate in ("control_zero_alerts", "recall_before_cm", "wrong_alerts")} <= set(report["gates"])
+    assert {f"holdout_{gate}" for gate in ("control_zero_alerts", "recall_before_cm", "wrong_alerts")} == set(report["gates"])
 
 
 def test_fixed_design_seeds_use_generator_defaults():
@@ -76,3 +75,21 @@ def test_generator_cli_args_from_draw():
     from eval.detector_eval import generator_cli_args
     assert generator_cli_args({}) == []
     assert generator_cli_args({"a_market": "M01", "b_start_week": 33}) == ["--a-market", "M01", "--b-start-week", "33"]
+
+
+def _fake_seed(seed: int) -> dict:
+    truth = [{"scenario": "C", "effects": {"reno_overrun": 1.18}, "scope": "M05", "start_week": 30,
+              "cm_first_visible_week": 46}]
+    runs = {"injected": {"evaluable": [40], "alerts": {"40": [["Ac", "reno_cost_drift", "M05"]]}},
+            "control": {"evaluable": [40], "alerts": {}}}
+    return {"seed": seed, "truth": truth, "runs": runs}
+
+
+def test_gates_are_scored_on_the_true_holdout_only():
+    from eval.detector_eval import assemble
+    report = assemble([_fake_seed(s) for s in (1, 6, 11, 12)], tuning_seeds=[1], seen_seeds=[6], holdout_seeds=[11, 12])
+    assert list(report["by_split"]) == ["holdout", "tuning", "seen"]
+    assert report["by_split"]["holdout"]["seeds"] == [11, 12]
+    assert set(report["gates"]) == {"holdout_control_zero_alerts", "holdout_recall_before_cm", "holdout_wrong_alerts"}
+    assert report["gates"]["holdout_recall_before_cm"]["value"] == {"C": "2/2"}
+    assert [r["seed"] for r in report["per_seed"]] == [1, 6, 11, 12]

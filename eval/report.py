@@ -69,9 +69,10 @@ def write_report(results: dict, md_path: str | Path, json_path: str | Path) -> s
                          f"{t.get('cache_read_input_tokens', '')} | {t.get('est_cost_usd')} |")
     lines += ["", "## Known limitations", "",
               "- Simultaneous all-segment shifts cancel in peer comparisons; the portfolio check only catches abrupt ones.",
-              "- Scenario scopes (M02, B2, M05) and onset (week 30) are the same in every seed; seeds vary only the noise.",
-              "- The detector configuration was chosen with pooled seed counts (DECISIONS D16), so the holdout split is not "
-              "fully held out for that design decision.",
+              "- Gates and quoted numbers use the true holdout, seeds 11–20 (DECISIONS D28, D30): scopes and onsets are "
+              "drawn per seed and these seeds were never used for tuning. Seeds 1–5 tuned the thresholds and the D29 "
+              "shrinkage; seeds 6–10 were seen in an earlier run. Both are shown for transparency only.",
+              "- The expanding-baseline design (DECISIONS D16) was chosen before the true holdout existed, on seeds 1–10.",
               "- Demand-softening impact is a lower bound (holding cost only); adverse-selection impact is a scenario "
               "estimate until resales confirm it.",
               "- Dollar figures are sample-scale; scores are uncalibrated, not probabilities."]
