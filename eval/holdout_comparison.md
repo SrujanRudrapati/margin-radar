@@ -2,7 +2,7 @@ Synthetic data — not Opendoor data.
 
 # Old vs new detector on the true holdout (seeds 11–20)
 
-No setting was tuned on seeds 11–20, and each seed draws its own scopes and onset weeks (DECISIONS D28). One holdout control run (seed 18) was inspected while diagnosing the false alerts (D32), so a second, never-inspected set, seeds 21–30, is reported at the end as a leakage check. "Old" is the detector as of commit `aadb61f`, with the D29 knobs off. Its holdout numbers were recorded before any change was made. "New" adds renovation-overrun shrinkage (floor 4, k = 35), chosen on seeds 1–5 only (D29, D31). Rates are truncated, never rounded up. The gate rules are unchanged (D30).
+No setting was tuned on seeds 11–20, and each seed draws its own scopes and onset weeks (DECISIONS D28). One holdout control run (seed 18) was inspected while diagnosing the false alerts (D32), so a second, never-inspected set, seeds 21–30, is reported at the end as a leakage check. "Old" is the detector as of commit `9ac8b7b`, with the D29 knobs off. Its holdout numbers were recorded before any change was made. "New" adds renovation-overrun shrinkage (floor 4, k = 35), chosen on seeds 1–5 only (D29, D31). Rates are truncated, never rounded up. The gate rules are unchanged (D30).
 
 | Measure (seeds 11–20) | Old | New | Gate |
 |---|---|---|---|
