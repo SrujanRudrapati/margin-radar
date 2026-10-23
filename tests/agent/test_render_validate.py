@@ -1,0 +1,121 @@
+"""Grounding checker, rendering, and brief generation (fake LLMs only)."""
+import json
+import re
+
+import pytest
+
+from agent.brief import GroundingError, make_brief
+from agent.facts import Fact
+from agent.render import render
+from agent.validate import check
+from common.banner import SYNTHETIC_BANNER
+from common.business import SAMPLE_SCALE_LABEL
+
+FACTS = {
+    "D0000000001": Fact("D0000000001", "b2 contract rate", 0.4658, "pct", "46.6%"),
+    "D0000000002": Fact("D0000000002", "b2 gap", 0.0815, "pct_points", "+8.2 pts"),
+    "D0000000003": Fact("D0000000003", "usd mid", 888_123.0, "usd", "$888K"),
+    "D0000000004": Fact("D0000000004", "usd high", 1_332_000.0, "usd", "$1.3M"),
+    "D0000000005": Fact("D0000000005", "bps", 16.2, "bps", "16 bps"),
+    "D0000000006": Fact("D0000000006", "score", 4.27, "score", "4.3"),
+}
+
+
+def test_correct_citations_pass():
+    body = ("B2 conversion rose to 46.6% [q:D0000000001], +8.2 pts [q:D0000000002] above peers in week 40 "
+            "(2025-10-13). Scenario estimate, sample-scale: $888K [q:D0000000003] mid, up to $1.3M [q:D0000000004]; "
+            "16 bps [q:D0000000005] of portfolio CM. Uncalibrated score 4.3 [q:D0000000006] for M02-B2-cash.")
+    assert check(body, FACTS) == []
+
+
+def test_hallucinated_number_rejected():
+    errors = check("Acceptance rose 12% in B2.", FACTS)
+    assert errors and "12%" in errors[0]
+
+
+def test_wrong_value_rejected():
+    errors = check("B2 conversion was 45.0% [q:D0000000001].", FACTS)
+    assert errors and "45.0%" in errors[0]
+
+
+def test_unknown_fact_id_rejected():
+    errors = check("Gap +8.2 pts [q:D9999999999].", FACTS)
+    assert errors and "D9999999999" in errors[0]
+
+
+def test_unit_mismatch_rejected():
+    assert check("B2 conversion was 46.6 [q:D0000000001].", FACTS)
+
+
+def test_panel_reference_is_not_a_number_citation():
+    assert check("B2 conversion was 46.6% [q:Q0123456789].", FACTS)
+
+
+def test_context_numbers_need_no_citation():
+    assert check("Week 38 to week 40, from 2025-09-29; scopes M02, B2, M05-B3-CNML.", FACTS) == []
+
+
+def test_render_banner_first_line_and_footer():
+    md, payload = render("## Top actions\nbody", FACTS, cited=["D0000000003"], as_of_week=40,
+                         week_start="2025-10-13", status="valid", model="m", purpose="dev")
+    assert md.splitlines()[0] == SYNTHETIC_BANNER
+    assert SAMPLE_SCALE_LABEL in md and "uncalibrated" in md
+    assert "D0000000003" in md and payload["banner"] == SYNTHETIC_BANNER and payload["status"] == "valid"
+
+
+# --- make_brief -----------------------------------------------------------------------------------------
+
+class FactAwareLLM:
+    """Calls get_alerts, then writes a body citing the top action's mid $ (valid) or a made-up number (bad)."""
+
+    def __init__(self, good=True):
+        self.good, self.calls = good, 0
+
+    def create(self, *, system, messages, tools, max_tokens):
+        self.calls += 1
+        last = messages[-1]["content"]
+        if isinstance(last, str):
+            return {"stop_reason": "tool_use", "usage": {},
+                    "content": [{"type": "tool_use", "id": f"t{self.calls}", "name": "get_alerts", "input": {}}]}
+        alerts = json.loads(last[0]["content"])
+        mid = alerts["actions"][0]["impact"]["usd_mid"]
+        text = (f"## Top actions\n### {alerts['actions'][0]['scope']}\n- **Impact:** {mid['value']} [{mid['ref']}] "
+                "sample-scale.\n\n## What we're not sure about\nNothing more.") if self.good else \
+            "## Top actions\nMargin fell 7.3% everywhere."
+        return {"stop_reason": "end_turn", "usage": {}, "content": [{"type": "text", "text": text}]}
+
+
+def test_valid_brief_written(built_runs, tmp_path):
+    llm = FactAwareLLM(good=True)
+    path = make_brief(built_runs["injected"], 40, "dev", out_dir=tmp_path, llm=llm)
+    md = path.read_text()
+    assert path.name == "week_40.md" and md.splitlines()[0] == SYNTHETIC_BANNER
+    payload = json.loads((tmp_path / "week_40.json").read_text())
+    assert payload["status"] == "valid" and payload["grounding"]["errors"] == []
+    assert payload["grounding"]["numbers_checked"] >= 1 and re.search(r"\[q:D[0-9a-f]{10}\]", md)
+
+
+def test_fails_closed_after_one_retry(built_runs, tmp_path):
+    llm = FactAwareLLM(good=False)
+    with pytest.raises(GroundingError):
+        make_brief(built_runs["injected"], 40, "dev", out_dir=tmp_path, llm=llm)
+    assert llm.calls == 4  # two agent runs x (tool turn + final turn)
+    assert (tmp_path / "week_40.invalid.md").exists() and not (tmp_path / "week_40.md").exists()
+
+
+class ExplodingLLM:
+    def create(self, **kwargs):
+        raise AssertionError("no LLM call expected")
+
+
+def test_abstain_brief_makes_no_llm_call(built_runs, tmp_path):
+    path = make_brief(built_runs["injected"], 6, "dev", out_dir=tmp_path, llm=ExplodingLLM())
+    md = path.read_text()
+    assert md.splitlines()[0] == SYNTHETIC_BANNER and "abstain" in md.lower()
+    assert json.loads((tmp_path / "week_06.json").read_text())["status"] == "abstain"
+
+
+def test_no_alert_brief_makes_no_llm_call(built_runs, tmp_path):
+    path = make_brief(built_runs["injected"], 33, "dev", out_dir=tmp_path, llm=ExplodingLLM())
+    assert "no active alerts" in path.read_text().lower()
+    assert json.loads((tmp_path / "week_33.json").read_text())["status"] == "no_alerts"
