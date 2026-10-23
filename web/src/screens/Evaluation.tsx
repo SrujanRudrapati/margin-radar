@@ -70,7 +70,7 @@ function SplitView({ name, s }: { name: string; s: Split }) {
     <div className="mt-10">
       <h2 className="text-xl font-bold">Detector, {name} seeds {s.seeds[0]} to {s.seeds[s.seeds.length - 1]}</h2>
       <p className="mt-1 text-[15px]">
-        Control run: {s.control_false_alerts_per_week.toFixed(3)} false alerts per week ({s.control_alert_weeks} alert-weeks over {s.control_evaluable_weeks} weeks).
+        Control run: {(Math.trunc(s.control_false_alerts_per_week * 1000) / 1000).toFixed(3)} false alerts per week ({s.control_alert_weeks} alert-weeks over {s.control_evaluable_weeks} weeks).
         Wrong-scope alerts in injected runs: {s.wrong_episodes}.
       </p>
       <ul className="mt-4 space-y-4">

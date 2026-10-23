@@ -1,0 +1,59 @@
+{
+ "container": null,
+ "content": [
+  {
+   "signature": "CAQS9gkKEAgTGAI4AUIIdGhpbmtpbmcSDC0D5YUM8bM0QAYV9xoMcycdaeMKiw5raEnHIjD/8zHvThnzqdkU/1Dyf/flVO3Wu4CMQlEor0nbebhB/5BtvQQqlNaaWIZynFzGUmIqkwkPk1GN7yd+PaS8cmNzNhG1ISHh8ji8EIu49r11zlCWLqxdPE6KdPx4q0U8UFhvzvWuQEoEyShdkkbwrln6mO8Yt8Sfh2ZjGRKglzArl+/FUCiCTmRqRFp+JznZf9kF8xP+xPaIfF7CYBfKTiB5S490G637mdaoRkOI8OHX5s7Ktdvv98Cii8pY9Wiz5EPQp1r+RKLj0TEtXuD7zz053NBY0WX4Qxij9IAlcf1TsrUlbm06uRI34Mytv9HBq019GIfs6/C8VfMs+sminp55kBjZTf0YLgjwbRFQtyyJFrZ8AyZbWOu6/mwanRKnRhq3auQLr6ZokJHIByG0naQoknTkFZRta7GH9qsXXIuV9VZC8trB9L2E+RLQ4PTGePKSbvBUWRWwvhrzsJWR1xI4mtxcvcUPScoWH9e1OvYXiHnlSxkhO4jg464PA+EZSu8P2jZh/+sbi2XYWxo9LZdS7bXJeJ/8lwEFp1UUs8XgIt7CbMMHyR2RKFTGa3A7jqKQzJEx6YoB33ltPUeJGJbj60HOTfhVT01DT36vAuPV7lUDmrJ+mCbVF7eQpIvkF5sozNRUMWcy7nJwF6dAqKTevyOIrzxZEQP1k9nFWBe/3tXmtn4pvkZB/6w/UMSVeKa5nwVSrJYxRiB9lRvoyYFCZnNBrV+/u6H6MXmtnRK8r+2IrtcDEMiwjyYP9e7N9au3PfAcluhYBaqwiqymCm5UNcPXM/F13ELAMFoqor3Fd2qL76bo8XyGvztldSluzAxdwUPyFywXC8Nrg+Li5e0ipqlG8SQ8b77WLvRJUS31eZAQz28Cg8ieknvN70pu1lqJg3S/DvLKZBXaUD+Jk8OoaNLOJGNqPq7fqQsp6MsLYoRXKzbCbVn4eMUup27BoDSlTyO7DjBqjCGvNvHeg8axKFyuO0fW7ekrh1ajKuVkoJ4UHvlnlgIRr/ug4FhMJzyRaAUeN0GTOc6gufa0yq6OgVv9hau5VXS5JX1jhOCvi2HAsKBJVzDZ+T9Fw3SFnOHMWsiaWyCpeGTH/1K4GM34ByMSu+t4i5i6Jw1VmdYOQ1rra+YoFre4pr1goTHwYBl+hK4pUU2hW6HXSiPFd6cupi8DK28zlmXPB/OU5wrH/IZs2YjoIImHTRnpqYMaKbNb2qxt9SsfCoBrAQ638BFDQ7/MwfAoESc9svVHb9l6oPU4dlwivhS8dId38i9xaSuc5oBENAQM9hFGshGnYUDMWlPBOuaQwzNK2cmdV3xACk4AmOFnIRZGuodHE8QgUhU4lcv2NQ4NTzeYjS+sPvNuPjkkWXpxAdom2wbA0bYYCkLvXlqwP9cX+Kpk2cjjrvo/lHpSA6XjWuIMKz/0vSOvtJgnbnLb8Mpc6jAabvuAw9UM1CgQlIKXdaqXDoFojAEFCvLx8Js8r9nJu1pEH9ccNeX3ImWzhiAMAk9V/RuQe2t1RU49kiH8gYkyke/a2a9arr536mKFPA9fj/bRGN3I9EqrDXK1CM+kspY6pKKzULv5zWS2bl3i0yStZTM7exm8M0yYgnkdEJJ/UVTL5H//ouWVLgRVGAE=",
+   "thinking": "",
+   "type": "thinking"
+  },
+  {
+   "caller": {
+    "type": "direct"
+   },
+   "id": "toolu_012KCFGBRXYmfLecqbMfxJDK",
+   "input": {
+    "sql": "select sum(acquisition_usd) from main.mart_segment_week where week<=40;"
+   },
+   "name": "run_sql",
+   "toolset_name": null,
+   "type": "tool_use"
+  },
+  {
+   "caller": {
+    "type": "direct"
+   },
+   "id": "toolu_01W3rDu9HhUTtRnKvMYc1zte",
+   "input": {
+    "sql": "select sum(offer_price), sum(offer_price+coalesce(fee_usd,0)), count(*) from raw.homes where close_date < timestamp '2025-01-06' + interval 287 day and (resale_date is null or resale_date >= timestamp '2025-01-06' + interval 287 day)"
+   },
+   "name": "run_sql",
+   "toolset_name": null,
+   "type": "tool_use"
+  }
+ ],
+ "diagnostics": null,
+ "id": "msg_011CgK94pwDf63ojmkm4PsiJ",
+ "model": "claude-sonnet-5-5",
+ "role": "assistant",
+ "stop_details": null,
+ "stop_reason": "tool_use",
+ "stop_sequence": null,
+ "type": "message",
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 0,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 1534,
+  "inference_geo": "global",
+  "input_tokens": 687,
+  "output_tokens": 479,
+  "output_tokens_details": {
+   "thinking_tokens": 257
+  },
+  "server_tool_use": null,
+  "service_tier": "batch",
+  "speed": "standard"
+ }
+}

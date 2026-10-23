@@ -1,5 +1,6 @@
 """Eval report: eval/results.json + eval/results.md (docs/SPEC.md Phase 5). Synthetic data — not Opendoor data."""
 import json
+import math
 from pathlib import Path
 
 from common.banner import SYNTHETIC_BANNER
@@ -44,10 +45,10 @@ def write_report(results: dict, md_path: str | Path, json_path: str | Path) -> s
     lines += _gate_rows(det.get("gates", {})) + _gate_rows(llm.get("gates", {}))
     for split, s in det.get("by_split", {}).items():
         lines += ["", f"## Detector — {split} seeds {s.get('seeds')}", "",
-                  f"- Control false alerts per week: {s['control_false_alerts_per_week']:.3f} "
+                  f"- Control false alerts per week: {_down(s['control_false_alerts_per_week'])} "
                   f"({s['control_alert_weeks']} alert-weeks over {s['control_evaluable_weeks']} evaluable control weeks)",
                   f"- Wrong-scope alert episodes (injected runs): {s['wrong_episodes']}; per week "
-                  f"{s['wrong_alert_weeks_per_week']:.3f}",
+                  f"{_down(s['wrong_alert_weeks_per_week'])}",
                   "- Control alert-weeks per seed: " + ", ".join(
                       f"s{c['seed']}: {c['alert_weeks']}" for c in s.get("control_per_seed", [])),
                   f"- Precision (true alert episodes / all episodes): {_fmt(s['precision'])}; "
@@ -82,4 +83,10 @@ def write_report(results: dict, md_path: str | Path, json_path: str | Path) -> s
 def _fmt(value) -> str:
     if value is None:
         return "n/a"
-    return f"{value:.3f}" if isinstance(value, float) and not float(value).is_integer() else str(value)
+    return _down(value) if isinstance(value, float) and not float(value).is_integer() else str(value)
+
+
+def _down(value: float, places: int = 3) -> str:
+    """Truncate toward zero: a reported rate is never rounded up (0.15294 → 0.152)."""
+    scale = 10 ** places
+    return f"{math.trunc(value * scale) / scale:.{places}f}"

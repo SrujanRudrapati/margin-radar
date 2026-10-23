@@ -16,3 +16,9 @@ def test_export_builds_the_governed_mart_first():
     # without `build`, decisions/markers run against a database with no dbt mart and the export aborts
     plan = subprocess.run(["make", "-n", "export"], cwd=ROOT, capture_output=True, text=True, check=True).stdout
     assert "dbt build" in plan or " dbt " in plan
+
+
+def test_every_target_that_reads_the_mart_builds_it_first():
+    for target in ("eval", "briefs", "markers", "decisions"):
+        plan = subprocess.run(["make", "-n", target], cwd=ROOT, capture_output=True, text=True, check=True).stdout
+        assert " dbt " in plan or "dbt build" in plan, f"make {target} does not build the governed mart"

@@ -84,3 +84,29 @@ def test_raw_sql_is_single_threaded_so_unordered_results_replay(built_runs):
     from eval.qa import open_sql
     with open_sql(built_runs["injected"]) as con:
         assert con.execute("select current_setting('threads')").fetchone()[0] == 1
+
+
+def test_raw_sql_results_do_not_depend_on_physical_row_order():
+    # dbt rebuilds change physical row order, so unordered results and float sums differ in their last bits;
+    # the tool output feeds the next turn's cache key, so it must be canonical for replay to work after a rebuild
+    import duckdb
+    from eval.qa import _run_sql
+    con = duckdb.connect()
+    unordered = _run_sql(con, "select * from (values ('b', 2), ('a', 1), ('c', 3)) t(k, v)")
+    assert unordered["rows"] == [["a", 1], ["b", 2], ["c", 3]]
+    ordered = _run_sql(con, "select * from (values ('b', 2), ('a', 1)) t(k, v) order by v desc")
+    assert ordered["rows"] == [["b", 2], ["a", 1]]  # the model's own ORDER BY is kept
+    windowed = _run_sql(con, "select k, sum(v) over (order by v desc) as s from (values ('b', 2), ('a', 1)) t(k, v)")
+    assert windowed["rows"] == [["a", 3], ["b", 2]]  # an ORDER BY inside OVER (...) does not order the output
+    floats = _run_sql(con, "select 0.010813380726812483::double as x, 0.01081338072681226::double as y")
+    assert floats["rows"][0][0] == floats["rows"][0][1]
+
+
+def test_semantic_tool_value_is_canonical(built_runs):
+    # the governed metric value is a float sum whose last bits change with each dbt rebuild; see D25
+    from detector.governed import GovernedStore
+    from eval.qa import _query_metric
+    with GovernedStore(str(built_runs["injected"]), "injected") as store:
+        out = _query_metric(store, "resale_usd", "portfolio", "portfolio", 60, 13)
+    assert out["raw_value"] == float(f"{out['raw_value']:.10g}")
+    assert len(repr(out["raw_value"]).replace(".", "").lstrip("0")) <= 11

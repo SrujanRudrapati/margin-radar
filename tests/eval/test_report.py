@@ -33,3 +33,13 @@ def test_report_has_banner_gates_and_cost(tmp_path):
     assert md.startswith("Synthetic data — not Opendoor data.")
     assert "FAIL" in md and "PASS" in md and "unknown" in md
     assert json.loads((tmp_path / "results.json").read_text())["detector"]["gates"]["control_zero_alerts"]["pass"] is False
+
+
+def test_report_never_rounds_a_rate_up(tmp_path):
+    from eval.report import write_report
+    split = {"seeds": [1], "control_false_alerts_per_week": 78 / 510, "control_alert_weeks": 78,
+             "control_evaluable_weeks": 510, "wrong_episodes": 8, "wrong_alert_weeks_per_week": 0.10666,
+             "control_per_seed": [], "precision": 0.65217, "recall_before_cm": 0.466666, "scenarios": {}}
+    md = write_report({"detector": {"gates": {}, "by_split": {"all": split}}}, tmp_path / "r.md", tmp_path / "r.json")
+    assert "0.152 (78 alert-weeks" in md and "0.153" not in md
+    assert "recall before margin shows the problem: 0.466" in md and "0.467" not in md

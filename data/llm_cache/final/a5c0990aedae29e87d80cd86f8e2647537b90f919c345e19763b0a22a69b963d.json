@@ -1,0 +1,47 @@
+{
+ "container": null,
+ "content": [
+  {
+   "signature": "CAQS1wYKEAgTGAI4AUIIdGhpbmtpbmcSDFoWJUM16RWrwWqEZRoML90wnB/XemWuy+GKIjCRKS4JYs9eQNak1RjPRtgdhrzb0DRvn+tkNO06LsnsdnjiZeV+hoy3aDjxKw5oJJQq9AWKTAdmt8C4GNaWZN94s585dNXpgjQfZl9RbHxmrbQg7mEoUHKLcN5hO5ywndN/RgEPsdzojX2AGhgKuC1rBYQWlQAtnShyIVihe9cB4jpXI+0D5+lJHjdwvtF/yQuNO0RuaC/0+U0pb70AZ6EeSeIlj3p6BQ66lRVaLqjD5mdtxgaxyjzGxvoyuEhSn5nA4Vod5ZMBtuyzSvfC9qkyLwVETIUZxJ6nZrTO3gy0TU+0Y5gOIY+9esC/jy27se96O//F4uys7j9+zs6oeMo/euBN68mDMLVlKYxuip094xB/3ANlcjY1TAdNJFd12Gs/MH6gMTKnHNE9jZQslSXZdjVq7m88n6ueHNYdbqKOQLmKT+cg3TGglLQ2MHeNhTfN14Rp7SjqHGrTPlGuXyCtuE8x93o/mAPs9IMoS7eUq8YEXzRpGIFm1g08wYMLgRHLaW5lUjegll8TuIImlRizFVFDOJukoT56pBQDyRgnzlB2LrZMR9gi24DeQZPa/GtgJeQTCXj9RouyHIeR3a0DtdDJWndrDDWXQ2RHcz0O4feK8BqAuQBUiRj6BKp5IH/BWKvwxKutpnP3UfTo7VcEk9arou+lAhZSxRLGsjd5O5Fw4XvIosnw5E+Y9+b/+riHbbOEWsL7uKK1vyqfetQAJTAk1MGUHJ50i1vZotLMiGfRbrKkePz/UiVSCVpT+IFhjcTY0/GvDLs3Z4PKM928JIJ7FEAN3pjhVItAGIQS7iy7lGhxrSY73Yy3eA44my8dzNRxWSGqHL0+iGuIavFSXxtVD2zFqSl8RjXVskz/ihRUeFZYFU60tk7Qr0Oa0v1too9iYr0ITlJ2cSGDzjvLiprv8VUbQDTmuTtUeEKmRspitZlfa7L3u1Un1uVX44b+z1iW5ptw0czpot89XMH6Trbau7Ioac4pKSe1vWQFDIDJPD8vQ/VW4zDiEuh+BiYLxj0PAo+FF1nZQ/ZIpjHLdItrCi6BxaU1s6O3xyaBxnVQE58iDBUYAQ==",
+   "thinking": "",
+   "type": "thinking"
+  },
+  {
+   "caller": {
+    "type": "direct"
+   },
+   "id": "toolu_01VZoJ5hApDZHNddDGnpjEoc",
+   "input": {
+    "value": 0.060480530240265
+   },
+   "name": "answer",
+   "toolset_name": null,
+   "type": "tool_use"
+  }
+ ],
+ "diagnostics": null,
+ "id": "msg_011CgK94yFHLfV3f3FNtXGg8",
+ "model": "claude-sonnet-5-5",
+ "role": "assistant",
+ "stop_details": null,
+ "stop_reason": "tool_use",
+ "stop_sequence": null,
+ "type": "message",
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 0,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 1534,
+  "inference_geo": "global",
+  "input_tokens": 550,
+  "output_tokens": 155,
+  "output_tokens_details": {
+   "thinking_tokens": 102
+  },
+  "server_tool_use": null,
+  "service_tier": "batch",
+  "speed": "standard"
+ }
+}

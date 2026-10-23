@@ -11,5 +11,6 @@
   "grounding": {
     "numbers_checked": 0,
     "errors": []
-  }
+  },
+  "actions": []
 }
