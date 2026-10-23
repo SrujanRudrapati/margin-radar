@@ -1,7 +1,7 @@
 PY := conda run --no-capture-output -n margin-radar python
 SEED ?= 42
 
-.PHONY: setup data test build detect briefs eval record-final
+.PHONY: setup data test build detect briefs eval record-final decisions
 
 setup:
 	conda env update -n margin-radar -f environment.yml
@@ -49,3 +49,8 @@ eval: data/radar_injected.duckdb
 # Record missing eval LLM responses with CLAUDE_MODEL_FINAL. Prints the planned call count and asks first.
 record-final: data/radar_injected.duckdb
 	$(PY) -m eval --live
+
+# Decision log (feedback loop): seed example decisions and score them against realized margin (deterministic, no LLM).
+decisions: data/radar_injected.duckdb
+	$(PY) -m agent decisions seed --db data/radar_injected.duckdb --log data/decisions.duckdb > /dev/null
+	$(PY) -m agent decisions score --db data/radar_injected.duckdb --log data/decisions.duckdb > data/decision_scores.json

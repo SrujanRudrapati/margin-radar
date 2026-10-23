@@ -17,3 +17,4 @@ briefs/dev/
 data/out/
 eval/runs/
 .worktrees/
+data/decision_scores.json
