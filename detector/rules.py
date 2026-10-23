@@ -43,8 +43,7 @@ def detect(store: GovernedStore, as_of_week: int) -> DetectorResult:
                 signal = _signal(store, metric, dim, scope, result, roll, panel_id, as_of_week)
                 if result.direction != bad:
                     watch.append(Watch(scope, metric, f"{metric} moved {result.direction} (not the margin-risk "
-                                                      f"direction); uncalibrated score {result.z_latest:.1f}",
-                                       signal.ref_ids))
+                                                      f"direction); see the cited uncalibrated score", signal.ref_ids))
                     continue
                 if kind == "adverse_selection":
                     spread = scored[(EXPLAINING_METRIC, dim)].get(scope, (None,))[0]
