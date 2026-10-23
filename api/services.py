@@ -19,7 +19,7 @@ from detector.drift import DriftScore, score
 from detector.governed import GovernedStore
 from detector.impact import rank_actions
 from detector.peers import peer_residuals, rollup
-from detector.rules import TRIGGERS, detect
+from detector.rules import TRIGGERS, detect, detector_rollup, drift_inputs
 
 log = logging.getLogger("api")
 RUNS = ("injected", "control")
@@ -149,10 +149,11 @@ class Services:
             scoped = store.panel(metric, dimension, last, WINDOW_WEEKS, min_denominator=MIN_SEGMENT_SAMPLE)
             values = scoped.values[scoped.values["scope"] == scope].set_index("week")["value"]
             weeks = list(own.index)
-            se = own["se"].fillna(0.0)
+            # Scores are the detector's own (its floor and shrinkage, D29); the gap line above is observed.
+            series, se = drift_inputs(detector_rollup(store, metric, dimension, last)[0], metric).get(scope, (None, None))
             scores = []
             for w in weeks:
-                r = score(own["residual"], w, metric, se)
+                r = score(series, w, metric, se) if series is not None else None
                 scores.append(r.z_latest if isinstance(r, DriftScore) else None)
             kind = TRIGGERS[metric][1]  # only this metric's alerts and ground truth belong on its chart
             episodes = [e for e in self._all_episodes(run, store) if e["scope"] == scope and e["kind"] == kind]

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { api } from "../api";
 import { Empty, ErrorNote, Loading } from "../components/States";
 import { useAsync } from "../components/useAsync";
@@ -63,25 +63,35 @@ function inline(text: string, cites: Map<string, Citation>) {
 }
 
 function Cite({ id, c }: { id: string; c?: Citation }) {
-  // Opens on hover, keyboard focus, or a tap/click (touch has no hover); a second tap, Escape or blur closes it.
-  // Hover counts only for a mouse (touch has none) and focus only for keyboard focus, so a tap toggles cleanly.
+  // Opens on mouse hover (the tooltip itself stays hoverable), keyboard focus, or a tap/click. A click or Enter on an
+  // open citation closes it, as do Escape, blur and a tap anywhere else (Safari never focuses a clicked button).
+  // Hover counts only for a mouse and focus only for keyboard focus, so a tap toggles cleanly on touch screens.
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
   const [pinned, setPinned] = useState(false);
+  const wrapper = useRef<HTMLSpanElement>(null);
+  const tipId = useId();
   const open = hovered || focused || pinned;
   const close = () => { setHovered(false); setFocused(false); setPinned(false); };
+  useEffect(() => {
+    if (!pinned) return;
+    const onOutside = (e: PointerEvent) => { if (!wrapper.current?.contains(e.target as Node)) close(); };
+    document.addEventListener("pointerdown", onOutside);
+    return () => document.removeEventListener("pointerdown", onOutside);
+  }, [pinned]);
   const sql = c?.sql ? Object.entries(c.sql)[0] : undefined;
   return (
-    <span className="relative inline-block indent-0">
-      <button type="button" aria-expanded={open} aria-label={`Citation ${id}`}
-              onPointerEnter={(e) => { if (e.pointerType === "mouse") setHovered(true); }}
-              onPointerLeave={(e) => { if (e.pointerType === "mouse") setHovered(false); }}
+    <span ref={wrapper} className="relative inline-block indent-0"
+          onPointerEnter={(e) => { if (e.pointerType === "mouse") setHovered(true); }}
+          onPointerLeave={(e) => { if (e.pointerType === "mouse") setHovered(false); }}>
+      <button type="button" aria-expanded={open} aria-label={`Citation ${id}`} aria-describedby={open ? tipId : undefined}
               onFocus={(e) => { if (e.currentTarget.matches(":focus-visible")) setFocused(true); }}
-              onBlur={close} onClick={() => setPinned((p) => !p)}
+              onBlur={() => { setFocused(false); setPinned(false); }}
+              onClick={() => (open ? close() : setPinned(true))}
               onKeyDown={(e) => { if (e.key === "Escape") close(); }}
               className="mx-0.5 rounded bg-grid/60 px-1 align-super text-[10px] font-semibold text-muted hover:bg-ink hover:text-paper">q</button>
       {open && (
-        <span role="tooltip" className="absolute left-0 top-6 z-20 block w-[min(30rem,80vw)] rounded-panel border border-grid bg-panel p-3 text-left text-sm shadow-lg">
+        <span id={tipId} role="tooltip" className="absolute left-0 top-6 z-20 block w-[min(30rem,80vw)] rounded-panel border border-grid bg-panel p-3 text-left text-sm shadow-lg">
           {c ? (
             <>
               <span className="block font-semibold">{c.display}: {c.label}</span>

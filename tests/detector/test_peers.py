@@ -105,9 +105,7 @@ def test_shrinkage_pulls_thin_residuals_toward_peers():
     assert shrunk == pytest.approx(plain * 100 / (100 + 100))
 
 
-def test_shrinkage_defaults_to_config(monkeypatch):
-    import detector.peers as peers
+def test_no_shrinkage_by_default():
     panel = make_panel(lambda m, b, p, w: 0.90 if m == "M01" else base(m, b, p, w), denom=100)
-    monkeypatch.setattr(peers, "SHRINK_K", {"contract_rate": 300})
     r = _row(peer_residuals(panel, "market"), "M01-B2-CNML", 7)["residual"]
-    assert r == pytest.approx(_row(peer_residuals(panel, "market", shrink_k=0), "M01-B2-CNML", 7)["residual"] / 4)
+    assert r == pytest.approx(0.90 - np.median([base(m, "B2", "CNML", 7) for m in MARKETS[1:]]))

@@ -57,11 +57,11 @@ def test_fixed_design_seeds_use_generator_defaults():
 
 
 def test_true_holdout_seeds_draw_scopes_and_onsets():
-    from eval.detector_eval import ONSET_WEEK_RANGE, TRUE_HOLDOUT_SEEDS, scenario_args
+    from eval.detector_eval import CONFIRM_SEEDS, ONSET_WEEK_RANGE, TRUE_HOLDOUT_SEEDS, scenario_args
     from generator.config import BANDS, MARKETS
-    assert TRUE_HOLDOUT_SEEDS == tuple(range(11, 21))
-    draws = [scenario_args(s) for s in TRUE_HOLDOUT_SEEDS]
-    assert draws == [scenario_args(s) for s in TRUE_HOLDOUT_SEEDS]  # deterministic per seed
+    assert TRUE_HOLDOUT_SEEDS == tuple(range(11, 21)) and CONFIRM_SEEDS == tuple(range(21, 31))
+    draws = [scenario_args(s) for s in TRUE_HOLDOUT_SEEDS + CONFIRM_SEEDS]
+    assert draws == [scenario_args(s) for s in TRUE_HOLDOUT_SEEDS + CONFIRM_SEEDS]  # deterministic per seed
     lo, hi = ONSET_WEEK_RANGE
     for d in draws:
         assert d["a_market"] in MARKETS and d["c_market"] in MARKETS and d["a_market"] != d["c_market"]
@@ -87,9 +87,16 @@ def _fake_seed(seed: int) -> dict:
 
 def test_gates_are_scored_on_the_true_holdout_only():
     from eval.detector_eval import assemble
-    report = assemble([_fake_seed(s) for s in (1, 6, 11, 12)], tuning_seeds=[1], seen_seeds=[6], holdout_seeds=[11, 12])
-    assert list(report["by_split"]) == ["holdout", "tuning", "seen"]
+    report = assemble([_fake_seed(s) for s in (1, 6, 11, 12, 21)], tuning_seeds=[1], seen_seeds=[6],
+                      holdout_seeds=[11, 12], confirm_seeds=[21])
+    assert list(report["by_split"]) == ["holdout", "tuning", "seen", "confirm"]
     assert report["by_split"]["holdout"]["seeds"] == [11, 12]
     assert set(report["gates"]) == {"holdout_control_zero_alerts", "holdout_recall_before_cm", "holdout_wrong_alerts"}
     assert report["gates"]["holdout_recall_before_cm"]["value"] == {"C": "2/2"}
-    assert [r["seed"] for r in report["per_seed"]] == [1, 6, 11, 12]
+    assert [r["seed"] for r in report["per_seed"]] == [1, 6, 11, 12, 21]
+
+
+def test_assemble_needs_holdout_seeds():
+    from eval.detector_eval import assemble
+    with pytest.raises(ValueError, match="holdout"):
+        assemble([_fake_seed(1)], tuning_seeds=[1], seen_seeds=[], holdout_seeds=[])

@@ -9,7 +9,7 @@ import math
 import numpy as np
 import pandas as pd
 
-from detector.config import MIN_SEGMENT_SAMPLE, SEGMENT_SAMPLE_FLOOR, WINDOW_WEEKS, Z_EXPLAIN
+from detector.config import MIN_SEGMENT_SAMPLE, SEGMENT_SAMPLE_FLOOR, SHRINK_K, WINDOW_WEEKS, Z_EXPLAIN
 from detector.drift import DriftScore, Insufficient, score
 from detector.governed import GovernedStore
 from detector.models import Abstention, Alert, DetectorResult, Signal, Watch
@@ -27,7 +27,8 @@ SUPPORTING = {"demand_softening": (("price_cut_rate", "+"), ("showing_rate_per_w
 EXPLAINING_METRIC = "avg_spread_pct"
 PROPORTION_METRICS = frozenset({"contract_rate", "first_offer_rate", "price_cut_rate"})
 
-Scored = dict[str, tuple[DriftScore | Insufficient, pd.DataFrame, str]]
+# scope -> (drift score, observed rollup frame, (scored panel query ID, observed panel query ID))
+Scored = dict[str, tuple[DriftScore | Insufficient, pd.DataFrame, tuple[str, str]]]
 
 
 def detect(store: GovernedStore, as_of_week: int) -> DetectorResult:
@@ -37,10 +38,10 @@ def detect(store: GovernedStore, as_of_week: int) -> DetectorResult:
     watch: list[Watch] = []
     for metric, (bad, kind) in TRIGGERS.items():
         for dim in DIMENSIONS:
-            for scope, (result, roll, panel_id) in scored[(metric, dim)].items():
+            for scope, (result, roll, refs) in scored[(metric, dim)].items():
                 if not (isinstance(result, DriftScore) and result.fired):
                     continue
-                signal = _signal(store, metric, dim, scope, result, roll, panel_id, as_of_week)
+                signal = _signal(store, metric, dim, scope, result, roll, refs, as_of_week)
                 if result.direction != bad:
                     watch.append(Watch(scope, metric, f"{metric} moved {result.direction} (not the margin-risk "
                                                       f"direction); see the cited uncalibrated score", signal.ref_ids))
@@ -73,39 +74,58 @@ def _metrics_needed() -> tuple[str, ...]:
     return tuple(TRIGGERS) + tuple(extra)
 
 
-def _score_metric(store: GovernedStore, metric: str, dim: str, as_of_week: int) -> Scored:
+def detector_rollup(store: GovernedStore, metric: str, dim: str, as_of_week: int) -> tuple[pd.DataFrame, str]:
+    """The rollup the detector scores: per-metric segment floor and shrinkage toward peers (DECISIONS D29)."""
     floor = SEGMENT_SAMPLE_FLOOR.get(metric, MIN_SEGMENT_SAMPLE)
     panel = store.panel(metric, "segment", as_of_week, WINDOW_WEEKS, min_denominator=floor)
-    roll = rollup(peer_residuals(panel, dim), dim)
-    out: Scored = {}
+    return rollup(peer_residuals(panel, dim, shrink_k=SHRINK_K.get(metric, 0.0)), dim), panel.query_id
+
+
+def observed_rollup(store: GovernedStore, metric: str, dim: str, as_of_week: int) -> tuple[pd.DataFrame, str]:
+    """Observed scope-minus-peers gaps (D6 floor, no shrinkage): every gap or $ the detector reports uses this."""
+    panel = store.panel(metric, "segment", as_of_week, WINDOW_WEEKS, min_denominator=MIN_SEGMENT_SAMPLE)
+    return rollup(peer_residuals(panel, dim), dim), panel.query_id
+
+
+def drift_inputs(roll: pd.DataFrame, metric: str) -> dict[str, tuple[pd.Series, pd.Series]]:
+    """Per scope: the residual series and its sampling-error floor (DECISIONS D7, D9), as the detector scores them."""
+    out = {}
     for scope, frame in roll.groupby("scope"):
         indexed = frame.set_index("week")
-        series = indexed["residual"]
         se = indexed["se"].fillna(0.0)
         if metric in PROPORTION_METRICS:
             p, n = indexed["peer_level"], indexed["weight"]
             se = np.maximum(se, np.sqrt((p * (1 - p)).clip(lower=1e-4) / n.where(n > 0)).fillna(0.0))
-        out[scope] = (score(series, as_of_week, metric, se), frame, panel.query_id)
+        out[scope] = (indexed["residual"], se)
     return out
 
 
-def _signal(store, metric, dim, scope, result: DriftScore, roll, panel_id, as_of_week) -> Signal:
-    residual = float(roll.set_index("week")["residual"].loc[as_of_week])
-    ids = [panel_id]
+def _score_metric(store: GovernedStore, metric: str, dim: str, as_of_week: int) -> Scored:
+    roll, scored_id = detector_rollup(store, metric, dim, as_of_week)
+    adjusted = metric in SHRINK_K or metric in SEGMENT_SAMPLE_FLOOR
+    observed, observed_id = observed_rollup(store, metric, dim, as_of_week) if adjusted else (roll, scored_id)
+    return {scope: (score(series, as_of_week, metric, se), observed[observed["scope"] == scope], (scored_id, observed_id))
+            for scope, (series, se) in drift_inputs(roll, metric).items()}
+
+
+def _signal(store, metric, dim, scope, result: DriftScore, roll, refs: tuple[str, str], as_of_week) -> Signal:
+    scored_id, observed_id = refs
+    residual = float(roll.set_index("week")["residual"].get(as_of_week, np.nan))
+    ids = list(dict.fromkeys(refs))
     if math.isfinite(residual):
         ids.append(store.register_derived(f"{metric} {dim} peer residual {scope} week {as_of_week}", residual,
-                                          "ratio", (panel_id,), "volume-weighted mean of leave-one-out peer residuals"))
+                                          "ratio", (observed_id,), "volume-weighted mean of leave-one-out peer residuals"))
     ids.append(store.register_derived(f"{metric} {dim} drift score {scope} week {as_of_week}", result.z_latest,
-                                      "ratio", (panel_id,), "robust z vs trailing history (uncalibrated)"))
+                                      "ratio", (scored_id,), "robust z vs trailing history (uncalibrated)"))
     return Signal(metric, dim, scope, result.direction, result.z_latest, residual, result.onset_week, tuple(ids))
 
 
 def _supporting(store, scored, kind, dim, scope, as_of_week) -> tuple[Signal, ...]:
     out = []
     for metric, direction in SUPPORTING.get(kind, ()):
-        result, roll, panel_id = scored[(metric, dim)].get(scope, (None, None, None))
+        result, roll, refs = scored[(metric, dim)].get(scope, (None, None, None))
         if isinstance(result, DriftScore) and result.fired and result.direction == direction:
-            out.append(_signal(store, metric, dim, scope, result, roll, panel_id, as_of_week))
+            out.append(_signal(store, metric, dim, scope, result, roll, refs, as_of_week))
     return tuple(out)
 
 

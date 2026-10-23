@@ -52,7 +52,8 @@ def test_governed_store_cannot_reach_another_run(built_runs):
         assert attached == [str(built_runs["injected"])]
         for sql in (f"attach '{control}' as other (read_only)",
                     f"select count(*) from read_parquet('{control.parent / 'parquet' / 'control' / '*.parquet'}')"):
-            with pytest.raises(duckdb.Error):
+            # blocked by the store's configuration, not merely a missing path
+            with pytest.raises(duckdb.PermissionException, match="disabled by configuration"):
                 store._con.execute(sql)
 
 

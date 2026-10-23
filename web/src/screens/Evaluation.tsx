@@ -9,7 +9,7 @@ type Split = { seeds: number[]; control_false_alerts_per_week: number; control_a
   wrong_episodes: number; precision: number | null; recall_before_cm: number | null; scenarios: Record<string, Scenario> };
 
 const NAMES: Record<string, string> = { A: "A: buyers slow down (one market)", B: "B: adverse selection (one price band)", C: "C: renovation overrun (one market)" };
-const SPLIT_LABEL: Record<string, string> = { holdout: "true holdout", tuning: "tuning", seen: "seen earlier" };
+const SPLIT_LABEL: Record<string, string> = { holdout: "true holdout", tuning: "tuning", seen: "seen earlier", confirm: "confirmation (leakage check)" };
 
 export function EvaluationScreen() {
   const state = useAsync(() => api.evaluation(), []);
@@ -22,7 +22,7 @@ export function EvaluationScreen() {
   return (
     <section aria-labelledby="eval-title">
       <h1 id="eval-title" className="text-2xl font-bold">How well it works, measured honestly</h1>
-      <p className="mt-1 max-w-[72ch] text-muted">Gates are scored on the true holdout, seeds 11 to 20: each seed draws its own scopes and onset weeks, and none was used for tuning. Seeds 1 to 5 tuned the detector; seeds 6 to 10 were seen in an earlier run. Gates are never loosened to pass.</p>
+      <p className="mt-1 max-w-[72ch] text-muted">Gates are scored on the true holdout, seeds 11 to 20: each seed draws its own scopes and onset weeks, and no setting was tuned on them (one control run, seed 18, was inspected to diagnose false alerts, and the keep-or-revert call for the detector change was made on them). Seeds 21 to 30 were never looked at before this run and check for leakage. Seeds 1 to 5 tuned the detector; seeds 6 to 10 were seen in an earlier run. Gates are never loosened to pass.</p>
       <table className="mt-6 w-full max-w-4xl text-left text-[15px]">
         <caption className="sr-only">Evaluation gates</caption>
         <thead className="border-b border-grid text-sm text-muted"><tr><th className="py-2 pr-3">Gate</th><th className="pr-3">Result</th><th className="pr-3">Measured</th><th>Rule</th></tr></thead>
@@ -37,7 +37,7 @@ export function EvaluationScreen() {
           ))}
         </tbody>
       </table>
-      {splits && (["holdout", "tuning", "seen"] as const).filter((k) => splits[k]).map((k) => <SplitView key={k} name={k} s={splits[k]} />)}
+      {splits && (["holdout", "confirm", "tuning", "seen"] as const).filter((k) => splits[k]).map((k) => <SplitView key={k} name={k} s={splits[k]} />)}
       {e.llm?.summary && (
         <div className="mt-10">
           <h2 className="text-xl font-bold">Briefs and questions (seed 42, final model)</h2>

@@ -43,7 +43,7 @@ Screenshots (light, dark, mobile): `docs/screenshots/`.
 
 ## Results
 
-From `eval/results.json`. Every detector number below is on the **true holdout, seeds 11–20**. These seeds were never used for tuning, and each one draws its own scenario scopes (which market or price band) and onset weeks (weeks 28–46). The thresholds and the renovation shrinkage were tuned on seeds 1–5. Gates are reported as measured and are never loosened. Rates are truncated, never rounded up. Lead ranges cover only the seeds caught in time. Old vs new detector: `eval/holdout_comparison.md`.
+From `eval/results.json`. Every detector number below is on the **true holdout, seeds 11–20**. No setting was tuned on these seeds, and each one draws its own scenario scopes (which market or price band) and onset weeks (weeks 28–46). The thresholds and the renovation shrinkage were tuned on seeds 1–5. Gates are reported as measured and are never loosened. Rates are truncated, never rounded up. Lead ranges cover only the seeds caught in time. Old vs new detector, and a leakage check on never-inspected seeds 21–30: `eval/holdout_comparison.md`.
 
 | Measure (seeds 11–20) | Result | Gate |
 |---|---|---|

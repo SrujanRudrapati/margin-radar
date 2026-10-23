@@ -120,3 +120,15 @@ def test_spread_explains_conversion():
     assert kind == "alert"
     kind, _ = classify_adverse_selection(_score(4.0, "+"), spread=None)
     assert kind == "alert"
+
+
+def test_reported_gap_is_observed_not_shrunk(built_runs):
+    """D29 shrinkage only feeds the drift score; the alert's gap (and so its $ impact) is the observed scope-minus-peers."""
+    from detector.rules import detector_rollup, observed_rollup
+    with GovernedStore(str(built_runs["injected"]), "injected") as store:
+        alert = next(a for a in detect(store, 60).alerts if (a.kind, a.scope) == ("reno_cost_drift", "M05"))
+        observed, _ = observed_rollup(store, "reno_overrun_pct", "market", 60)
+        shrunk, _ = detector_rollup(store, "reno_overrun_pct", "market", 60)
+    gap = observed.set_index(["scope", "week"]).loc[("M05", 60), "residual"]
+    assert alert.signals[0].residual == pytest.approx(gap)
+    assert abs(shrunk.set_index(["scope", "week"]).loc[("M05", 60), "residual"]) < abs(gap)

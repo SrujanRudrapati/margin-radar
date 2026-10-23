@@ -70,7 +70,8 @@ def write_report(results: dict, md_path: str | Path, json_path: str | Path) -> s
     lines += ["", "## Known limitations", "",
               "- Simultaneous all-segment shifts cancel in peer comparisons; the portfolio check only catches abrupt ones.",
               "- Gates and quoted numbers use the true holdout, seeds 11–20 (DECISIONS D28, D30): scopes and onsets are "
-              "drawn per seed and these seeds were never used for tuning. Seeds 1–5 tuned the thresholds and the D29 "
+              "drawn per seed and no setting was tuned on them (one control run was inspected while diagnosing, D32; seeds 21–30, "
+              "never inspected, are a leakage check). Seeds 1–5 tuned the thresholds and the D29 "
               "shrinkage; seeds 6–10 were seen in an earlier run. Both are shown for transparency only.",
               "- The expanding-baseline design (DECISIONS D16) was chosen before the true holdout existed, on seeds 1–10.",
               "- Demand-softening impact is a lower bound (holding cost only); adverse-selection impact is a scenario "
