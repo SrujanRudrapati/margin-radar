@@ -1,0 +1,81 @@
+version: 2
+
+models:
+  - name: metricflow_time_spine
+    description: Day-grain calendar (2025-01-01 to 2026-12-31) required by MetricFlow.
+    columns:
+      - name: date_day
+        data_tests: [unique, not_null]
+
+  - name: mart_segment_week
+    description: >
+      Point-in-time weekly funnel by segment (6 markets x 3 bands x 2 products x 78 weeks, zero-filled).
+      Each event counts in its own event week; state columns use only dates up to the end of the week.
+      Numerators and denominators only. Synthetic data — not Opendoor data.
+    data_tests:
+      - unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [segment, week]
+    columns:
+      - name: segment
+        description: Market-band-product id such as M02-B2-cash.
+        data_tests: [not_null]
+      - name: market
+        data_tests: [not_null]
+      - name: band
+        data_tests:
+          - not_null
+          - accepted_values: {arguments: {values: [B1, B2, B3]}}
+      - name: product
+        data_tests:
+          - not_null
+          - accepted_values: {arguments: {values: [cash, CNML]}}
+      - name: week
+        description: Integer week index; week 0 starts Monday 2025-01-06.
+        data_tests: [not_null]
+      - name: week_start
+        data_tests: [not_null]
+      - name: offers
+        description: Offers made in the week.
+      - name: spread_sum
+        description: Sum of offer spread_pct for offers in the week.
+      - name: contracts
+        description: Contracts signed in the week.
+      - name: fell_through
+        description: Contracts cancelled in the week because the seller fell through.
+      - name: company_declined
+        description: Contracts cancelled in the week because the company declined.
+      - name: closes
+        description: Acquisitions closed in the week.
+      - name: acquisition_usd
+        description: Sum of offer_price of closes in the week.
+      - name: awaiting_offer
+        description: Listings with list_date before the week start and no first buyer offer before the week start.
+      - name: first_offers
+        description: Listings whose first buyer offer fell in the week.
+      - name: dtfo_sum
+        description: Sum of days_to_first_offer, by first-offer week.
+      - name: showings_sum
+        description: Sum of showings before first offer, by first-offer week.
+      - name: price_cuts
+        description: Price cuts made in the week.
+      - name: renos_completed
+        description: Renovations completed in the week.
+      - name: reno_estimate_sum
+        description: Sum of estimated renovation cost, by completion week.
+      - name: reno_actual_sum
+        description: Sum of actual renovation cost, by completion week.
+      - name: resales
+        description: Homes resold in the week.
+      - name: resale_usd
+        description: Sum of resale price, by resale week.
+      - name: model_valuation_sold_sum
+        description: Sum of model valuation of homes resold in the week.
+      - name: cm_usd
+        description: Contribution margin of homes resold in the week = resale - (offer - fee) - reno_actual - holding - selling.
+      - name: holding_cost_sum
+        description: Sum of holding cost, by resale week.
+      - name: hold_days_sum
+        description: Sum of hold days, by resale week.
+      - name: unsold_inventory_usd
+        description: Sum of (offer - fee) of homes closed by week end and not resold by week end.

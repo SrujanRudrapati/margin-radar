@@ -1,0 +1,23 @@
+name: margin_radar
+version: "0.1.0"
+config-version: 2
+profile: margin_radar
+
+# Synthetic data — not Opendoor data.
+model-paths: ["models"]
+macro-paths: ["macros"]
+test-paths: ["tests"]
+target-path: "target"
+log-path: "logs"
+packages-install-path: "dbt_packages"
+
+vars:
+  start_date: "2025-01-06"   # Monday of week 0
+  n_weeks: 78
+
+models:
+  margin_radar:
+    staging:
+      +materialized: view
+    marts:
+      +materialized: table
