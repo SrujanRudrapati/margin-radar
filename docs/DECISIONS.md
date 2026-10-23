@@ -67,3 +67,29 @@ Pre-flight table rulings: fixtures pass --truth-path to tmp; test_business_const
 - Final: minor (deferred): impact values not rounded before registration (byte-for-byte replay risk in Phase 4)
 - Final: minor (deferred): scenario exposure_usd uses exposed homes × price; negative measured erosion has no label
 - Final: minor (deferred): test_impact_in_usd_and_bps only sees measured M05 alerts; Scored type alias inaccurate
+
+## Phase 4 decisions
+
+| # | Phase | Decision | Reasoning |
+|---|---|---|---|
+| D13 | 4 | `claude-sonnet-5-5` calls go through `client.beta.messages.create` with `betas=["server-side-fallback-2026-07-01"]` and `fallbacks="default"`. Haiku calls use the plain `messages.create`. | The claude-api skill says to include the server-side refusal fallback by default for Sonnet 5.5 on the Claude API and to tell the user. A refused request is re-run on a fallback model inside the same call, so a classifier refusal does not silently kill the sample brief. |
+| D14 | 4 | anthropic SDK 2.1.0 (newest at install), pinned. The skill's Python docs describe 1.x. Only the surfaces verified by introspection are used: `messages.create`, `beta.messages.create`, `model_dump`. | The skill says not to guess SDK usage. The methods used exist with the documented parameters (`system`, `tools`, `cache_control`, `max_tokens`). |
+| D15 | 4 | Grounding checker is strict: exact display-string match (a leading "+" is optional), number words rejected, every `[q:ID]` must exist, only plain week references, dates, scope names and the sample-scale label are exempt. A structure check requires every ranked action in rank order, the scenario labels with low/mid/high cited, and the "What we're not sure about" section. One retry continues the same conversation; any failure (grounding, model stop, turn limit) writes `week_XX.invalid.md` and is never published. | The Phase 4 final review showed tolerance-based matching let `$1M` pass for $1.3M and let uncited numbers hide behind week phrases and words. Phase 5 measures "grounding %", so the checker has to be strict for that number to mean anything. |
+
+## Phase 4 execution rulings (from the ledger)
+
+- Task 12: Ruling: SPEC's cohort_curve tool needs per-home sell order, which the weekly mart lacks; GovernedStore gains cohort_curve(level, scope, close_week_start, close_week_end, as_of_week) reading raw.homes from the same single DB file (read-only, whitelisted SQL, query ID, point-in-time: resales dated <= as_of week end) — cost if wrong: one extra governed query type
+- Task 13: Ruling: brief CLI takes --db as a required argument (no default path) — agent/ may not name a run's file (tests/test_boundaries.py); the Makefile passes data/radar_injected.duckdb — cost if wrong: none
+- Task 13: Ruling: demo briefs per SPEC are written for the injected run only (D2): week 6 (global abstention, no LLM), week 33 (inside the Q3 dip, no alerts, no LLM), and LLM briefs at alert weeks; the plan's control-run no-alert brief becomes the injected week-33 brief (same purpose: show seasonality does not alert) — cost if wrong: one brief moves runs
+- Task 13: Ruling: the single grounding retry continues the same conversation (draft + listed errors → revision, one call) instead of a fresh agent run — live Haiku smoke showed fresh reruns repeat mistakes; cheaper and closer to an editor's fix — cost if wrong: none (still exactly one retry, then fail closed)
+- Final: Ruling: re-recorded the week-40 final brief live after the prompt tightening (4 Sonnet calls) — the strict checker rejected the old recording's number words — cost if wrong: ~$0.08
+
+### Phase 4 deferred minors
+
+- Final: minor (deferred): non-final stops (max_tokens/refusal) are cached; a live rerun replays them — delete the cache file to retry
+- Final: minor (deferred): cache key excludes max_tokens — Ruling-free: the user's BUDGET RULE 3 specifies the key as (model, system, messages, tools); kept as specified
+- Final: minor (deferred): token log prices the requested model, not response["model"] (Sonnet fallback-served calls would be priced as Sonnet)
+- Final: minor (deferred): dev runs default to --out briefs and can overwrite the committed sample brief (use --out briefs/dev)
+- Final: minor (deferred): unused `feedback` parameter in run_agent/user_prompt
+- Final: minor (deferred): hyphen ranges "$444K [q:…]-$1.3M" read as negative (fail closed → retry); "3 actions" in a heading rejected
+- Final: minor (deferred): missing tests for live-call cost math and CLI exit code 3 on ReplayMiss

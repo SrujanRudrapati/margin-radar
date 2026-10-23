@@ -288,3 +288,36 @@ def test_min_denominator_override(store):
     for bad in (-1, 1.5, True, "5"):
         with pytest.raises(ValueError):
             store.panel("contract_rate", "segment", 77, min_denominator=bad)
+
+
+# --- cohort curve (Phase 4 Task 12) -------------------------------------------------------------------
+
+def test_cohort_curve_shape_and_point_in_time(built_runs):
+    from detector.governed import GovernedStore
+    with GovernedStore(str(built_runs["injected"]), "injected") as store:
+        late = store.cohort_curve("band", "B2", 30, 33, as_of_week=77)
+        early = store.cohort_curve("band", "B2", 30, 33, as_of_week=40)
+    assert late.query_id.startswith("Q") and late.query_id != early.query_id
+    frame = late.values
+    assert list(frame["sold_share"]) == [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
+    assert frame["n_homes"].nunique() == 1 and frame["n_homes"].iloc[0] > 50
+    assert frame["cm_pct"].notna().all()
+    # As of week 40 the week 30–33 cohort has barely started selling: high sold shares are not reached yet.
+    assert early.values["cm_pct"].isna().iloc[-1]
+
+
+def test_cohort_curve_rejects_bad_scope(built_runs):
+    import pytest
+    from detector.governed import GovernedStore
+    with GovernedStore(str(built_runs["injected"]), "injected") as store:
+        with pytest.raises(ValueError):
+            store.cohort_curve("band", "B9'; drop table x; --", 30, 33, as_of_week=77)
+        with pytest.raises(ValueError):
+            store.cohort_curve("band", "B2", 33, 30, as_of_week=77)
+
+
+def test_cohort_curve_sql_breaks_ties_by_home_id(built_runs):
+    from detector.governed import GovernedStore
+    with GovernedStore(str(built_runs["injected"]), "injected") as store:
+        sql = store.cohort_curve("band", "B2", 30, 33, as_of_week=77).sql
+    assert "order by resale_date, close_date, home_id" in sql

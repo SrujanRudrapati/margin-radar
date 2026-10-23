@@ -192,6 +192,13 @@ class GovernedStore:
             raise ValueError(f"{MART} has no event data")
         return int(week)
 
+    def week_start(self, week: int) -> str:
+        """ISO date of the Monday that starts `week` (from the mart; no hard-coded calendar)."""
+        if not _is_int(week):
+            raise ValueError("week must be an int")
+        base = self._con.execute(f"select min(week_start) from {MART} where week = 0").fetchone()[0]
+        return (pd.Timestamp(base) + pd.Timedelta(weeks=int(week))).date().isoformat()
+
     def metrics(self, role: str | None = None) -> tuple[str, ...]:
         return tuple(sorted(n for n, d in self._defs.items() if role is None or d.role == role))
 
@@ -260,6 +267,52 @@ class GovernedStore:
                    "window_weeks": window_weeks, "start_week": start_week, "as_of_week": as_of_week, "sql": sql,
                    **_summary(frame)})
         return replace(panel, values=frame.copy())
+
+    def cohort_curve(self, level: Level, scope: str, close_week_start: int, close_week_end: int,
+                     as_of_week: int) -> MetricPanel:
+        """Bleed curve of one purchase cohort: contribution margin of the first 10%..80% of its homes to sell.
+
+        Cohort = homes in `scope` closed in weeks [close_week_start, close_week_end]. Point-in-time: only resales
+        in weeks <= as_of_week count; a share the cohort has not reached yet is None.
+        """
+        if not isinstance(level, str) or level not in SCOPE_SQL:
+            raise ValueError(f"unknown level {level!r}")
+        if not all(_is_int(i) for i in (close_week_start, close_week_end, as_of_week)):
+            raise ValueError("weeks must be ints")
+        a, b, as_of = int(close_week_start), int(close_week_end), int(as_of_week)
+        if not 0 <= a <= b <= as_of <= self.max_week:
+            raise ValueError("need 0 <= close_week_start <= close_week_end <= as_of_week <= max_week")
+        scopes = {r[0] for r in self._con.execute(f"select distinct {SCOPE_SQL[level]} from {MART}").fetchall()}
+        if scope not in scopes:
+            raise ValueError(f"unknown scope {scope!r} for level {level!r}")
+        start = self._con.execute(f"select min(week_start) from {MART} where week = 0").fetchone()[0]
+        week = lambda col: f"date_diff('day', DATE '{start}', {col}) // 7"  # noqa: E731
+        shares = ", ".join(f"({k / 10:.1f})" for k in range(1, 9))
+        sql = (
+            f"with cohort as (select {SCOPE_SQL[level]} as scope, home_id, close_date, resale_date, resale_price, "
+            f"resale_price - (offer_price - fee_usd) - reno_actual_usd - holding_cost_usd - selling_cost_usd as cm_usd "
+            f"from raw.homes where close_date is not null and {week('close_date')} between {a} and {b}), "
+            f"scoped as (select * from cohort where scope = '{scope}'), "
+            f"sold as (select cm_usd, resale_price, row_number() over (order by resale_date, close_date, home_id) as rn "
+            f"from scoped where resale_date is not null and {week('resale_date')} <= {as_of}), "
+            f"n as (select count(*) as n_homes from scoped), "
+            f"shares(share) as (values {shares}) "
+            f"select share as sold_share, n_homes, ceil(share * n_homes) as homes_needed, "
+            f"(select count(*) from sold) as n_sold, "
+            f"case when (select count(*) from sold) >= ceil(share * n_homes) and n_homes > 0 then "
+            f"(select sum(cm_usd) / sum(resale_price) from sold where rn <= ceil(share * n_homes)) end as cm_pct "
+            f"from shares, n order by share"
+        )
+        key = "|".join(map(str, (self.run_id, "cohort_curve", level, scope, a, b, as_of, sql)))
+        query_id = "Q" + hashlib.sha256(key.encode()).hexdigest()[:10]
+        if query_id not in self._items:
+            frame = self._con.execute(sql).fetchdf()
+            frame["cm_pct"] = frame["cm_pct"].astype(object).where(frame["cm_pct"].notna(), None)
+            panel = MetricPanel(query_id, "cohort_curve", self.run_id, level, as_of, b - a + 1, frame, sql)
+            self._items[query_id], self._frames[query_id] = panel, frame.copy()
+            self._log({"kind": "cohort_curve", "id": query_id, "run_id": self.run_id, "level": level, "scope": scope,
+                       "close_weeks": [a, b], "as_of_week": as_of, "sql": sql})
+        return self.get(query_id)  # type: ignore[return-value]
 
     def register_derived(self, label: str, value: float, unit: str, inputs: tuple[str, ...], formula: str) -> str:
         if unit not in UNITS:
