@@ -1,0 +1,52 @@
+{
+ "container": null,
+ "content": [
+  {
+   "citations": null,
+   "text": "## Top actions\n\n### B2 \u2014 adverse selection (contract rate)\n\n- **What changed:** The B2 contract rate rose to 46.6% [q:D81eb477cc6] in week 40. The peer median was 38.5% [q:D32352c2a1d], a gap of +8.2 pts [q:D67db236025]. The gap opened in week 35 (2025-09-08). The uncalibrated drift score is 1.9 [q:D0d500ed625]. The share of contracts above the peer-expected rate is 17.5% [q:Ddaf443f411].\n- **Why it's not seasonality:** Peer bands share the same weeks, so a seasonal move would lift them together. The peer median moved between 32.0% [q:Dee15294bcf] and 41.4% [q:D130f4ef5d3], while B2 stayed above it in every week from week 35 onward. The gap was -3.6 pts [q:Db903d2050b] in week 33. It was +13.7 pts [q:D5dd436fe8c] in week 37 and +14.2 pts [q:D2f71651b36] in week 38. It narrowed to +5.5 pts [q:D37c65708f3] in week 39 and widened again in week 40. The gap is noisy week to week, but it has stayed positive since onset.\n- **Adverse-selection verdict:** Yes, on the leading-indicator pattern. Conversion rose while our spread did not change. B2 spread was 6.6% [q:D3cd5be75cf] against a 6.6% [q:D6a690a0148] peer median, a gap of +0.0 pts [q:Dc32519e453]. That fits sellers accepting more often because the homes are worth less than our model assumes. Resales have not confirmed it.\n- **Impact:** This is a scenario estimate, sample-scale, and it is unconfirmed until resales. It is ranked on its midpoint.\n  - The range is $444K [q:Dad0f537dd7] to $1.3M [q:D9a151e7a68], with a midpoint of $888K [q:D51a5835f9f].\n  - In portfolio contribution margin, that is 8 bps [q:Dc71f85eeb0] to 24 bps [q:D729860b50b], with a midpoint of 16 bps [q:Df51c23682f].\n  - The scenario assumes a resale shortfall of 1.0% [q:D12868fb46b] to 3.0% [q:Dc05bb4c888] on an exposure of $253.4M [q:D958f373c21].\n  - Sensitivity: each 100 bps of erosion would cost $2.5M [q:D56f0dfd248]. This is a sensitivity, not a forecast loss.\n- **Action / owner:** Pricing should widen the B2 spread or add in-person inspection. Pricing should also audit the model valuation inputs for B2.\n\n## What we're not sure about\n\n- **No resale confirmation:** The B2 impact is a scenario built on assumed shortfalls. Contribution margin shows up only when homes resell, so we can't say whether the loss is real or how large it is. The score is uncalibrated and is not a probability.\n- **Noisy gap:** The week-to-week gap is uneven, and the week 39 dip shows that. The pattern is persistent but not smooth.\n- **Cause not identified:** The spread comparison shows that price did not drive the conversion rise. It does not show whether the cause is model valuation inputs, condition information, or something else. The audit should settle that.\n- **Scope limits:** The only action raised is at band level. I did not check whether the signal is concentrated in particular markets or payment types within B2.\n- **Nothing else flagged:** The alert feed has no watch items and no abstentions this week.",
+   "type": "text"
+  }
+ ],
+ "context_management": null,
+ "diagnostics": null,
+ "id": "msg_011CgKemvGU8uRKg92zVUDvZ",
+ "input_transformations": null,
+ "model": "claude-sonnet-5-5",
+ "role": "assistant",
+ "stop_details": null,
+ "stop_reason": "end_turn",
+ "stop_sequence": null,
+ "type": "message",
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 0,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 3071,
+  "fallback_credit": null,
+  "inference_geo": "global",
+  "input_tokens": 5281,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 0,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 3071,
+    "input_tokens": 5281,
+    "model": null,
+    "output_tokens": 1236,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 1236,
+  "output_tokens_details": {
+   "thinking_tokens": 0
+  },
+  "server_tool_use": null,
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

@@ -1,0 +1,52 @@
+{
+ "container": null,
+ "content": [
+  {
+   "citations": null,
+   "text": "## Top actions\n\n### M05 \u2014 renovation cost drift\n- **What changed:** The renovation overrun rate in M05 has stayed high since the onset in week 37 (2025-09-22). In week 60 it was 20.3% [q:D515d02cd77], against a peer median of 2.1% [q:D6ed91cb83b]. That is a gap of +18.9 pts [q:D87f2e23fd2]. The uncalibrated drift score is 2.8 [q:D0751e0ae06].\n- **Why it's not seasonality:** Peers share the same weeks, so seasonal moves show up in them too. The peer median stayed low throughout, for example 4.1% [q:D7ee447ed50] in week 59. M05 stayed high, for example 18.2% [q:De16b896d3e] in week 59. The gap has been persistent, for example +23.3 pts [q:Dab2c75b9fd] in week 52. M05 moved apart from its peers, not with them. Week 57 has no peer median, so I can't give a gap for that week.\n- **Adverse-selection verdict:** Not applicable. This is a cost-estimation problem on renovation, not a conversion signal. The alert gives no evidence of sellers accepting more because the homes are worth less than our model thinks.\n- **Impact:** The impact basis is measured, not a scenario estimate. It comes from current leading-indicator data, not from resales. Sample-scale, it is $927K [q:D43a0059f66] on an exposure of $132.6M [q:Dfe8cd33e0b]. That is 70 bps [q:Dd0bb1dc276] of M05 margin and 11 bps [q:D7bace2e94d] of portfolio contribution margin. As a sensitivity, each 100 bps of erosion would cost $1.3M [q:De5bda263d5].\n- **Action / owner:** Re-baseline renovation estimates in M05 and require an in-person assessment. The owner is Renovation.\n\n## What we're not sure about\n- The $927K [q:D43a0059f66] figure is measured from current leading indicators. It is not confirmed by resales, so realized margin could differ.\n- I called only the peer comparison for this action. I did not check cohort bleed curves or other markets, so I can't say whether the drift has reached realized margin yet.\n- Week 57 has no peer median, so the comparison has a gap there.\n- The alert feed shows no watch items and no abstentions this week.",
+   "type": "text"
+  }
+ ],
+ "context_management": null,
+ "diagnostics": null,
+ "id": "msg_011CgKeqfETA6RE3yLqH3hDq",
+ "input_transformations": null,
+ "model": "claude-sonnet-5-5",
+ "role": "assistant",
+ "stop_details": null,
+ "stop_reason": "end_turn",
+ "stop_sequence": null,
+ "type": "message",
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 0,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 3071,
+  "fallback_credit": null,
+  "inference_geo": "global",
+  "input_tokens": 2898,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 0,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 3071,
+    "input_tokens": 2898,
+    "model": null,
+    "output_tokens": 812,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 812,
+  "output_tokens_details": {
+   "thinking_tokens": 0
+  },
+  "server_tool_use": null,
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

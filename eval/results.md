@@ -12,7 +12,7 @@ _Dollar figures are sample-scale ($ at the synthetic portfolio's ~$1.6B/yr). Det
 | holdout_recall_before_cm | FAIL | {'A': '0/10', 'B': '8/10', 'C': '8/10'} | >= 8/10 of holdout seeds per scenario alert on the true scope before margin shows it |
 | holdout_wrong_alerts | FAIL | 5 | <= 2 wrong-scope alert episodes (holdout injected runs) |
 | all_briefs_valid | PASS | 4/4 | every eval brief published (a failed brief never counts as grounded) |
-| grounding_100 | PASS | 107/107 | 100% of numbers in the briefs match their cited facts |
+| grounding_100 | PASS | 105/105 | 100% of numbers in the briefs match their cited facts |
 | brief_accuracy | PASS | min 1.00, 0 direction errors | >= 90% of sections accurate in every brief AND zero direction errors |
 | top_action_true_scope | PASS | 4/4 | each brief's top-ranked action is on an injected scope |
 | sample_scale_labeled | PASS | 4/4 | every action section labels its $ as sample-scale |
@@ -57,12 +57,25 @@ _Dollar figures are sample-scale ($ at the synthetic portfolio's ~$1.6B/yr). Det
 | B | 4/5 | 9.0 | 8 | 13 | 6.0 |
 | C | 5/5 | 7 | 3 | 10 | 8 |
 
+## Detector — confirm seeds [21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
+
+- Control false alerts per week: 0.019 (10 alert-weeks over 510 evaluable control weeks)
+- Wrong-scope alert episodes (injected runs): 4; per week 0.041
+- Control alert-weeks per seed: s21: 0, s22: 2, s23: 0, s24: 0, s25: 4, s26: 0, s27: 0, s28: 0, s29: 4, s30: 0
+- Precision (true alert episodes / all episodes): 0.840; recall before margin shows the problem: 0.466
+
+| scenario | detected before margin | median lead (weeks) | min | max | median delay after onset (weeks) |
+|---|---|---|---|---|---|
+| A | 2/10 | 6.0 | 2 | 10 | 9.500 |
+| B | 4/10 | 7.500 | 2 | 12 | 9.0 |
+| C | 8/10 | 5.0 | 4 | 13 | 8.500 |
+
 ## LLM evaluation (seed 42, final model)
 
 - briefs: 4/4 valid (published) at weeks [40, 45, 50, 60]
 - number_grounding_pct: 100.0
-- numbers_checked: 107
-- first_draft_errors_total: 4
+- numbers_checked: 105
+- first_draft_errors_total: 3
 - brief_section_accuracy_min: 1.0
 - brief_direction_errors: 0
 - semantic_layer_accuracy: 1.0
@@ -76,14 +89,14 @@ _Dollar figures are sample-scale ($ at the synthetic portfolio's ~$1.6B/yr). Det
 
 | scope | live calls | input | output | cache read | est. cost (USD) |
 |---|---|---|---|---|---|
-| eval recording (committed) | 170 | 174985 | 38811 | 258553 | 0.6511 |
+| eval recording (committed) | 181 | 225264 | 48042 | 289263 | 0.8578 |
 | this run, live | 0 |  |  |  | 0 |
-| all logged calls on this machine | 195 | 270232 | 64337 | 318547 | 0.8367 |
+| all logged calls on this machine | 206 | 320511 | 73568 | 349257 | 1.0434 |
 
 ## Known limitations
 
 - Simultaneous all-segment shifts cancel in peer comparisons; the portfolio check only catches abrupt ones.
-- Gates and quoted numbers use the true holdout, seeds 11–20 (DECISIONS D28, D30): scopes and onsets are drawn per seed and these seeds were never used for tuning. Seeds 1–5 tuned the thresholds and the D29 shrinkage; seeds 6–10 were seen in an earlier run. Both are shown for transparency only.
+- Gates and quoted numbers use the true holdout, seeds 11–20 (DECISIONS D28, D30): scopes and onsets are drawn per seed and no setting was tuned on them (one control run was inspected while diagnosing, D32; seeds 21–30, never inspected, are a leakage check). Seeds 1–5 tuned the thresholds and the D29 shrinkage; seeds 6–10 were seen in an earlier run. Both are shown for transparency only.
 - The expanding-baseline design (DECISIONS D16) was chosen before the true holdout existed, on seeds 1–10.
 - Demand-softening impact is a lower bound (holding cost only); adverse-selection impact is a scenario estimate until resales confirm it.
 - Dollar figures are sample-scale; scores are uncalibrated, not probabilities.

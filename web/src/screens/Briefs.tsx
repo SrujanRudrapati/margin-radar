@@ -63,8 +63,9 @@ function inline(text: string, cites: Map<string, Citation>) {
 }
 
 function Cite({ id, c }: { id: string; c?: Citation }) {
-  // Opens on mouse hover (the tooltip itself stays hoverable), keyboard focus, or a tap/click. A click or Enter on an
-  // open citation closes it, as do Escape, blur and a tap anywhere else (Safari never focuses a clicked button).
+  // Opens on mouse hover (the tooltip itself stays hoverable), keyboard focus, or a tap/click, which pins it open. A
+  // click or Enter on a pinned or keyboard-opened citation closes it, as do Escape, blur and a tap anywhere else
+  // (Safari never focuses a clicked button). Clicks ignore hover state, so a click never races a hover.
   // Hover counts only for a mouse and focus only for keyboard focus, so a tap toggles cleanly on touch screens.
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -87,7 +88,7 @@ function Cite({ id, c }: { id: string; c?: Citation }) {
       <button type="button" aria-expanded={open} aria-label={`Citation ${id}`} aria-describedby={open ? tipId : undefined}
               onFocus={(e) => { if (e.currentTarget.matches(":focus-visible")) setFocused(true); }}
               onBlur={() => { setFocused(false); setPinned(false); }}
-              onClick={() => (open ? close() : setPinned(true))}
+              onClick={() => (pinned || focused ? close() : setPinned(true))}
               onKeyDown={(e) => { if (e.key === "Escape") close(); }}
               className="mx-0.5 rounded bg-grid/60 px-1 align-super text-[10px] font-semibold text-muted hover:bg-ink hover:text-paper">q</button>
       {open && (

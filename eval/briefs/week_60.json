@@ -6,7 +6,7 @@
   "status": "valid",
   "model": "claude-sonnet-5-5",
   "purpose": "final",
-  "body": "## Top actions\n\n### M05 \u2014 renovation cost drift\n\n- **What changed:** Renovation overrun in M05 has run well above peers since onset in week 37 (2025-09-22). In week 60 it was 20.3% [q:D515d02cd77], against a peer median of 2.1% [q:D6ed91cb83b]. The tool reports the gap as +5.6 pts [q:D87f2e23fd2]. The uncalibrated drift score is 2.8 [q:D3d00c6c274]. It is a score, not a probability that the alert is real.\n- **Why it's not seasonality:** Peers share the same weeks, so seasonal effects move them together. The peer median stayed low through the whole window, for example 4.0% [q:D4611a210cc] in week 48 and 4.1% [q:D7ee447ed50] in week 59. M05 stayed high throughout, for example 21.2% [q:D09a48ef8d7] in week 48 and 18.2% [q:De16b896d3e] in week 59. The gap persisted, from +4.9 pts [q:Db0ad5c3f9d] in week 48 to +6.1 pts [q:D116e7c945b] in week 55 and +5.6 pts [q:D87f2e23fd2] in week 60. M05 moved apart from its peers.\n- **Adverse-selection verdict:** Not applicable. This is a cost-estimate problem on the renovation side. It is not a case of conversion rising without a matching change in our spread.\n- **Impact:** The impact is measured from current leading-indicator data. It is not a scenario estimate, and it is not confirmed by resales. The sample-scale impact is $273K [q:D406975b0df]. That is 21 bps [q:Dafa02f9e9b] of M05 contribution margin and 3 bps [q:Df0a83fde20] of portfolio contribution margin. The exposure is $132.6M [q:D661ce1c1fb]. As a sensitivity, not a loss, each 100 bps of erosion would cost $1.3M [q:D0f2975026f].\n- **Action / owner:** Re-baseline renovation estimates in M05 and require an in-person assessment. The owner is Renovation.\n\n## What we're not sure about\n\n- **Gap arithmetic:** The tool's reported gap does not equal the scope value minus the peer median on the same row. I have cited the gap as the tool gives it and have not tried to reconcile it. The likely cause is how peers are weighted, but I can't confirm that.\n- **Missing peer data:** The peer median and gap are missing for week 57 (2026-02-09). That week is a gap in the peer comparison.\n- **Measured, not realized:** The $273K [q:D406975b0df] is measured from current indicators. Final margin will only be known when the affected homes resell.\n- **Watch items and abstentions:** The tool returned no watch items and no abstentions. It returned no other actions, so I'm reporting nothing on other markets.\n- **Data source:** The data is synthetic, not Opendoor data.",
+  "body": "## Top actions\n\n### M05 \u2014 renovation cost drift\n- **What changed:** The renovation overrun rate in M05 has stayed high since the onset in week 37 (2025-09-22). In week 60 it was 20.3% [q:D515d02cd77], against a peer median of 2.1% [q:D6ed91cb83b]. That is a gap of +18.9 pts [q:D87f2e23fd2]. The uncalibrated drift score is 2.8 [q:D0751e0ae06].\n- **Why it's not seasonality:** Peers share the same weeks, so seasonal moves show up in them too. The peer median stayed low throughout, for example 4.1% [q:D7ee447ed50] in week 59. M05 stayed high, for example 18.2% [q:De16b896d3e] in week 59. The gap has been persistent, for example +23.3 pts [q:Dab2c75b9fd] in week 52. M05 moved apart from its peers, not with them. Week 57 has no peer median, so I can't give a gap for that week.\n- **Adverse-selection verdict:** Not applicable. This is a cost-estimation problem on renovation, not a conversion signal. The alert gives no evidence of sellers accepting more because the homes are worth less than our model thinks.\n- **Impact:** The impact basis is measured, not a scenario estimate. It comes from current leading-indicator data, not from resales. Sample-scale, it is $927K [q:D43a0059f66] on an exposure of $132.6M [q:Dfe8cd33e0b]. That is 70 bps [q:Dd0bb1dc276] of M05 margin and 11 bps [q:D7bace2e94d] of portfolio contribution margin. As a sensitivity, each 100 bps of erosion would cost $1.3M [q:De5bda263d5].\n- **Action / owner:** Re-baseline renovation estimates in M05 and require an in-person assessment. The owner is Renovation.\n\n## What we're not sure about\n- The $927K [q:D43a0059f66] figure is measured from current leading indicators. It is not confirmed by resales, so realized margin could differ.\n- I called only the peer comparison for this action. I did not check cohort bleed curves or other markets, so I can't say whether the drift has reached realized margin yet.\n- Week 57 has no peer median, so the comparison has a gap there.\n- The alert feed shows no watch items and no abstentions this week.",
   "citations": [
     {
       "ref": "D515d02cd77",
@@ -57,8 +57,8 @@
     {
       "ref": "D87f2e23fd2",
       "label": "reno_overrun_pct M05 gap vs peers week 60",
-      "value": 0.05644,
-      "display": "+5.6 pts",
+      "value": 0.188988,
+      "display": "+18.9 pts",
       "kind": "pct_points",
       "queries": [
         "Q31a3760396",
@@ -78,48 +78,19 @@
       }
     },
     {
-      "ref": "D3d00c6c274",
+      "ref": "D0751e0ae06",
       "label": "reno_overrun_pct M05 drift score week 60",
-      "value": 2.81405,
+      "value": 2.75146,
       "display": "2.8",
       "kind": "score",
       "queries": [
-        "Q31a3760396",
-        "Qafdd15796e"
+        "Qb7da5afa49"
       ],
       "sql": {
-        "Qafdd15796e": {
-          "metric": "reno_overrun_pct",
-          "level": "market",
-          "sql": "with agg as (select market as scope, week, cast(sum(reno_actual_sum) as double) as reno_actual_sum, cast(sum(reno_estimate_sum) as double) as reno_estimate_sum, cast(sum(renos_completed) as double) as renos_completed from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, sum(reno_actual_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_actual_sum, sum(reno_estimate_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_estimate_sum, sum(renos_completed) over (partition by scope order by week rows between 3 preceding and current row) as renos_completed from agg) select scope, week, case when week < 3 then null else case when renos_completed < 8 then null else (reno_actual_sum) / nullif(reno_estimate_sum, 0) - 1 end end as value, case when week < 3 then null else renos_completed end as denominator from win where week >= 0 order by scope, week"
-        },
-        "Q31a3760396": {
+        "Qb7da5afa49": {
           "metric": "reno_overrun_pct",
           "level": "segment",
-          "sql": "with agg as (select segment as scope, week, market, band, product, cast(sum(reno_actual_sum) as double) as reno_actual_sum, cast(sum(reno_estimate_sum) as double) as reno_estimate_sum, cast(sum(renos_completed) as double) as renos_completed from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, market, band, product, sum(reno_actual_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_actual_sum, sum(reno_estimate_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_estimate_sum, sum(renos_completed) over (partition by scope order by week rows between 3 preceding and current row) as renos_completed from agg) select scope, week, market, band, product, case when week < 3 then null else case when renos_completed < 8 then null else (reno_actual_sum) / nullif(reno_estimate_sum, 0) - 1 end end as value, case when week < 3 then null else renos_completed end as denominator from win where week >= 0 order by scope, week"
-        }
-      }
-    },
-    {
-      "ref": "D4611a210cc",
-      "label": "reno_overrun_pct peers of M05 week 48",
-      "value": 0.0398414,
-      "display": "4.0%",
-      "kind": "pct",
-      "queries": [
-        "Q31a3760396",
-        "Qafdd15796e"
-      ],
-      "sql": {
-        "Qafdd15796e": {
-          "metric": "reno_overrun_pct",
-          "level": "market",
-          "sql": "with agg as (select market as scope, week, cast(sum(reno_actual_sum) as double) as reno_actual_sum, cast(sum(reno_estimate_sum) as double) as reno_estimate_sum, cast(sum(renos_completed) as double) as renos_completed from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, sum(reno_actual_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_actual_sum, sum(reno_estimate_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_estimate_sum, sum(renos_completed) over (partition by scope order by week rows between 3 preceding and current row) as renos_completed from agg) select scope, week, case when week < 3 then null else case when renos_completed < 8 then null else (reno_actual_sum) / nullif(reno_estimate_sum, 0) - 1 end end as value, case when week < 3 then null else renos_completed end as denominator from win where week >= 0 order by scope, week"
-        },
-        "Q31a3760396": {
-          "metric": "reno_overrun_pct",
-          "level": "segment",
-          "sql": "with agg as (select segment as scope, week, market, band, product, cast(sum(reno_actual_sum) as double) as reno_actual_sum, cast(sum(reno_estimate_sum) as double) as reno_estimate_sum, cast(sum(renos_completed) as double) as renos_completed from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, market, band, product, sum(reno_actual_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_actual_sum, sum(reno_estimate_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_estimate_sum, sum(renos_completed) over (partition by scope order by week rows between 3 preceding and current row) as renos_completed from agg) select scope, week, market, band, product, case when week < 3 then null else case when renos_completed < 8 then null else (reno_actual_sum) / nullif(reno_estimate_sum, 0) - 1 end end as value, case when week < 3 then null else renos_completed end as denominator from win where week >= 0 order by scope, week"
+          "sql": "with agg as (select segment as scope, week, market, band, product, cast(sum(reno_actual_sum) as double) as reno_actual_sum, cast(sum(reno_estimate_sum) as double) as reno_estimate_sum, cast(sum(renos_completed) as double) as renos_completed from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, market, band, product, sum(reno_actual_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_actual_sum, sum(reno_estimate_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_estimate_sum, sum(renos_completed) over (partition by scope order by week rows between 3 preceding and current row) as renos_completed from agg) select scope, week, market, band, product, case when week < 3 then null else case when renos_completed < 4 then null else (reno_actual_sum) / nullif(reno_estimate_sum, 0) - 1 end end as value, case when week < 3 then null else renos_completed end as denominator from win where week >= 0 order by scope, week"
         }
       }
     },
@@ -128,29 +99,6 @@
       "label": "reno_overrun_pct peers of M05 week 59",
       "value": 0.0405666,
       "display": "4.1%",
-      "kind": "pct",
-      "queries": [
-        "Q31a3760396",
-        "Qafdd15796e"
-      ],
-      "sql": {
-        "Qafdd15796e": {
-          "metric": "reno_overrun_pct",
-          "level": "market",
-          "sql": "with agg as (select market as scope, week, cast(sum(reno_actual_sum) as double) as reno_actual_sum, cast(sum(reno_estimate_sum) as double) as reno_estimate_sum, cast(sum(renos_completed) as double) as renos_completed from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, sum(reno_actual_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_actual_sum, sum(reno_estimate_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_estimate_sum, sum(renos_completed) over (partition by scope order by week rows between 3 preceding and current row) as renos_completed from agg) select scope, week, case when week < 3 then null else case when renos_completed < 8 then null else (reno_actual_sum) / nullif(reno_estimate_sum, 0) - 1 end end as value, case when week < 3 then null else renos_completed end as denominator from win where week >= 0 order by scope, week"
-        },
-        "Q31a3760396": {
-          "metric": "reno_overrun_pct",
-          "level": "segment",
-          "sql": "with agg as (select segment as scope, week, market, band, product, cast(sum(reno_actual_sum) as double) as reno_actual_sum, cast(sum(reno_estimate_sum) as double) as reno_estimate_sum, cast(sum(renos_completed) as double) as renos_completed from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, market, band, product, sum(reno_actual_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_actual_sum, sum(reno_estimate_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_estimate_sum, sum(renos_completed) over (partition by scope order by week rows between 3 preceding and current row) as renos_completed from agg) select scope, week, market, band, product, case when week < 3 then null else case when renos_completed < 8 then null else (reno_actual_sum) / nullif(reno_estimate_sum, 0) - 1 end end as value, case when week < 3 then null else renos_completed end as denominator from win where week >= 0 order by scope, week"
-        }
-      }
-    },
-    {
-      "ref": "D09a48ef8d7",
-      "label": "reno_overrun_pct M05 week 48",
-      "value": 0.212087,
-      "display": "21.2%",
       "kind": "pct",
       "queries": [
         "Q31a3760396",
@@ -193,10 +141,10 @@
       }
     },
     {
-      "ref": "Db0ad5c3f9d",
-      "label": "reno_overrun_pct M05 gap vs peers week 48",
-      "value": 0.0485325,
-      "display": "+4.9 pts",
+      "ref": "Dab2c75b9fd",
+      "label": "reno_overrun_pct M05 gap vs peers week 52",
+      "value": 0.233005,
+      "display": "+23.3 pts",
       "kind": "pct_points",
       "queries": [
         "Q31a3760396",
@@ -216,36 +164,14 @@
       }
     },
     {
-      "ref": "D116e7c945b",
-      "label": "reno_overrun_pct M05 gap vs peers week 55",
-      "value": 0.0613329,
-      "display": "+6.1 pts",
-      "kind": "pct_points",
-      "queries": [
-        "Q31a3760396",
-        "Qafdd15796e"
-      ],
-      "sql": {
-        "Qafdd15796e": {
-          "metric": "reno_overrun_pct",
-          "level": "market",
-          "sql": "with agg as (select market as scope, week, cast(sum(reno_actual_sum) as double) as reno_actual_sum, cast(sum(reno_estimate_sum) as double) as reno_estimate_sum, cast(sum(renos_completed) as double) as renos_completed from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, sum(reno_actual_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_actual_sum, sum(reno_estimate_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_estimate_sum, sum(renos_completed) over (partition by scope order by week rows between 3 preceding and current row) as renos_completed from agg) select scope, week, case when week < 3 then null else case when renos_completed < 8 then null else (reno_actual_sum) / nullif(reno_estimate_sum, 0) - 1 end end as value, case when week < 3 then null else renos_completed end as denominator from win where week >= 0 order by scope, week"
-        },
-        "Q31a3760396": {
-          "metric": "reno_overrun_pct",
-          "level": "segment",
-          "sql": "with agg as (select segment as scope, week, market, band, product, cast(sum(reno_actual_sum) as double) as reno_actual_sum, cast(sum(reno_estimate_sum) as double) as reno_estimate_sum, cast(sum(renos_completed) as double) as renos_completed from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, market, band, product, sum(reno_actual_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_actual_sum, sum(reno_estimate_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_estimate_sum, sum(renos_completed) over (partition by scope order by week rows between 3 preceding and current row) as renos_completed from agg) select scope, week, market, band, product, case when week < 3 then null else case when renos_completed < 8 then null else (reno_actual_sum) / nullif(reno_estimate_sum, 0) - 1 end end as value, case when week < 3 then null else renos_completed end as denominator from win where week >= 0 order by scope, week"
-        }
-      }
-    },
-    {
-      "ref": "D406975b0df",
+      "ref": "D43a0059f66",
       "label": "Ab238fd5c usd_mid",
-      "value": 272581.0,
-      "display": "$273K",
+      "value": 926715.0,
+      "display": "$927K",
       "kind": "usd",
       "queries": [
         "Q1bdd2859c3",
+        "Q31a3760396",
         "Q4272afac77",
         "Q5a6a21638b",
         "Qa55aa51545",
@@ -257,6 +183,11 @@
           "metric": "reno_overrun_pct",
           "level": "segment",
           "sql": "with agg as (select segment as scope, week, market, band, product, cast(sum(reno_actual_sum) as double) as reno_actual_sum, cast(sum(reno_estimate_sum) as double) as reno_estimate_sum, cast(sum(renos_completed) as double) as renos_completed from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, market, band, product, sum(reno_actual_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_actual_sum, sum(reno_estimate_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_estimate_sum, sum(renos_completed) over (partition by scope order by week rows between 3 preceding and current row) as renos_completed from agg) select scope, week, market, band, product, case when week < 3 then null else case when renos_completed < 4 then null else (reno_actual_sum) / nullif(reno_estimate_sum, 0) - 1 end end as value, case when week < 3 then null else renos_completed end as denominator from win where week >= 0 order by scope, week"
+        },
+        "Q31a3760396": {
+          "metric": "reno_overrun_pct",
+          "level": "segment",
+          "sql": "with agg as (select segment as scope, week, market, band, product, cast(sum(reno_actual_sum) as double) as reno_actual_sum, cast(sum(reno_estimate_sum) as double) as reno_estimate_sum, cast(sum(renos_completed) as double) as renos_completed from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, market, band, product, sum(reno_actual_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_actual_sum, sum(reno_estimate_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_estimate_sum, sum(renos_completed) over (partition by scope order by week rows between 3 preceding and current row) as renos_completed from agg) select scope, week, market, band, product, case when week < 3 then null else case when renos_completed < 8 then null else (reno_actual_sum) / nullif(reno_estimate_sum, 0) - 1 end end as value, case when week < 3 then null else renos_completed end as denominator from win where week >= 0 order by scope, week"
         },
         "Qda4afa7611": {
           "metric": "reno_estimate_sum",
@@ -286,107 +217,14 @@
       }
     },
     {
-      "ref": "Dafa02f9e9b",
-      "label": "Ab238fd5c scope_bps_mid",
-      "value": 20.5544,
-      "display": "21 bps",
-      "kind": "bps",
-      "queries": [
-        "Q1bdd2859c3",
-        "Q4272afac77",
-        "Q5a6a21638b",
-        "Qa55aa51545",
-        "Qb7da5afa49",
-        "Qda4afa7611"
-      ],
-      "sql": {
-        "Qb7da5afa49": {
-          "metric": "reno_overrun_pct",
-          "level": "segment",
-          "sql": "with agg as (select segment as scope, week, market, band, product, cast(sum(reno_actual_sum) as double) as reno_actual_sum, cast(sum(reno_estimate_sum) as double) as reno_estimate_sum, cast(sum(renos_completed) as double) as renos_completed from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, market, band, product, sum(reno_actual_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_actual_sum, sum(reno_estimate_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_estimate_sum, sum(renos_completed) over (partition by scope order by week rows between 3 preceding and current row) as renos_completed from agg) select scope, week, market, band, product, case when week < 3 then null else case when renos_completed < 4 then null else (reno_actual_sum) / nullif(reno_estimate_sum, 0) - 1 end end as value, case when week < 3 then null else renos_completed end as denominator from win where week >= 0 order by scope, week"
-        },
-        "Qda4afa7611": {
-          "metric": "reno_estimate_sum",
-          "level": "market",
-          "sql": "with agg as (select market as scope, week, cast(sum(reno_estimate_sum) as double) as reno_estimate_sum from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, sum(reno_estimate_sum) over (partition by scope order by week rows between 12 preceding and current row) as reno_estimate_sum from agg) select scope, week, case when week < 12 then null else reno_estimate_sum end as value, case when week < 12 then null else null end as denominator from win where week >= 0 order by scope, week"
-        },
-        "Qa55aa51545": {
-          "metric": "resale_usd",
-          "level": "portfolio",
-          "sql": "with agg as (select 'portfolio' as scope, week, cast(sum(resale_usd) as double) as resale_usd from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, sum(resale_usd) over (partition by scope order by week rows between 12 preceding and current row) as resale_usd from agg) select scope, week, case when week < 12 then null else resale_usd end as value, case when week < 12 then null else null end as denominator from win where week >= 0 order by scope, week"
-        },
-        "Q5a6a21638b": {
-          "metric": "resale_usd",
-          "level": "market",
-          "sql": "with agg as (select market as scope, week, cast(sum(resale_usd) as double) as resale_usd from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, sum(resale_usd) over (partition by scope order by week rows between 12 preceding and current row) as resale_usd from agg) select scope, week, case when week < 12 then null else resale_usd end as value, case when week < 12 then null else null end as denominator from win where week >= 0 order by scope, week"
-        },
-        "Q1bdd2859c3": {
-          "metric": "acquisition_usd",
-          "level": "market",
-          "sql": "with agg as (select market as scope, week, cast(sum(acquisition_usd) as double) as acquisition_usd from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, sum(acquisition_usd) over (partition by scope order by week rows between 3 preceding and current row) as acquisition_usd from agg) select scope, week, case when week < 3 then null else acquisition_usd end as value, case when week < 3 then null else null end as denominator from win where week >= 0 order by scope, week"
-        },
-        "Q4272afac77": {
-          "metric": "unsold_inventory_usd",
-          "level": "market",
-          "sql": "with agg as (select market as scope, week, cast(sum(unsold_inventory_usd) as double) as unsold_inventory_usd from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, unsold_inventory_usd from agg) select scope, week, unsold_inventory_usd as value, null as denominator from win where week >= 0 order by scope, week"
-        }
-      }
-    },
-    {
-      "ref": "Df0a83fde20",
-      "label": "Ab238fd5c portfolio_cm_bps_mid",
-      "value": 3.10857,
-      "display": "3 bps",
-      "kind": "bps",
-      "queries": [
-        "Q1bdd2859c3",
-        "Q4272afac77",
-        "Q5a6a21638b",
-        "Qa55aa51545",
-        "Qb7da5afa49",
-        "Qda4afa7611"
-      ],
-      "sql": {
-        "Qb7da5afa49": {
-          "metric": "reno_overrun_pct",
-          "level": "segment",
-          "sql": "with agg as (select segment as scope, week, market, band, product, cast(sum(reno_actual_sum) as double) as reno_actual_sum, cast(sum(reno_estimate_sum) as double) as reno_estimate_sum, cast(sum(renos_completed) as double) as renos_completed from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, market, band, product, sum(reno_actual_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_actual_sum, sum(reno_estimate_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_estimate_sum, sum(renos_completed) over (partition by scope order by week rows between 3 preceding and current row) as renos_completed from agg) select scope, week, market, band, product, case when week < 3 then null else case when renos_completed < 4 then null else (reno_actual_sum) / nullif(reno_estimate_sum, 0) - 1 end end as value, case when week < 3 then null else renos_completed end as denominator from win where week >= 0 order by scope, week"
-        },
-        "Qda4afa7611": {
-          "metric": "reno_estimate_sum",
-          "level": "market",
-          "sql": "with agg as (select market as scope, week, cast(sum(reno_estimate_sum) as double) as reno_estimate_sum from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, sum(reno_estimate_sum) over (partition by scope order by week rows between 12 preceding and current row) as reno_estimate_sum from agg) select scope, week, case when week < 12 then null else reno_estimate_sum end as value, case when week < 12 then null else null end as denominator from win where week >= 0 order by scope, week"
-        },
-        "Qa55aa51545": {
-          "metric": "resale_usd",
-          "level": "portfolio",
-          "sql": "with agg as (select 'portfolio' as scope, week, cast(sum(resale_usd) as double) as resale_usd from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, sum(resale_usd) over (partition by scope order by week rows between 12 preceding and current row) as resale_usd from agg) select scope, week, case when week < 12 then null else resale_usd end as value, case when week < 12 then null else null end as denominator from win where week >= 0 order by scope, week"
-        },
-        "Q5a6a21638b": {
-          "metric": "resale_usd",
-          "level": "market",
-          "sql": "with agg as (select market as scope, week, cast(sum(resale_usd) as double) as resale_usd from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, sum(resale_usd) over (partition by scope order by week rows between 12 preceding and current row) as resale_usd from agg) select scope, week, case when week < 12 then null else resale_usd end as value, case when week < 12 then null else null end as denominator from win where week >= 0 order by scope, week"
-        },
-        "Q1bdd2859c3": {
-          "metric": "acquisition_usd",
-          "level": "market",
-          "sql": "with agg as (select market as scope, week, cast(sum(acquisition_usd) as double) as acquisition_usd from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, sum(acquisition_usd) over (partition by scope order by week rows between 3 preceding and current row) as acquisition_usd from agg) select scope, week, case when week < 3 then null else acquisition_usd end as value, case when week < 3 then null else null end as denominator from win where week >= 0 order by scope, week"
-        },
-        "Q4272afac77": {
-          "metric": "unsold_inventory_usd",
-          "level": "market",
-          "sql": "with agg as (select market as scope, week, cast(sum(unsold_inventory_usd) as double) as unsold_inventory_usd from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, unsold_inventory_usd from agg) select scope, week, unsold_inventory_usd as value, null as denominator from win where week >= 0 order by scope, week"
-        }
-      }
-    },
-    {
-      "ref": "D661ce1c1fb",
+      "ref": "Dfe8cd33e0b",
       "label": "Ab238fd5c exposure_usd",
       "value": 132615000.0,
       "display": "$132.6M",
       "kind": "usd",
       "queries": [
         "Q1bdd2859c3",
+        "Q31a3760396",
         "Q4272afac77",
         "Q5a6a21638b",
         "Qa55aa51545",
@@ -398,6 +236,11 @@
           "metric": "reno_overrun_pct",
           "level": "segment",
           "sql": "with agg as (select segment as scope, week, market, band, product, cast(sum(reno_actual_sum) as double) as reno_actual_sum, cast(sum(reno_estimate_sum) as double) as reno_estimate_sum, cast(sum(renos_completed) as double) as renos_completed from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, market, band, product, sum(reno_actual_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_actual_sum, sum(reno_estimate_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_estimate_sum, sum(renos_completed) over (partition by scope order by week rows between 3 preceding and current row) as renos_completed from agg) select scope, week, market, band, product, case when week < 3 then null else case when renos_completed < 4 then null else (reno_actual_sum) / nullif(reno_estimate_sum, 0) - 1 end end as value, case when week < 3 then null else renos_completed end as denominator from win where week >= 0 order by scope, week"
+        },
+        "Q31a3760396": {
+          "metric": "reno_overrun_pct",
+          "level": "segment",
+          "sql": "with agg as (select segment as scope, week, market, band, product, cast(sum(reno_actual_sum) as double) as reno_actual_sum, cast(sum(reno_estimate_sum) as double) as reno_estimate_sum, cast(sum(renos_completed) as double) as renos_completed from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, market, band, product, sum(reno_actual_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_actual_sum, sum(reno_estimate_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_estimate_sum, sum(renos_completed) over (partition by scope order by week rows between 3 preceding and current row) as renos_completed from agg) select scope, week, market, band, product, case when week < 3 then null else case when renos_completed < 8 then null else (reno_actual_sum) / nullif(reno_estimate_sum, 0) - 1 end end as value, case when week < 3 then null else renos_completed end as denominator from win where week >= 0 order by scope, week"
         },
         "Qda4afa7611": {
           "metric": "reno_estimate_sum",
@@ -427,13 +270,14 @@
       }
     },
     {
-      "ref": "D0f2975026f",
-      "label": "Ab238fd5c usd_per_100bps",
-      "value": 1326150.0,
-      "display": "$1.3M",
-      "kind": "usd",
+      "ref": "Dd0bb1dc276",
+      "label": "Ab238fd5c scope_bps_mid",
+      "value": 69.8802,
+      "display": "70 bps",
+      "kind": "bps",
       "queries": [
         "Q1bdd2859c3",
+        "Q31a3760396",
         "Q4272afac77",
         "Q5a6a21638b",
         "Qa55aa51545",
@@ -445,6 +289,117 @@
           "metric": "reno_overrun_pct",
           "level": "segment",
           "sql": "with agg as (select segment as scope, week, market, band, product, cast(sum(reno_actual_sum) as double) as reno_actual_sum, cast(sum(reno_estimate_sum) as double) as reno_estimate_sum, cast(sum(renos_completed) as double) as renos_completed from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, market, band, product, sum(reno_actual_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_actual_sum, sum(reno_estimate_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_estimate_sum, sum(renos_completed) over (partition by scope order by week rows between 3 preceding and current row) as renos_completed from agg) select scope, week, market, band, product, case when week < 3 then null else case when renos_completed < 4 then null else (reno_actual_sum) / nullif(reno_estimate_sum, 0) - 1 end end as value, case when week < 3 then null else renos_completed end as denominator from win where week >= 0 order by scope, week"
+        },
+        "Q31a3760396": {
+          "metric": "reno_overrun_pct",
+          "level": "segment",
+          "sql": "with agg as (select segment as scope, week, market, band, product, cast(sum(reno_actual_sum) as double) as reno_actual_sum, cast(sum(reno_estimate_sum) as double) as reno_estimate_sum, cast(sum(renos_completed) as double) as renos_completed from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, market, band, product, sum(reno_actual_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_actual_sum, sum(reno_estimate_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_estimate_sum, sum(renos_completed) over (partition by scope order by week rows between 3 preceding and current row) as renos_completed from agg) select scope, week, market, band, product, case when week < 3 then null else case when renos_completed < 8 then null else (reno_actual_sum) / nullif(reno_estimate_sum, 0) - 1 end end as value, case when week < 3 then null else renos_completed end as denominator from win where week >= 0 order by scope, week"
+        },
+        "Qda4afa7611": {
+          "metric": "reno_estimate_sum",
+          "level": "market",
+          "sql": "with agg as (select market as scope, week, cast(sum(reno_estimate_sum) as double) as reno_estimate_sum from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, sum(reno_estimate_sum) over (partition by scope order by week rows between 12 preceding and current row) as reno_estimate_sum from agg) select scope, week, case when week < 12 then null else reno_estimate_sum end as value, case when week < 12 then null else null end as denominator from win where week >= 0 order by scope, week"
+        },
+        "Qa55aa51545": {
+          "metric": "resale_usd",
+          "level": "portfolio",
+          "sql": "with agg as (select 'portfolio' as scope, week, cast(sum(resale_usd) as double) as resale_usd from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, sum(resale_usd) over (partition by scope order by week rows between 12 preceding and current row) as resale_usd from agg) select scope, week, case when week < 12 then null else resale_usd end as value, case when week < 12 then null else null end as denominator from win where week >= 0 order by scope, week"
+        },
+        "Q5a6a21638b": {
+          "metric": "resale_usd",
+          "level": "market",
+          "sql": "with agg as (select market as scope, week, cast(sum(resale_usd) as double) as resale_usd from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, sum(resale_usd) over (partition by scope order by week rows between 12 preceding and current row) as resale_usd from agg) select scope, week, case when week < 12 then null else resale_usd end as value, case when week < 12 then null else null end as denominator from win where week >= 0 order by scope, week"
+        },
+        "Q1bdd2859c3": {
+          "metric": "acquisition_usd",
+          "level": "market",
+          "sql": "with agg as (select market as scope, week, cast(sum(acquisition_usd) as double) as acquisition_usd from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, sum(acquisition_usd) over (partition by scope order by week rows between 3 preceding and current row) as acquisition_usd from agg) select scope, week, case when week < 3 then null else acquisition_usd end as value, case when week < 3 then null else null end as denominator from win where week >= 0 order by scope, week"
+        },
+        "Q4272afac77": {
+          "metric": "unsold_inventory_usd",
+          "level": "market",
+          "sql": "with agg as (select market as scope, week, cast(sum(unsold_inventory_usd) as double) as unsold_inventory_usd from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, unsold_inventory_usd from agg) select scope, week, unsold_inventory_usd as value, null as denominator from win where week >= 0 order by scope, week"
+        }
+      }
+    },
+    {
+      "ref": "D7bace2e94d",
+      "label": "Ab238fd5c portfolio_cm_bps_mid",
+      "value": 10.5684,
+      "display": "11 bps",
+      "kind": "bps",
+      "queries": [
+        "Q1bdd2859c3",
+        "Q31a3760396",
+        "Q4272afac77",
+        "Q5a6a21638b",
+        "Qa55aa51545",
+        "Qb7da5afa49",
+        "Qda4afa7611"
+      ],
+      "sql": {
+        "Qb7da5afa49": {
+          "metric": "reno_overrun_pct",
+          "level": "segment",
+          "sql": "with agg as (select segment as scope, week, market, band, product, cast(sum(reno_actual_sum) as double) as reno_actual_sum, cast(sum(reno_estimate_sum) as double) as reno_estimate_sum, cast(sum(renos_completed) as double) as renos_completed from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, market, band, product, sum(reno_actual_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_actual_sum, sum(reno_estimate_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_estimate_sum, sum(renos_completed) over (partition by scope order by week rows between 3 preceding and current row) as renos_completed from agg) select scope, week, market, band, product, case when week < 3 then null else case when renos_completed < 4 then null else (reno_actual_sum) / nullif(reno_estimate_sum, 0) - 1 end end as value, case when week < 3 then null else renos_completed end as denominator from win where week >= 0 order by scope, week"
+        },
+        "Q31a3760396": {
+          "metric": "reno_overrun_pct",
+          "level": "segment",
+          "sql": "with agg as (select segment as scope, week, market, band, product, cast(sum(reno_actual_sum) as double) as reno_actual_sum, cast(sum(reno_estimate_sum) as double) as reno_estimate_sum, cast(sum(renos_completed) as double) as renos_completed from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, market, band, product, sum(reno_actual_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_actual_sum, sum(reno_estimate_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_estimate_sum, sum(renos_completed) over (partition by scope order by week rows between 3 preceding and current row) as renos_completed from agg) select scope, week, market, band, product, case when week < 3 then null else case when renos_completed < 8 then null else (reno_actual_sum) / nullif(reno_estimate_sum, 0) - 1 end end as value, case when week < 3 then null else renos_completed end as denominator from win where week >= 0 order by scope, week"
+        },
+        "Qda4afa7611": {
+          "metric": "reno_estimate_sum",
+          "level": "market",
+          "sql": "with agg as (select market as scope, week, cast(sum(reno_estimate_sum) as double) as reno_estimate_sum from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, sum(reno_estimate_sum) over (partition by scope order by week rows between 12 preceding and current row) as reno_estimate_sum from agg) select scope, week, case when week < 12 then null else reno_estimate_sum end as value, case when week < 12 then null else null end as denominator from win where week >= 0 order by scope, week"
+        },
+        "Qa55aa51545": {
+          "metric": "resale_usd",
+          "level": "portfolio",
+          "sql": "with agg as (select 'portfolio' as scope, week, cast(sum(resale_usd) as double) as resale_usd from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, sum(resale_usd) over (partition by scope order by week rows between 12 preceding and current row) as resale_usd from agg) select scope, week, case when week < 12 then null else resale_usd end as value, case when week < 12 then null else null end as denominator from win where week >= 0 order by scope, week"
+        },
+        "Q5a6a21638b": {
+          "metric": "resale_usd",
+          "level": "market",
+          "sql": "with agg as (select market as scope, week, cast(sum(resale_usd) as double) as resale_usd from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, sum(resale_usd) over (partition by scope order by week rows between 12 preceding and current row) as resale_usd from agg) select scope, week, case when week < 12 then null else resale_usd end as value, case when week < 12 then null else null end as denominator from win where week >= 0 order by scope, week"
+        },
+        "Q1bdd2859c3": {
+          "metric": "acquisition_usd",
+          "level": "market",
+          "sql": "with agg as (select market as scope, week, cast(sum(acquisition_usd) as double) as acquisition_usd from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, sum(acquisition_usd) over (partition by scope order by week rows between 3 preceding and current row) as acquisition_usd from agg) select scope, week, case when week < 3 then null else acquisition_usd end as value, case when week < 3 then null else null end as denominator from win where week >= 0 order by scope, week"
+        },
+        "Q4272afac77": {
+          "metric": "unsold_inventory_usd",
+          "level": "market",
+          "sql": "with agg as (select market as scope, week, cast(sum(unsold_inventory_usd) as double) as unsold_inventory_usd from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, unsold_inventory_usd from agg) select scope, week, unsold_inventory_usd as value, null as denominator from win where week >= 0 order by scope, week"
+        }
+      }
+    },
+    {
+      "ref": "De5bda263d5",
+      "label": "Ab238fd5c usd_per_100bps",
+      "value": 1326150.0,
+      "display": "$1.3M",
+      "kind": "usd",
+      "queries": [
+        "Q1bdd2859c3",
+        "Q31a3760396",
+        "Q4272afac77",
+        "Q5a6a21638b",
+        "Qa55aa51545",
+        "Qb7da5afa49",
+        "Qda4afa7611"
+      ],
+      "sql": {
+        "Qb7da5afa49": {
+          "metric": "reno_overrun_pct",
+          "level": "segment",
+          "sql": "with agg as (select segment as scope, week, market, band, product, cast(sum(reno_actual_sum) as double) as reno_actual_sum, cast(sum(reno_estimate_sum) as double) as reno_estimate_sum, cast(sum(renos_completed) as double) as renos_completed from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, market, band, product, sum(reno_actual_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_actual_sum, sum(reno_estimate_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_estimate_sum, sum(renos_completed) over (partition by scope order by week rows between 3 preceding and current row) as renos_completed from agg) select scope, week, market, band, product, case when week < 3 then null else case when renos_completed < 4 then null else (reno_actual_sum) / nullif(reno_estimate_sum, 0) - 1 end end as value, case when week < 3 then null else renos_completed end as denominator from win where week >= 0 order by scope, week"
+        },
+        "Q31a3760396": {
+          "metric": "reno_overrun_pct",
+          "level": "segment",
+          "sql": "with agg as (select segment as scope, week, market, band, product, cast(sum(reno_actual_sum) as double) as reno_actual_sum, cast(sum(reno_estimate_sum) as double) as reno_estimate_sum, cast(sum(renos_completed) as double) as renos_completed from main.mart_segment_week where week <= 60 group by all), win as (select scope, week, market, band, product, sum(reno_actual_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_actual_sum, sum(reno_estimate_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_estimate_sum, sum(renos_completed) over (partition by scope order by week rows between 3 preceding and current row) as renos_completed from agg) select scope, week, market, band, product, case when week < 3 then null else case when renos_completed < 8 then null else (reno_actual_sum) / nullif(reno_estimate_sum, 0) - 1 end end as value, case when week < 3 then null else renos_completed end as denominator from win where week >= 0 order by scope, week"
         },
         "Qda4afa7611": {
           "metric": "reno_estimate_sum",
@@ -475,11 +430,11 @@
     }
   ],
   "grounding": {
-    "numbers_checked": 17,
+    "numbers_checked": 13,
     "errors": [],
     "first_draft": {
-      "numbers_checked": 18,
-      "errors": 2
+      "numbers_checked": 13,
+      "errors": 0
     }
   },
   "actions": [

@@ -1,10 +1,10 @@
 {
-  "live_calls": 170,
+  "live_calls": 181,
   "batch_calls": 143,
-  "replays": 1159,
-  "input_tokens": 174985,
-  "output_tokens": 38811,
-  "cache_read_input_tokens": 258553,
-  "cache_creation_input_tokens": 15148,
-  "est_cost_usd": 0.6511
+  "replays": 1383,
+  "input_tokens": 225264,
+  "output_tokens": 48042,
+  "cache_read_input_tokens": 289263,
+  "cache_creation_input_tokens": 18219,
+  "est_cost_usd": 0.8578
 }
