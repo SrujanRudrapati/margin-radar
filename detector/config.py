@@ -23,3 +23,7 @@ PORTFOLIO_BASELINE_WEEKS = 8
 FORWARD_WEEKS = 13
 # Minimum robust scale per metric, so a quiet history can't produce huge z-scores (DECISIONS D7).
 SIGMA_FLOOR = {"contract_rate": 0.01, "first_offer_rate": 0.01, "reno_overrun_pct": 0.01, "avg_spread_pct": 0.0005}
+# User-given planning range for the resale shortfall behind an adverse-selection scenario estimate
+# (low, mid, high). Not a generator parameter.
+ADVERSE_SELECTION_SHORTFALL = (0.01, 0.02, 0.03)
+IMPACT_TRAILING_WEEKS = 13
