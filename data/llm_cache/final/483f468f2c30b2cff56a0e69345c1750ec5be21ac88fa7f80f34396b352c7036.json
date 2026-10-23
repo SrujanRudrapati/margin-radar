@@ -1,0 +1,52 @@
+{
+ "container": null,
+ "content": [
+  {
+   "citations": null,
+   "text": "## Top actions\n\n### B2 \u2014 adverse selection\n- **What changed:** The contract rate in B2 is above peers and has stayed there since onset in week 35. In week 50 it was 45.8% [q:D9d32a7ff18] against a peer median of 38.0% [q:Df0d49c8fa7], a gap of +6.4 pts [q:Df53d9cf2db]. The uncalibrated score is 1.4 [q:D6512e9bc44]. The share of contracts above the peer-expected rate is 13.9% [q:Dad218742fb].\n- **Why it's not seasonality:** Peer bands share the same weeks, and their median moved with the season, from 33.8% [q:D7097162ca4] in week 38 to 38.0% [q:Df0d49c8fa7] in week 50. B2 stayed above the peer median in every one of the 13 weeks shown. The gap was +14.2 pts [q:D19c497c334] in week 38 and +6.4 pts [q:Df53d9cf2db] in week 50. It narrowed in the middle weeks, for example +0.5 pts [q:Dffd45edb4c] in week 42, then widened again.\n- **Adverse-selection verdict:** Yes. B2's average spread was 6.6% [q:D89f99519a8] against a peer median of 6.6% [q:D9ee58f664a], a gap of +0.0 pts [q:Db852945e06]. Sellers are accepting more often without any change in our spread. That pattern fits homes being worth less than our model thinks.\n- **Impact:** This is a scenario estimate, sample-scale, and it is unconfirmed until resales. It is ranked on its midpoint. The range is $534K [q:D48e86149e3] to $1.6M [q:D60fe52f673], with a midpoint of $1.1M [q:D86ed2d5eda]. That is 6 bps [q:D8e415b2339] to 18 bps [q:Dffdec06a7b] of portfolio contribution margin, with a midpoint of 12 bps [q:D2b6137d495]. The exposure is $383.4M [q:Db1dfa95370]. Each 100 bps of erosion would cost $3.8M [q:De7e68bed08].\n- **Action / owner:** Pricing should widen the spread or add in-person inspection for B2, and should audit the model's valuation inputs.\n\n### M05 \u2014 renovation cost drift\n- **What changed:** Renovation overruns in M05 are far above peers. In week 50 the overrun was 21.0% [q:D8563d6d349] against a peer median of 4.1% [q:D38a2df190d], a gap of +17.8 pts [q:D29d9953c9c]. The uncalibrated score is 4.7 [q:D3198c9ae84]. Onset was in week 37.\n- **Why it's not seasonality:** The peer median stayed low throughout, for example 4.5% [q:D5bf61e5698] in week 38 and 4.1% [q:D38a2df190d] in week 50. M05 rose from 15.0% [q:D977097faa7] to 21.0% [q:D8563d6d349] over the same weeks. The gap was +5.7 pts [q:D8ba60355b4] in week 38 and has stayed wide since.\n- **Adverse-selection verdict:** Not applicable. This is a cost-estimation problem on the renovation side. It is not a conversion signal.\n- **Impact:** Measured from current leading-indicator data, sample-scale, at $764K [q:Db64571b692]. That is 68 bps [q:D0901381d8d] of scope contribution margin and 11 bps [q:D00d8bc58f7] of portfolio contribution margin. The exposure is $111.9M [q:D2d82c1da75]. Each 100 bps of erosion would cost $1.1M [q:D57b91e8ec4].\n- **Action / owner:** Renovation should re-baseline renovation estimates in M05 and require an in-person assessment.\n\n## What we're not sure about\n- The B2 impact is a scenario, not a result. Resales have not yet confirmed it. The scenario assumes a shortfall of 1.0% [q:D18c3c9fc27] to 3.0% [q:Dfe3b9c3f7e].\n- The B2 score is low at 1.4 [q:D6512e9bc44], and the gap has swung from week to week. Treat the signal as persistent but noisy. I did not check whether it is concentrated in particular markets.\n- For M05 I did not look at which renovation categories drive the overruns, so I can't say what a re-baseline should change.\n- `get_alerts` returned no watch items and no abstentions this week.",
+   "type": "text"
+  }
+ ],
+ "context_management": null,
+ "diagnostics": null,
+ "id": "msg_011CgJvVnhDuYMiWxA6sTLPp",
+ "input_transformations": null,
+ "model": "claude-sonnet-5-5",
+ "role": "assistant",
+ "stop_details": null,
+ "stop_reason": "end_turn",
+ "stop_sequence": null,
+ "type": "message",
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 0,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 3071,
+  "fallback_credit": null,
+  "inference_geo": "global",
+  "input_tokens": 7754,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 0,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 3071,
+    "input_tokens": 7754,
+    "model": null,
+    "output_tokens": 1565,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 1565,
+  "output_tokens_details": {
+   "thinking_tokens": 0
+  },
+  "server_tool_use": null,
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

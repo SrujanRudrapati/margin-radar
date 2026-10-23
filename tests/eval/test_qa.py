@@ -76,3 +76,11 @@ def test_raw_sql_cannot_read_files(built_runs, tmp_path):
                     f"select * from read_csv('{secret}')"):
             with pytest.raises(Exception):
                 con.execute(sql).fetchall()
+
+
+def test_raw_sql_is_single_threaded_so_unordered_results_replay(built_runs):
+    # an unordered GROUP BY on a multi-threaded connection returns rows in varying order, which changes the next
+    # turn's cache key and breaks replay; one thread makes the same query return the same order every run
+    from eval.qa import open_sql
+    with open_sql(built_runs["injected"]) as con:
+        assert con.execute("select current_setting('threads')").fetchone()[0] == 1

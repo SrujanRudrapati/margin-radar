@@ -1,0 +1,2248 @@
+{
+  "detector": {
+    "per_seed": [
+      {
+        "seed": 1,
+        "truth": [
+          {
+            "scenario": "A",
+            "effects": {
+              "days_to_first_offer": 1.4
+            },
+            "scope_type": "market",
+            "scope": "M02",
+            "segments": [
+              "M02-B1-cash",
+              "M02-B1-CNML",
+              "M02-B2-cash",
+              "M02-B2-CNML",
+              "M02-B3-cash",
+              "M02-B3-CNML"
+            ],
+            "start_week": 30,
+            "start_date": "2025-08-04",
+            "cm_first_visible_week": 40,
+            "cm_first_visible_date": "2025-10-13",
+            "cm_lag_weeks": 10,
+            "cm_first_visible_week_solo": 40
+          },
+          {
+            "scenario": "B",
+            "effects": {
+              "conversion": 1.25,
+              "resale_vs_model": 0.97
+            },
+            "scope_type": "band",
+            "scope": "B2",
+            "segments": [
+              "M01-B2-cash",
+              "M01-B2-CNML",
+              "M02-B2-cash",
+              "M02-B2-CNML",
+              "M03-B2-cash",
+              "M03-B2-CNML",
+              "M04-B2-cash",
+              "M04-B2-CNML",
+              "M05-B2-cash",
+              "M05-B2-CNML",
+              "M06-B2-cash",
+              "M06-B2-CNML"
+            ],
+            "start_week": 30,
+            "start_date": "2025-08-04",
+            "cm_first_visible_week": 45,
+            "cm_first_visible_date": "2025-11-17",
+            "cm_lag_weeks": 15,
+            "cm_first_visible_week_solo": 48
+          },
+          {
+            "scenario": "C",
+            "effects": {
+              "reno_overrun": 1.18
+            },
+            "scope_type": "market",
+            "scope": "M05",
+            "segments": [
+              "M05-B1-cash",
+              "M05-B1-CNML",
+              "M05-B2-cash",
+              "M05-B2-CNML",
+              "M05-B3-cash",
+              "M05-B3-CNML"
+            ],
+            "start_week": 30,
+            "start_date": "2025-08-04",
+            "cm_first_visible_week": 45,
+            "cm_first_visible_date": "2025-11-17",
+            "cm_lag_weeks": 15,
+            "cm_first_visible_week_solo": 49
+          }
+        ]
+      },
+      {
+        "seed": 2,
+        "truth": [
+          {
+            "scenario": "A",
+            "effects": {
+              "days_to_first_offer": 1.4
+            },
+            "scope_type": "market",
+            "scope": "M02",
+            "segments": [
+              "M02-B1-cash",
+              "M02-B1-CNML",
+              "M02-B2-cash",
+              "M02-B2-CNML",
+              "M02-B3-cash",
+              "M02-B3-CNML"
+            ],
+            "start_week": 30,
+            "start_date": "2025-08-04",
+            "cm_first_visible_week": 49,
+            "cm_first_visible_date": "2025-12-15",
+            "cm_lag_weeks": 19,
+            "cm_first_visible_week_solo": 49
+          },
+          {
+            "scenario": "B",
+            "effects": {
+              "conversion": 1.25,
+              "resale_vs_model": 0.97
+            },
+            "scope_type": "band",
+            "scope": "B2",
+            "segments": [
+              "M01-B2-cash",
+              "M01-B2-CNML",
+              "M02-B2-cash",
+              "M02-B2-CNML",
+              "M03-B2-cash",
+              "M03-B2-CNML",
+              "M04-B2-cash",
+              "M04-B2-CNML",
+              "M05-B2-cash",
+              "M05-B2-CNML",
+              "M06-B2-cash",
+              "M06-B2-CNML"
+            ],
+            "start_week": 30,
+            "start_date": "2025-08-04",
+            "cm_first_visible_week": 47,
+            "cm_first_visible_date": "2025-12-01",
+            "cm_lag_weeks": 17,
+            "cm_first_visible_week_solo": 46
+          },
+          {
+            "scenario": "C",
+            "effects": {
+              "reno_overrun": 1.18
+            },
+            "scope_type": "market",
+            "scope": "M05",
+            "segments": [
+              "M05-B1-cash",
+              "M05-B1-CNML",
+              "M05-B2-cash",
+              "M05-B2-CNML",
+              "M05-B3-cash",
+              "M05-B3-CNML"
+            ],
+            "start_week": 30,
+            "start_date": "2025-08-04",
+            "cm_first_visible_week": 46,
+            "cm_first_visible_date": "2025-11-24",
+            "cm_lag_weeks": 16,
+            "cm_first_visible_week_solo": 48
+          }
+        ]
+      },
+      {
+        "seed": 3,
+        "truth": [
+          {
+            "scenario": "A",
+            "effects": {
+              "days_to_first_offer": 1.4
+            },
+            "scope_type": "market",
+            "scope": "M02",
+            "segments": [
+              "M02-B1-cash",
+              "M02-B1-CNML",
+              "M02-B2-cash",
+              "M02-B2-CNML",
+              "M02-B3-cash",
+              "M02-B3-CNML"
+            ],
+            "start_week": 30,
+            "start_date": "2025-08-04",
+            "cm_first_visible_week": 36,
+            "cm_first_visible_date": "2025-09-15",
+            "cm_lag_weeks": 6,
+            "cm_first_visible_week_solo": 36
+          },
+          {
+            "scenario": "B",
+            "effects": {
+              "conversion": 1.25,
+              "resale_vs_model": 0.97
+            },
+            "scope_type": "band",
+            "scope": "B2",
+            "segments": [
+              "M01-B2-cash",
+              "M01-B2-CNML",
+              "M02-B2-cash",
+              "M02-B2-CNML",
+              "M03-B2-cash",
+              "M03-B2-CNML",
+              "M04-B2-cash",
+              "M04-B2-CNML",
+              "M05-B2-cash",
+              "M05-B2-CNML",
+              "M06-B2-cash",
+              "M06-B2-CNML"
+            ],
+            "start_week": 30,
+            "start_date": "2025-08-04",
+            "cm_first_visible_week": 46,
+            "cm_first_visible_date": "2025-11-24",
+            "cm_lag_weeks": 16,
+            "cm_first_visible_week_solo": 46
+          },
+          {
+            "scenario": "C",
+            "effects": {
+              "reno_overrun": 1.18
+            },
+            "scope_type": "market",
+            "scope": "M05",
+            "segments": [
+              "M05-B1-cash",
+              "M05-B1-CNML",
+              "M05-B2-cash",
+              "M05-B2-CNML",
+              "M05-B3-cash",
+              "M05-B3-CNML"
+            ],
+            "start_week": 30,
+            "start_date": "2025-08-04",
+            "cm_first_visible_week": 48,
+            "cm_first_visible_date": "2025-12-08",
+            "cm_lag_weeks": 18,
+            "cm_first_visible_week_solo": 48
+          }
+        ]
+      },
+      {
+        "seed": 4,
+        "truth": [
+          {
+            "scenario": "A",
+            "effects": {
+              "days_to_first_offer": 1.4
+            },
+            "scope_type": "market",
+            "scope": "M02",
+            "segments": [
+              "M02-B1-cash",
+              "M02-B1-CNML",
+              "M02-B2-cash",
+              "M02-B2-CNML",
+              "M02-B3-cash",
+              "M02-B3-CNML"
+            ],
+            "start_week": 30,
+            "start_date": "2025-08-04",
+            "cm_first_visible_week": 43,
+            "cm_first_visible_date": "2025-11-03",
+            "cm_lag_weeks": 13,
+            "cm_first_visible_week_solo": 43
+          },
+          {
+            "scenario": "B",
+            "effects": {
+              "conversion": 1.25,
+              "resale_vs_model": 0.97
+            },
+            "scope_type": "band",
+            "scope": "B2",
+            "segments": [
+              "M01-B2-cash",
+              "M01-B2-CNML",
+              "M02-B2-cash",
+              "M02-B2-CNML",
+              "M03-B2-cash",
+              "M03-B2-CNML",
+              "M04-B2-cash",
+              "M04-B2-CNML",
+              "M05-B2-cash",
+              "M05-B2-CNML",
+              "M06-B2-cash",
+              "M06-B2-CNML"
+            ],
+            "start_week": 30,
+            "start_date": "2025-08-04",
+            "cm_first_visible_week": 46,
+            "cm_first_visible_date": "2025-11-24",
+            "cm_lag_weeks": 16,
+            "cm_first_visible_week_solo": 46
+          },
+          {
+            "scenario": "C",
+            "effects": {
+              "reno_overrun": 1.18
+            },
+            "scope_type": "market",
+            "scope": "M05",
+            "segments": [
+              "M05-B1-cash",
+              "M05-B1-CNML",
+              "M05-B2-cash",
+              "M05-B2-CNML",
+              "M05-B3-cash",
+              "M05-B3-CNML"
+            ],
+            "start_week": 30,
+            "start_date": "2025-08-04",
+            "cm_first_visible_week": 47,
+            "cm_first_visible_date": "2025-12-01",
+            "cm_lag_weeks": 17,
+            "cm_first_visible_week_solo": 50
+          }
+        ]
+      },
+      {
+        "seed": 5,
+        "truth": [
+          {
+            "scenario": "A",
+            "effects": {
+              "days_to_first_offer": 1.4
+            },
+            "scope_type": "market",
+            "scope": "M02",
+            "segments": [
+              "M02-B1-cash",
+              "M02-B1-CNML",
+              "M02-B2-cash",
+              "M02-B2-CNML",
+              "M02-B3-cash",
+              "M02-B3-CNML"
+            ],
+            "start_week": 30,
+            "start_date": "2025-08-04",
+            "cm_first_visible_week": 42,
+            "cm_first_visible_date": "2025-10-27",
+            "cm_lag_weeks": 12,
+            "cm_first_visible_week_solo": 42
+          },
+          {
+            "scenario": "B",
+            "effects": {
+              "conversion": 1.25,
+              "resale_vs_model": 0.97
+            },
+            "scope_type": "band",
+            "scope": "B2",
+            "segments": [
+              "M01-B2-cash",
+              "M01-B2-CNML",
+              "M02-B2-cash",
+              "M02-B2-CNML",
+              "M03-B2-cash",
+              "M03-B2-CNML",
+              "M04-B2-cash",
+              "M04-B2-CNML",
+              "M05-B2-cash",
+              "M05-B2-CNML",
+              "M06-B2-cash",
+              "M06-B2-CNML"
+            ],
+            "start_week": 30,
+            "start_date": "2025-08-04",
+            "cm_first_visible_week": 48,
+            "cm_first_visible_date": "2025-12-08",
+            "cm_lag_weeks": 18,
+            "cm_first_visible_week_solo": 48
+          },
+          {
+            "scenario": "C",
+            "effects": {
+              "reno_overrun": 1.18
+            },
+            "scope_type": "market",
+            "scope": "M05",
+            "segments": [
+              "M05-B1-cash",
+              "M05-B1-CNML",
+              "M05-B2-cash",
+              "M05-B2-CNML",
+              "M05-B3-cash",
+              "M05-B3-CNML"
+            ],
+            "start_week": 30,
+            "start_date": "2025-08-04",
+            "cm_first_visible_week": 48,
+            "cm_first_visible_date": "2025-12-08",
+            "cm_lag_weeks": 18,
+            "cm_first_visible_week_solo": 48
+          }
+        ]
+      },
+      {
+        "seed": 6,
+        "truth": [
+          {
+            "scenario": "A",
+            "effects": {
+              "days_to_first_offer": 1.4
+            },
+            "scope_type": "market",
+            "scope": "M02",
+            "segments": [
+              "M02-B1-cash",
+              "M02-B1-CNML",
+              "M02-B2-cash",
+              "M02-B2-CNML",
+              "M02-B3-cash",
+              "M02-B3-CNML"
+            ],
+            "start_week": 30,
+            "start_date": "2025-08-04",
+            "cm_first_visible_week": 49,
+            "cm_first_visible_date": "2025-12-15",
+            "cm_lag_weeks": 19,
+            "cm_first_visible_week_solo": 49
+          },
+          {
+            "scenario": "B",
+            "effects": {
+              "conversion": 1.25,
+              "resale_vs_model": 0.97
+            },
+            "scope_type": "band",
+            "scope": "B2",
+            "segments": [
+              "M01-B2-cash",
+              "M01-B2-CNML",
+              "M02-B2-cash",
+              "M02-B2-CNML",
+              "M03-B2-cash",
+              "M03-B2-CNML",
+              "M04-B2-cash",
+              "M04-B2-CNML",
+              "M05-B2-cash",
+              "M05-B2-CNML",
+              "M06-B2-cash",
+              "M06-B2-CNML"
+            ],
+            "start_week": 30,
+            "start_date": "2025-08-04",
+            "cm_first_visible_week": 45,
+            "cm_first_visible_date": "2025-11-17",
+            "cm_lag_weeks": 15,
+            "cm_first_visible_week_solo": 46
+          },
+          {
+            "scenario": "C",
+            "effects": {
+              "reno_overrun": 1.18
+            },
+            "scope_type": "market",
+            "scope": "M05",
+            "segments": [
+              "M05-B1-cash",
+              "M05-B1-CNML",
+              "M05-B2-cash",
+              "M05-B2-CNML",
+              "M05-B3-cash",
+              "M05-B3-CNML"
+            ],
+            "start_week": 30,
+            "start_date": "2025-08-04",
+            "cm_first_visible_week": 44,
+            "cm_first_visible_date": "2025-11-10",
+            "cm_lag_weeks": 14,
+            "cm_first_visible_week_solo": 44
+          }
+        ]
+      },
+      {
+        "seed": 7,
+        "truth": [
+          {
+            "scenario": "A",
+            "effects": {
+              "days_to_first_offer": 1.4
+            },
+            "scope_type": "market",
+            "scope": "M02",
+            "segments": [
+              "M02-B1-cash",
+              "M02-B1-CNML",
+              "M02-B2-cash",
+              "M02-B2-CNML",
+              "M02-B3-cash",
+              "M02-B3-CNML"
+            ],
+            "start_week": 30,
+            "start_date": "2025-08-04",
+            "cm_first_visible_week": 45,
+            "cm_first_visible_date": "2025-11-17",
+            "cm_lag_weeks": 15,
+            "cm_first_visible_week_solo": 45
+          },
+          {
+            "scenario": "B",
+            "effects": {
+              "conversion": 1.25,
+              "resale_vs_model": 0.97
+            },
+            "scope_type": "band",
+            "scope": "B2",
+            "segments": [
+              "M01-B2-cash",
+              "M01-B2-CNML",
+              "M02-B2-cash",
+              "M02-B2-CNML",
+              "M03-B2-cash",
+              "M03-B2-CNML",
+              "M04-B2-cash",
+              "M04-B2-CNML",
+              "M05-B2-cash",
+              "M05-B2-CNML",
+              "M06-B2-cash",
+              "M06-B2-CNML"
+            ],
+            "start_week": 30,
+            "start_date": "2025-08-04",
+            "cm_first_visible_week": 45,
+            "cm_first_visible_date": "2025-11-17",
+            "cm_lag_weeks": 15,
+            "cm_first_visible_week_solo": 47
+          },
+          {
+            "scenario": "C",
+            "effects": {
+              "reno_overrun": 1.18
+            },
+            "scope_type": "market",
+            "scope": "M05",
+            "segments": [
+              "M05-B1-cash",
+              "M05-B1-CNML",
+              "M05-B2-cash",
+              "M05-B2-CNML",
+              "M05-B3-cash",
+              "M05-B3-CNML"
+            ],
+            "start_week": 30,
+            "start_date": "2025-08-04",
+            "cm_first_visible_week": 47,
+            "cm_first_visible_date": "2025-12-01",
+            "cm_lag_weeks": 17,
+            "cm_first_visible_week_solo": 50
+          }
+        ]
+      },
+      {
+        "seed": 8,
+        "truth": [
+          {
+            "scenario": "A",
+            "effects": {
+              "days_to_first_offer": 1.4
+            },
+            "scope_type": "market",
+            "scope": "M02",
+            "segments": [
+              "M02-B1-cash",
+              "M02-B1-CNML",
+              "M02-B2-cash",
+              "M02-B2-CNML",
+              "M02-B3-cash",
+              "M02-B3-CNML"
+            ],
+            "start_week": 30,
+            "start_date": "2025-08-04",
+            "cm_first_visible_week": 49,
+            "cm_first_visible_date": "2025-12-15",
+            "cm_lag_weeks": 19,
+            "cm_first_visible_week_solo": 49
+          },
+          {
+            "scenario": "B",
+            "effects": {
+              "conversion": 1.25,
+              "resale_vs_model": 0.97
+            },
+            "scope_type": "band",
+            "scope": "B2",
+            "segments": [
+              "M01-B2-cash",
+              "M01-B2-CNML",
+              "M02-B2-cash",
+              "M02-B2-CNML",
+              "M03-B2-cash",
+              "M03-B2-CNML",
+              "M04-B2-cash",
+              "M04-B2-CNML",
+              "M05-B2-cash",
+              "M05-B2-CNML",
+              "M06-B2-cash",
+              "M06-B2-CNML"
+            ],
+            "start_week": 30,
+            "start_date": "2025-08-04",
+            "cm_first_visible_week": 46,
+            "cm_first_visible_date": "2025-11-24",
+            "cm_lag_weeks": 16,
+            "cm_first_visible_week_solo": 46
+          },
+          {
+            "scenario": "C",
+            "effects": {
+              "reno_overrun": 1.18
+            },
+            "scope_type": "market",
+            "scope": "M05",
+            "segments": [
+              "M05-B1-cash",
+              "M05-B1-CNML",
+              "M05-B2-cash",
+              "M05-B2-CNML",
+              "M05-B3-cash",
+              "M05-B3-CNML"
+            ],
+            "start_week": 30,
+            "start_date": "2025-08-04",
+            "cm_first_visible_week": 46,
+            "cm_first_visible_date": "2025-11-24",
+            "cm_lag_weeks": 16,
+            "cm_first_visible_week_solo": 48
+          }
+        ]
+      },
+      {
+        "seed": 9,
+        "truth": [
+          {
+            "scenario": "A",
+            "effects": {
+              "days_to_first_offer": 1.4
+            },
+            "scope_type": "market",
+            "scope": "M02",
+            "segments": [
+              "M02-B1-cash",
+              "M02-B1-CNML",
+              "M02-B2-cash",
+              "M02-B2-CNML",
+              "M02-B3-cash",
+              "M02-B3-CNML"
+            ],
+            "start_week": 30,
+            "start_date": "2025-08-04",
+            "cm_first_visible_week": 41,
+            "cm_first_visible_date": "2025-10-20",
+            "cm_lag_weeks": 11,
+            "cm_first_visible_week_solo": 41
+          },
+          {
+            "scenario": "B",
+            "effects": {
+              "conversion": 1.25,
+              "resale_vs_model": 0.97
+            },
+            "scope_type": "band",
+            "scope": "B2",
+            "segments": [
+              "M01-B2-cash",
+              "M01-B2-CNML",
+              "M02-B2-cash",
+              "M02-B2-CNML",
+              "M03-B2-cash",
+              "M03-B2-CNML",
+              "M04-B2-cash",
+              "M04-B2-CNML",
+              "M05-B2-cash",
+              "M05-B2-CNML",
+              "M06-B2-cash",
+              "M06-B2-CNML"
+            ],
+            "start_week": 30,
+            "start_date": "2025-08-04",
+            "cm_first_visible_week": 46,
+            "cm_first_visible_date": "2025-11-24",
+            "cm_lag_weeks": 16,
+            "cm_first_visible_week_solo": 46
+          },
+          {
+            "scenario": "C",
+            "effects": {
+              "reno_overrun": 1.18
+            },
+            "scope_type": "market",
+            "scope": "M05",
+            "segments": [
+              "M05-B1-cash",
+              "M05-B1-CNML",
+              "M05-B2-cash",
+              "M05-B2-CNML",
+              "M05-B3-cash",
+              "M05-B3-CNML"
+            ],
+            "start_week": 30,
+            "start_date": "2025-08-04",
+            "cm_first_visible_week": 44,
+            "cm_first_visible_date": "2025-11-10",
+            "cm_lag_weeks": 14,
+            "cm_first_visible_week_solo": 45
+          }
+        ]
+      },
+      {
+        "seed": 10,
+        "truth": [
+          {
+            "scenario": "A",
+            "effects": {
+              "days_to_first_offer": 1.4
+            },
+            "scope_type": "market",
+            "scope": "M02",
+            "segments": [
+              "M02-B1-cash",
+              "M02-B1-CNML",
+              "M02-B2-cash",
+              "M02-B2-CNML",
+              "M02-B3-cash",
+              "M02-B3-CNML"
+            ],
+            "start_week": 30,
+            "start_date": "2025-08-04",
+            "cm_first_visible_week": 37,
+            "cm_first_visible_date": "2025-09-22",
+            "cm_lag_weeks": 7,
+            "cm_first_visible_week_solo": 37
+          },
+          {
+            "scenario": "B",
+            "effects": {
+              "conversion": 1.25,
+              "resale_vs_model": 0.97
+            },
+            "scope_type": "band",
+            "scope": "B2",
+            "segments": [
+              "M01-B2-cash",
+              "M01-B2-CNML",
+              "M02-B2-cash",
+              "M02-B2-CNML",
+              "M03-B2-cash",
+              "M03-B2-CNML",
+              "M04-B2-cash",
+              "M04-B2-CNML",
+              "M05-B2-cash",
+              "M05-B2-CNML",
+              "M06-B2-cash",
+              "M06-B2-CNML"
+            ],
+            "start_week": 30,
+            "start_date": "2025-08-04",
+            "cm_first_visible_week": 45,
+            "cm_first_visible_date": "2025-11-17",
+            "cm_lag_weeks": 15,
+            "cm_first_visible_week_solo": 45
+          },
+          {
+            "scenario": "C",
+            "effects": {
+              "reno_overrun": 1.18
+            },
+            "scope_type": "market",
+            "scope": "M05",
+            "segments": [
+              "M05-B1-cash",
+              "M05-B1-CNML",
+              "M05-B2-cash",
+              "M05-B2-CNML",
+              "M05-B3-cash",
+              "M05-B3-CNML"
+            ],
+            "start_week": 30,
+            "start_date": "2025-08-04",
+            "cm_first_visible_week": 45,
+            "cm_first_visible_date": "2025-11-17",
+            "cm_lag_weeks": 15,
+            "cm_first_visible_week_solo": 45
+          }
+        ]
+      }
+    ],
+    "by_split": {
+      "tuning": {
+        "seeds": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "control_evaluable_weeks": 255,
+        "control_alert_weeks": 16,
+        "control_false_alerts_per_week": 0.06274509803921569,
+        "wrong_episodes": 3,
+        "wrong_alert_weeks_per_week": 0.0392156862745098,
+        "precision": 0.625,
+        "recall_before_cm": 0.3333333333333333,
+        "scenarios": {
+          "A": {
+            "seeds": 5,
+            "detected_before_cm": 0,
+            "median_lead_weeks": null,
+            "min_lead_weeks": null,
+            "max_lead_weeks": null,
+            "median_delay_weeks": null,
+            "per_seed": [
+              {
+                "seed": 1,
+                "first_alert_week": null,
+                "start_week": 30,
+                "cm_first_visible_week": 40,
+                "delay_weeks": null,
+                "lead_weeks": null,
+                "before_cm": false
+              },
+              {
+                "seed": 2,
+                "first_alert_week": null,
+                "start_week": 30,
+                "cm_first_visible_week": 49,
+                "delay_weeks": null,
+                "lead_weeks": null,
+                "before_cm": false
+              },
+              {
+                "seed": 3,
+                "first_alert_week": null,
+                "start_week": 30,
+                "cm_first_visible_week": 36,
+                "delay_weeks": null,
+                "lead_weeks": null,
+                "before_cm": false
+              },
+              {
+                "seed": 4,
+                "first_alert_week": null,
+                "start_week": 30,
+                "cm_first_visible_week": 43,
+                "delay_weeks": null,
+                "lead_weeks": null,
+                "before_cm": false
+              },
+              {
+                "seed": 5,
+                "first_alert_week": null,
+                "start_week": 30,
+                "cm_first_visible_week": 42,
+                "delay_weeks": null,
+                "lead_weeks": null,
+                "before_cm": false
+              }
+            ]
+          },
+          "B": {
+            "seeds": 5,
+            "detected_before_cm": 1,
+            "median_lead_weeks": 7,
+            "min_lead_weeks": 7,
+            "max_lead_weeks": 7,
+            "median_delay_weeks": 11,
+            "per_seed": [
+              {
+                "seed": 1,
+                "first_alert_week": null,
+                "start_week": 30,
+                "cm_first_visible_week": 45,
+                "delay_weeks": null,
+                "lead_weeks": null,
+                "before_cm": false
+              },
+              {
+                "seed": 2,
+                "first_alert_week": null,
+                "start_week": 30,
+                "cm_first_visible_week": 47,
+                "delay_weeks": null,
+                "lead_weeks": null,
+                "before_cm": false
+              },
+              {
+                "seed": 3,
+                "first_alert_week": null,
+                "start_week": 30,
+                "cm_first_visible_week": 46,
+                "delay_weeks": null,
+                "lead_weeks": null,
+                "before_cm": false
+              },
+              {
+                "seed": 4,
+                "first_alert_week": null,
+                "start_week": 30,
+                "cm_first_visible_week": 46,
+                "delay_weeks": null,
+                "lead_weeks": null,
+                "before_cm": false
+              },
+              {
+                "seed": 5,
+                "first_alert_week": 41,
+                "start_week": 30,
+                "cm_first_visible_week": 48,
+                "delay_weeks": 11,
+                "lead_weeks": 7,
+                "before_cm": true
+              }
+            ]
+          },
+          "C": {
+            "seeds": 5,
+            "detected_before_cm": 4,
+            "median_lead_weeks": 12.0,
+            "min_lead_weeks": 5,
+            "max_lead_weeks": 13,
+            "median_delay_weeks": 5.5,
+            "per_seed": [
+              {
+                "seed": 1,
+                "first_alert_week": 33,
+                "start_week": 30,
+                "cm_first_visible_week": 45,
+                "delay_weeks": 3,
+                "lead_weeks": 12,
+                "before_cm": true
+              },
+              {
+                "seed": 2,
+                "first_alert_week": null,
+                "start_week": 30,
+                "cm_first_visible_week": 46,
+                "delay_weeks": null,
+                "lead_weeks": null,
+                "before_cm": false
+              },
+              {
+                "seed": 3,
+                "first_alert_week": 36,
+                "start_week": 30,
+                "cm_first_visible_week": 48,
+                "delay_weeks": 6,
+                "lead_weeks": 12,
+                "before_cm": true
+              },
+              {
+                "seed": 4,
+                "first_alert_week": 42,
+                "start_week": 30,
+                "cm_first_visible_week": 47,
+                "delay_weeks": 12,
+                "lead_weeks": 5,
+                "before_cm": true
+              },
+              {
+                "seed": 5,
+                "first_alert_week": 35,
+                "start_week": 30,
+                "cm_first_visible_week": 48,
+                "delay_weeks": 5,
+                "lead_weeks": 13,
+                "before_cm": true
+              }
+            ]
+          }
+        },
+        "control_per_seed": [
+          {
+            "seed": 1,
+            "alert_weeks": 5,
+            "episodes": 1,
+            "per_week": 0.098
+          },
+          {
+            "seed": 2,
+            "alert_weeks": 0,
+            "episodes": 0,
+            "per_week": 0.0
+          },
+          {
+            "seed": 3,
+            "alert_weeks": 11,
+            "episodes": 4,
+            "per_week": 0.216
+          },
+          {
+            "seed": 4,
+            "alert_weeks": 0,
+            "episodes": 0,
+            "per_week": 0.0
+          },
+          {
+            "seed": 5,
+            "alert_weeks": 0,
+            "episodes": 0,
+            "per_week": 0.0
+          }
+        ]
+      },
+      "holdout": {
+        "seeds": [
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "control_evaluable_weeks": 255,
+        "control_alert_weeks": 62,
+        "control_false_alerts_per_week": 0.24313725490196078,
+        "wrong_episodes": 5,
+        "wrong_alert_weeks_per_week": 0.17254901960784313,
+        "precision": 0.6666666666666666,
+        "recall_before_cm": 0.6,
+        "scenarios": {
+          "A": {
+            "seeds": 5,
+            "detected_before_cm": 0,
+            "median_lead_weeks": null,
+            "min_lead_weeks": null,
+            "max_lead_weeks": null,
+            "median_delay_weeks": null,
+            "per_seed": [
+              {
+                "seed": 6,
+                "first_alert_week": null,
+                "start_week": 30,
+                "cm_first_visible_week": 49,
+                "delay_weeks": null,
+                "lead_weeks": null,
+                "before_cm": false
+              },
+              {
+                "seed": 7,
+                "first_alert_week": null,
+                "start_week": 30,
+                "cm_first_visible_week": 45,
+                "delay_weeks": null,
+                "lead_weeks": null,
+                "before_cm": false
+              },
+              {
+                "seed": 8,
+                "first_alert_week": null,
+                "start_week": 30,
+                "cm_first_visible_week": 49,
+                "delay_weeks": null,
+                "lead_weeks": null,
+                "before_cm": false
+              },
+              {
+                "seed": 9,
+                "first_alert_week": null,
+                "start_week": 30,
+                "cm_first_visible_week": 41,
+                "delay_weeks": null,
+                "lead_weeks": null,
+                "before_cm": false
+              },
+              {
+                "seed": 10,
+                "first_alert_week": null,
+                "start_week": 30,
+                "cm_first_visible_week": 37,
+                "delay_weeks": null,
+                "lead_weeks": null,
+                "before_cm": false
+              }
+            ]
+          },
+          "B": {
+            "seeds": 5,
+            "detected_before_cm": 4,
+            "median_lead_weeks": 9.0,
+            "min_lead_weeks": 8,
+            "max_lead_weeks": 13,
+            "median_delay_weeks": 6.0,
+            "per_seed": [
+              {
+                "seed": 6,
+                "first_alert_week": 37,
+                "start_week": 30,
+                "cm_first_visible_week": 45,
+                "delay_weeks": 7,
+                "lead_weeks": 8,
+                "before_cm": true
+              },
+              {
+                "seed": 7,
+                "first_alert_week": 35,
+                "start_week": 30,
+                "cm_first_visible_week": 45,
+                "delay_weeks": 5,
+                "lead_weeks": 10,
+                "before_cm": true
+              },
+              {
+                "seed": 8,
+                "first_alert_week": 54,
+                "start_week": 30,
+                "cm_first_visible_week": 46,
+                "delay_weeks": 24,
+                "lead_weeks": -8,
+                "before_cm": false
+              },
+              {
+                "seed": 9,
+                "first_alert_week": 38,
+                "start_week": 30,
+                "cm_first_visible_week": 46,
+                "delay_weeks": 8,
+                "lead_weeks": 8,
+                "before_cm": true
+              },
+              {
+                "seed": 10,
+                "first_alert_week": 32,
+                "start_week": 30,
+                "cm_first_visible_week": 45,
+                "delay_weeks": 2,
+                "lead_weeks": 13,
+                "before_cm": true
+              }
+            ]
+          },
+          "C": {
+            "seeds": 5,
+            "detected_before_cm": 5,
+            "median_lead_weeks": 8,
+            "min_lead_weeks": 7,
+            "max_lead_weeks": 11,
+            "median_delay_weeks": 7,
+            "per_seed": [
+              {
+                "seed": 6,
+                "first_alert_week": 36,
+                "start_week": 30,
+                "cm_first_visible_week": 44,
+                "delay_weeks": 6,
+                "lead_weeks": 8,
+                "before_cm": true
+              },
+              {
+                "seed": 7,
+                "first_alert_week": 36,
+                "start_week": 30,
+                "cm_first_visible_week": 47,
+                "delay_weeks": 6,
+                "lead_weeks": 11,
+                "before_cm": true
+              },
+              {
+                "seed": 8,
+                "first_alert_week": 38,
+                "start_week": 30,
+                "cm_first_visible_week": 46,
+                "delay_weeks": 8,
+                "lead_weeks": 8,
+                "before_cm": true
+              },
+              {
+                "seed": 9,
+                "first_alert_week": 37,
+                "start_week": 30,
+                "cm_first_visible_week": 44,
+                "delay_weeks": 7,
+                "lead_weeks": 7,
+                "before_cm": true
+              },
+              {
+                "seed": 10,
+                "first_alert_week": 38,
+                "start_week": 30,
+                "cm_first_visible_week": 45,
+                "delay_weeks": 8,
+                "lead_weeks": 7,
+                "before_cm": true
+              }
+            ]
+          }
+        },
+        "control_per_seed": [
+          {
+            "seed": 6,
+            "alert_weeks": 16,
+            "episodes": 2,
+            "per_week": 0.314
+          },
+          {
+            "seed": 7,
+            "alert_weeks": 18,
+            "episodes": 3,
+            "per_week": 0.353
+          },
+          {
+            "seed": 8,
+            "alert_weeks": 0,
+            "episodes": 0,
+            "per_week": 0.0
+          },
+          {
+            "seed": 9,
+            "alert_weeks": 18,
+            "episodes": 2,
+            "per_week": 0.353
+          },
+          {
+            "seed": 10,
+            "alert_weeks": 10,
+            "episodes": 2,
+            "per_week": 0.196
+          }
+        ]
+      },
+      "all": {
+        "seeds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "control_evaluable_weeks": 510,
+        "control_alert_weeks": 78,
+        "control_false_alerts_per_week": 0.15294117647058825,
+        "wrong_episodes": 8,
+        "wrong_alert_weeks_per_week": 0.10588235294117647,
+        "precision": 0.6521739130434783,
+        "recall_before_cm": 0.4666666666666667,
+        "scenarios": {
+          "A": {
+            "seeds": 10,
+            "detected_before_cm": 0,
+            "median_lead_weeks": null,
+            "min_lead_weeks": null,
+            "max_lead_weeks": null,
+            "median_delay_weeks": null,
+            "per_seed": [
+              {
+                "seed": 1,
+                "first_alert_week": null,
+                "start_week": 30,
+                "cm_first_visible_week": 40,
+                "delay_weeks": null,
+                "lead_weeks": null,
+                "before_cm": false
+              },
+              {
+                "seed": 2,
+                "first_alert_week": null,
+                "start_week": 30,
+                "cm_first_visible_week": 49,
+                "delay_weeks": null,
+                "lead_weeks": null,
+                "before_cm": false
+              },
+              {
+                "seed": 3,
+                "first_alert_week": null,
+                "start_week": 30,
+                "cm_first_visible_week": 36,
+                "delay_weeks": null,
+                "lead_weeks": null,
+                "before_cm": false
+              },
+              {
+                "seed": 4,
+                "first_alert_week": null,
+                "start_week": 30,
+                "cm_first_visible_week": 43,
+                "delay_weeks": null,
+                "lead_weeks": null,
+                "before_cm": false
+              },
+              {
+                "seed": 5,
+                "first_alert_week": null,
+                "start_week": 30,
+                "cm_first_visible_week": 42,
+                "delay_weeks": null,
+                "lead_weeks": null,
+                "before_cm": false
+              },
+              {
+                "seed": 6,
+                "first_alert_week": null,
+                "start_week": 30,
+                "cm_first_visible_week": 49,
+                "delay_weeks": null,
+                "lead_weeks": null,
+                "before_cm": false
+              },
+              {
+                "seed": 7,
+                "first_alert_week": null,
+                "start_week": 30,
+                "cm_first_visible_week": 45,
+                "delay_weeks": null,
+                "lead_weeks": null,
+                "before_cm": false
+              },
+              {
+                "seed": 8,
+                "first_alert_week": null,
+                "start_week": 30,
+                "cm_first_visible_week": 49,
+                "delay_weeks": null,
+                "lead_weeks": null,
+                "before_cm": false
+              },
+              {
+                "seed": 9,
+                "first_alert_week": null,
+                "start_week": 30,
+                "cm_first_visible_week": 41,
+                "delay_weeks": null,
+                "lead_weeks": null,
+                "before_cm": false
+              },
+              {
+                "seed": 10,
+                "first_alert_week": null,
+                "start_week": 30,
+                "cm_first_visible_week": 37,
+                "delay_weeks": null,
+                "lead_weeks": null,
+                "before_cm": false
+              }
+            ]
+          },
+          "B": {
+            "seeds": 10,
+            "detected_before_cm": 5,
+            "median_lead_weeks": 8,
+            "min_lead_weeks": 7,
+            "max_lead_weeks": 13,
+            "median_delay_weeks": 7,
+            "per_seed": [
+              {
+                "seed": 1,
+                "first_alert_week": null,
+                "start_week": 30,
+                "cm_first_visible_week": 45,
+                "delay_weeks": null,
+                "lead_weeks": null,
+                "before_cm": false
+              },
+              {
+                "seed": 2,
+                "first_alert_week": null,
+                "start_week": 30,
+                "cm_first_visible_week": 47,
+                "delay_weeks": null,
+                "lead_weeks": null,
+                "before_cm": false
+              },
+              {
+                "seed": 3,
+                "first_alert_week": null,
+                "start_week": 30,
+                "cm_first_visible_week": 46,
+                "delay_weeks": null,
+                "lead_weeks": null,
+                "before_cm": false
+              },
+              {
+                "seed": 4,
+                "first_alert_week": null,
+                "start_week": 30,
+                "cm_first_visible_week": 46,
+                "delay_weeks": null,
+                "lead_weeks": null,
+                "before_cm": false
+              },
+              {
+                "seed": 5,
+                "first_alert_week": 41,
+                "start_week": 30,
+                "cm_first_visible_week": 48,
+                "delay_weeks": 11,
+                "lead_weeks": 7,
+                "before_cm": true
+              },
+              {
+                "seed": 6,
+                "first_alert_week": 37,
+                "start_week": 30,
+                "cm_first_visible_week": 45,
+                "delay_weeks": 7,
+                "lead_weeks": 8,
+                "before_cm": true
+              },
+              {
+                "seed": 7,
+                "first_alert_week": 35,
+                "start_week": 30,
+                "cm_first_visible_week": 45,
+                "delay_weeks": 5,
+                "lead_weeks": 10,
+                "before_cm": true
+              },
+              {
+                "seed": 8,
+                "first_alert_week": 54,
+                "start_week": 30,
+                "cm_first_visible_week": 46,
+                "delay_weeks": 24,
+                "lead_weeks": -8,
+                "before_cm": false
+              },
+              {
+                "seed": 9,
+                "first_alert_week": 38,
+                "start_week": 30,
+                "cm_first_visible_week": 46,
+                "delay_weeks": 8,
+                "lead_weeks": 8,
+                "before_cm": true
+              },
+              {
+                "seed": 10,
+                "first_alert_week": 32,
+                "start_week": 30,
+                "cm_first_visible_week": 45,
+                "delay_weeks": 2,
+                "lead_weeks": 13,
+                "before_cm": true
+              }
+            ]
+          },
+          "C": {
+            "seeds": 10,
+            "detected_before_cm": 9,
+            "median_lead_weeks": 8,
+            "min_lead_weeks": 5,
+            "max_lead_weeks": 13,
+            "median_delay_weeks": 6,
+            "per_seed": [
+              {
+                "seed": 1,
+                "first_alert_week": 33,
+                "start_week": 30,
+                "cm_first_visible_week": 45,
+                "delay_weeks": 3,
+                "lead_weeks": 12,
+                "before_cm": true
+              },
+              {
+                "seed": 2,
+                "first_alert_week": null,
+                "start_week": 30,
+                "cm_first_visible_week": 46,
+                "delay_weeks": null,
+                "lead_weeks": null,
+                "before_cm": false
+              },
+              {
+                "seed": 3,
+                "first_alert_week": 36,
+                "start_week": 30,
+                "cm_first_visible_week": 48,
+                "delay_weeks": 6,
+                "lead_weeks": 12,
+                "before_cm": true
+              },
+              {
+                "seed": 4,
+                "first_alert_week": 42,
+                "start_week": 30,
+                "cm_first_visible_week": 47,
+                "delay_weeks": 12,
+                "lead_weeks": 5,
+                "before_cm": true
+              },
+              {
+                "seed": 5,
+                "first_alert_week": 35,
+                "start_week": 30,
+                "cm_first_visible_week": 48,
+                "delay_weeks": 5,
+                "lead_weeks": 13,
+                "before_cm": true
+              },
+              {
+                "seed": 6,
+                "first_alert_week": 36,
+                "start_week": 30,
+                "cm_first_visible_week": 44,
+                "delay_weeks": 6,
+                "lead_weeks": 8,
+                "before_cm": true
+              },
+              {
+                "seed": 7,
+                "first_alert_week": 36,
+                "start_week": 30,
+                "cm_first_visible_week": 47,
+                "delay_weeks": 6,
+                "lead_weeks": 11,
+                "before_cm": true
+              },
+              {
+                "seed": 8,
+                "first_alert_week": 38,
+                "start_week": 30,
+                "cm_first_visible_week": 46,
+                "delay_weeks": 8,
+                "lead_weeks": 8,
+                "before_cm": true
+              },
+              {
+                "seed": 9,
+                "first_alert_week": 37,
+                "start_week": 30,
+                "cm_first_visible_week": 44,
+                "delay_weeks": 7,
+                "lead_weeks": 7,
+                "before_cm": true
+              },
+              {
+                "seed": 10,
+                "first_alert_week": 38,
+                "start_week": 30,
+                "cm_first_visible_week": 45,
+                "delay_weeks": 8,
+                "lead_weeks": 7,
+                "before_cm": true
+              }
+            ]
+          }
+        },
+        "control_per_seed": [
+          {
+            "seed": 1,
+            "alert_weeks": 5,
+            "episodes": 1,
+            "per_week": 0.098
+          },
+          {
+            "seed": 2,
+            "alert_weeks": 0,
+            "episodes": 0,
+            "per_week": 0.0
+          },
+          {
+            "seed": 3,
+            "alert_weeks": 11,
+            "episodes": 4,
+            "per_week": 0.216
+          },
+          {
+            "seed": 4,
+            "alert_weeks": 0,
+            "episodes": 0,
+            "per_week": 0.0
+          },
+          {
+            "seed": 5,
+            "alert_weeks": 0,
+            "episodes": 0,
+            "per_week": 0.0
+          },
+          {
+            "seed": 6,
+            "alert_weeks": 16,
+            "episodes": 2,
+            "per_week": 0.314
+          },
+          {
+            "seed": 7,
+            "alert_weeks": 18,
+            "episodes": 3,
+            "per_week": 0.353
+          },
+          {
+            "seed": 8,
+            "alert_weeks": 0,
+            "episodes": 0,
+            "per_week": 0.0
+          },
+          {
+            "seed": 9,
+            "alert_weeks": 18,
+            "episodes": 2,
+            "per_week": 0.353
+          },
+          {
+            "seed": 10,
+            "alert_weeks": 10,
+            "episodes": 2,
+            "per_week": 0.196
+          }
+        ]
+      }
+    },
+    "gates": {
+      "all_control_zero_alerts": {
+        "pass": false,
+        "value": 78,
+        "rule": "0 control alert-weeks (all seeds)"
+      },
+      "all_recall_before_cm": {
+        "pass": false,
+        "value": {
+          "A": "0/10",
+          "B": "5/10",
+          "C": "9/10"
+        },
+        "rule": ">= 8/10 of all seeds per scenario alert on the true scope before margin shows it"
+      },
+      "all_wrong_alerts": {
+        "pass": false,
+        "value": 8,
+        "rule": "<= 2 wrong-scope alert episodes (all injected runs)"
+      },
+      "holdout_control_zero_alerts": {
+        "pass": false,
+        "value": 62,
+        "rule": "0 control alert-weeks (holdout seeds)"
+      },
+      "holdout_recall_before_cm": {
+        "pass": false,
+        "value": {
+          "A": "0/5",
+          "B": "4/5",
+          "C": "5/5"
+        },
+        "rule": ">= 8/10 of holdout seeds per scenario alert on the true scope before margin shows it"
+      },
+      "holdout_wrong_alerts": {
+        "pass": false,
+        "value": 5,
+        "rule": "<= 1 wrong-scope alert episodes (holdout injected runs)"
+      }
+    }
+  },
+  "llm": {
+    "briefs": [
+      {
+        "week": 40,
+        "status": "valid",
+        "numbers_checked": 40,
+        "final_errors": 0,
+        "first_draft": {
+          "numbers_checked": 40,
+          "errors": 0
+        },
+        "section_accuracy": 1.0,
+        "direction_errors": 0,
+        "top_scope_true": true,
+        "sample_scale_labeled": true
+      },
+      {
+        "week": 45,
+        "status": "valid",
+        "numbers_checked": 35,
+        "final_errors": 0,
+        "first_draft": {
+          "numbers_checked": 35,
+          "errors": 0
+        },
+        "section_accuracy": 1.0,
+        "direction_errors": 0,
+        "top_scope_true": true,
+        "sample_scale_labeled": true
+      },
+      {
+        "week": 50,
+        "status": "valid",
+        "numbers_checked": 38,
+        "final_errors": 0,
+        "first_draft": {
+          "numbers_checked": 39,
+          "errors": 1
+        },
+        "section_accuracy": 1.0,
+        "direction_errors": 0,
+        "top_scope_true": true,
+        "sample_scale_labeled": true
+      },
+      {
+        "week": 60,
+        "status": "valid",
+        "numbers_checked": 16,
+        "final_errors": 0,
+        "first_draft": {
+          "numbers_checked": 16,
+          "errors": 0
+        },
+        "section_accuracy": 1.0,
+        "direction_errors": 0,
+        "top_scope_true": true,
+        "sample_scale_labeled": true
+      }
+    ],
+    "qa": {
+      "semantic": {
+        "mode": "semantic",
+        "rows": [
+          {
+            "id": "q01",
+            "answerable": true,
+            "gold": 0.46551724137931033,
+            "answer": 0.46551724137931033,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q02",
+            "answerable": true,
+            "gold": 0.12472160356347439,
+            "answer": 0.12472160356347439,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q03",
+            "answerable": true,
+            "gold": 0.18503632068608966,
+            "answer": 0.18503632068608966,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q04",
+            "answerable": true,
+            "gold": 0.06975597287773998,
+            "answer": 0.06975597287773998,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q05",
+            "answerable": true,
+            "gold": 279.0,
+            "answer": 279.0,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q06",
+            "answerable": true,
+            "gold": 0.06579498343888095,
+            "answer": 0.06579498343888095,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q07",
+            "answerable": true,
+            "gold": 65.0,
+            "answer": 65.0,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q08",
+            "answerable": true,
+            "gold": 400884792.79,
+            "answer": 400884792.79,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q09",
+            "answerable": true,
+            "gold": 0.2690677966101695,
+            "answer": 0.2690677966101695,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q10",
+            "answerable": true,
+            "gold": 36.10606060606061,
+            "answer": 36.10606060606061,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q11",
+            "answerable": true,
+            "gold": 481501981.5300001,
+            "answer": 481501981.53,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q12",
+            "answerable": true,
+            "gold": 0.06048053024026512,
+            "answer": 0.06048053024026512,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q13",
+            "answerable": true,
+            "gold": 0.58,
+            "answer": 0.58,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q14",
+            "answerable": true,
+            "gold": 0.05263157894736842,
+            "answer": 0.05263157894736842,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q15",
+            "answerable": true,
+            "gold": 1.1012139141216706,
+            "answer": 1.1012139141216706,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q16",
+            "answerable": true,
+            "gold": -337.80639277985244,
+            "answer": -337.80639277985244,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q17",
+            "answerable": true,
+            "gold": 23750695.49,
+            "answer": 23750695.49,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q18",
+            "answerable": true,
+            "gold": 2.0991048593350383,
+            "answer": 2.0991048593350383,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q19",
+            "answerable": true,
+            "gold": 0.030648485066540464,
+            "answer": 0.030648485066540464,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q20",
+            "answerable": true,
+            "gold": 350.0,
+            "answer": 350.0,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "u01",
+            "answerable": false,
+            "gold": null,
+            "answer": null,
+            "abstained": true,
+            "correct": false,
+            "note": ""
+          },
+          {
+            "id": "u02",
+            "answerable": false,
+            "gold": null,
+            "answer": null,
+            "abstained": true,
+            "correct": false,
+            "note": ""
+          },
+          {
+            "id": "u03",
+            "answerable": false,
+            "gold": null,
+            "answer": null,
+            "abstained": true,
+            "correct": false,
+            "note": ""
+          },
+          {
+            "id": "u04",
+            "answerable": false,
+            "gold": null,
+            "answer": null,
+            "abstained": true,
+            "correct": false,
+            "note": ""
+          },
+          {
+            "id": "u05",
+            "answerable": false,
+            "gold": null,
+            "answer": null,
+            "abstained": true,
+            "correct": false,
+            "note": ""
+          }
+        ],
+        "answered": 20,
+        "accuracy": 1.0,
+        "false_abstentions": 0,
+        "abstention_rate": 1.0
+      },
+      "raw_sql": {
+        "mode": "raw_sql",
+        "rows": [
+          {
+            "id": "q01",
+            "answerable": true,
+            "gold": 0.46551724137931033,
+            "answer": 0.46551724137931033,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q02",
+            "answerable": true,
+            "gold": 0.12472160356347439,
+            "answer": 0.12472160356347439,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q03",
+            "answerable": true,
+            "gold": 0.18503632068608966,
+            "answer": 0.18503632068608944,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q04",
+            "answerable": true,
+            "gold": 0.06975597287773998,
+            "answer": 0.06975597287773998,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q05",
+            "answerable": true,
+            "gold": 279.0,
+            "answer": 279.0,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q06",
+            "answerable": true,
+            "gold": 0.06579498343888095,
+            "answer": 0.06579498343888095,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q07",
+            "answerable": true,
+            "gold": 65.0,
+            "answer": 65.0,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q08",
+            "answerable": true,
+            "gold": 400884792.79,
+            "answer": 400884792.79,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q09",
+            "answerable": true,
+            "gold": 0.2690677966101695,
+            "answer": 0.2690677966101695,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q10",
+            "answerable": true,
+            "gold": 36.10606060606061,
+            "answer": 36.10606060606061,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q11",
+            "answerable": true,
+            "gold": 481501981.5300001,
+            "answer": null,
+            "abstained": false,
+            "correct": false,
+            "note": ""
+          },
+          {
+            "id": "q12",
+            "answerable": true,
+            "gold": 0.06048053024026512,
+            "answer": 0.060480530240265,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q13",
+            "answerable": true,
+            "gold": 0.58,
+            "answer": 0.58,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q14",
+            "answerable": true,
+            "gold": 0.05263157894736842,
+            "answer": 0.05263157894736842,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q15",
+            "answerable": true,
+            "gold": 1.1012139141216706,
+            "answer": 1.101213914,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q16",
+            "answerable": true,
+            "gold": -337.80639277985244,
+            "answer": -337.806,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q17",
+            "answerable": true,
+            "gold": 23750695.49,
+            "answer": 23750695.49,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q18",
+            "answerable": true,
+            "gold": 2.0991048593350383,
+            "answer": 2.099,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q19",
+            "answerable": true,
+            "gold": 0.030648485066540464,
+            "answer": 0.030648485066540464,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "q20",
+            "answerable": true,
+            "gold": 350.0,
+            "answer": 350.0,
+            "abstained": false,
+            "correct": true,
+            "note": ""
+          },
+          {
+            "id": "u01",
+            "answerable": false,
+            "gold": null,
+            "answer": null,
+            "abstained": true,
+            "correct": false,
+            "note": ""
+          },
+          {
+            "id": "u02",
+            "answerable": false,
+            "gold": null,
+            "answer": null,
+            "abstained": true,
+            "correct": false,
+            "note": ""
+          },
+          {
+            "id": "u03",
+            "answerable": false,
+            "gold": null,
+            "answer": null,
+            "abstained": true,
+            "correct": false,
+            "note": ""
+          },
+          {
+            "id": "u04",
+            "answerable": false,
+            "gold": null,
+            "answer": null,
+            "abstained": true,
+            "correct": false,
+            "note": ""
+          },
+          {
+            "id": "u05",
+            "answerable": false,
+            "gold": null,
+            "answer": null,
+            "abstained": true,
+            "correct": false,
+            "note": ""
+          }
+        ],
+        "answered": 19,
+        "accuracy": 0.95,
+        "false_abstentions": 0,
+        "abstention_rate": 1.0
+      }
+    },
+    "summary": {
+      "briefs": "4/4 valid (published) at weeks [40, 45, 50, 60]",
+      "number_grounding_pct": 100.0,
+      "numbers_checked": 129,
+      "first_draft_errors_total": 1,
+      "brief_section_accuracy_min": 1.0,
+      "brief_direction_errors": 0,
+      "semantic_layer_accuracy": 1.0,
+      "raw_sql_accuracy": 0.95,
+      "abstention_rate_semantic": 1.0,
+      "abstention_rate_raw_sql": 1.0,
+      "false_abstentions": {
+        "semantic": 0,
+        "raw_sql": 0
+      },
+      "note": "raw-SQL mode can read mart_segment_week, the semantic layer's own pre-aggregated input"
+    },
+    "gates": {
+      "all_briefs_valid": {
+        "pass": true,
+        "value": "4/4",
+        "rule": "every eval brief published (a failed brief never counts as grounded)"
+      },
+      "grounding_100": {
+        "pass": true,
+        "value": "129/129",
+        "rule": "100% of numbers in the briefs match their cited facts"
+      },
+      "brief_accuracy": {
+        "pass": true,
+        "value": "min 1.00, 0 direction errors",
+        "rule": ">= 90% of sections accurate in every brief AND zero direction errors"
+      },
+      "top_action_true_scope": {
+        "pass": true,
+        "value": "4/4",
+        "rule": "each brief's top-ranked action is on an injected scope"
+      },
+      "sample_scale_labeled": {
+        "pass": true,
+        "value": "4/4",
+        "rule": "every action section labels its $ as sample-scale"
+      },
+      "abstention_100": {
+        "pass": true,
+        "value": 1.0,
+        "rule": "abstains on all 5 unanswerable questions (semantic-layer mode)"
+      }
+    }
+  },
+  "cost": {
+    "eval recording (committed)": {
+      "live_calls": 116,
+      "batch_calls": 102,
+      "replays": 229,
+      "input_tokens": 88465,
+      "output_tokens": 23321,
+      "cache_read_input_tokens": 171203,
+      "cache_creation_input_tokens": 8341,
+      "est_cost_usd": 0.3412
+    },
+    "this run, live": {
+      "live_calls": 0,
+      "est_cost_usd": 0
+    },
+    "all logged calls on this machine": {
+      "live_calls": 141,
+      "batch_calls": 102,
+      "replays": 479,
+      "input_tokens": 183712,
+      "output_tokens": 48847,
+      "cache_read_input_tokens": 231197,
+      "cache_creation_input_tokens": 18317,
+      "est_cost_usd": 0.5268
+    }
+  }
+}

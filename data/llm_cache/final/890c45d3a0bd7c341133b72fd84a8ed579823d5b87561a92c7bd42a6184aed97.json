@@ -1,0 +1,47 @@
+{
+ "container": null,
+ "content": [
+  {
+   "citations": null,
+   "text": "Markets are M01..M06, so M09 isn't in the data. I'll abstain.",
+   "type": "text"
+  },
+  {
+   "caller": {
+    "type": "direct"
+   },
+   "id": "toolu_01Eaw8JLQQcuxfG1ENgj318n",
+   "input": {
+    "reason": "Market M09 does not exist in this data; the only markets are M01..M06."
+   },
+   "name": "abstain",
+   "toolset_name": null,
+   "type": "tool_use"
+  }
+ ],
+ "diagnostics": null,
+ "id": "msg_011CgJvrm171UorjXgy3BXAg",
+ "model": "claude-sonnet-5-5",
+ "role": "assistant",
+ "stop_details": null,
+ "stop_reason": "tool_use",
+ "stop_sequence": null,
+ "type": "message",
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 0,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 1101,
+  "inference_geo": "global",
+  "input_tokens": 93,
+  "output_tokens": 100,
+  "output_tokens_details": {
+   "thinking_tokens": 0
+  },
+  "server_tool_use": null,
+  "service_tier": "batch",
+  "speed": "standard"
+ }
+}

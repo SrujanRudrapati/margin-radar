@@ -1,0 +1,47 @@
+{
+ "container": null,
+ "content": [
+  {
+   "signature": "CAQSygcKEAgTGAI4AUIIdGhpbmtpbmcSDJLjrlSxwThuXIpyKRoMyiwqMUK6BAOh1bz/IjBmqovV2HNZWkyoEkXV3AMynFou4cx6H/eB0RkG5Qb/udr7nKiWIt+3AiHZkIZzONkq5wY/lQxlHN8AsfdeciYDGztldzYOWUJUoEcqmwBKR3SdafWvFKTyvpamz42DMlujSe/tFWoBWlcHBXbhnAA36DpmmJqg1x3QMAr5b+CNTrcN9q+r9Ny+KkEO4rUhfH5DUMSOI0KprHIDefFFUGe/6ghszEb+OWTt7c63xjK/jJFL+xT7YQyS828NNODw7CoaL83vOUpz43Q0F0COVbJFDIybfu89S4kNAtF8jCjNf1uRgTpQ9w06GE8gN6Ry7Z/7j3W99oRVjycuy1Xh9AIBz+Z+NTPIk2P7efH6uHAnh2aR/w/HRhKC7mthVJPTnUn4bTKp09c65QW1FukBMmT5RcdepkM2XFhFKZDlnWoH7Cl3F7Pi9ERwj0SR3c6oixAWsUQ6nOK8GbKxG4EZPhWwbxWNYEqGlxgq058RbgdbFNyh8s32hq4Vm5AktwEoO2KTefIfSEkanQWojrM1aTg1GGxvU1mastI72hjxIUkxXfMpUfwCis+5ODoEaW7m4tU27d8+IqvuBPokakVfnrPNfjpLVIy8/PCeerJREGhXvrL4lARVzUSPBNQjpo+AVAwohzE9aK/fjEVzpulbwoLAI5AQu30lzX7uQ2jLG/+aQzKqjxkqH3cZitepuniwZ71B5MALXlw5uDL1KiwaTpd65hxOizk7rlmUseXaRbfftO2/ucI00SLp7NJG4TP610uaiY7Yi8ht1t5yn9bW2PhHJhvqgc5sRLWFdA5Kecqr+FMXhInM/RDFIP1PNX88zQ15dHAM6aYBtkw3wpBLVrtbzDG5WVAy6Nn31Ca6BTtWRSu/ZpbD0B/SGHTRmnJrz+5ihKBhssgujkan+xwFfdfxRfasmSC1q5+OORcFONsbgtBFRW3M/nxRK535P6kidcmDSNwN2yg0x+y1h6hS/jvskwOOXI5auiFO1h1ZE85Ig9WyKkH9jPHMB7sm42m8kC5dOVQNWHHk7vfO7V06d7vXQwrK2mOxs2b8LajuNJNMvl9ApgXPQsUv9IT3M4cYQcfu/vcRw22aXhiLOfe7NhQo7YpfyXs1IFZFuNYC4DAQLKB3m48VJo4ELOAPO/ILwp+xhRG9UEtMorY/SH+5xv4q6MIFblyVlUg6QJp9aEJYsc1exp1ZSK90IO3PajFeQgNhe1sYJ6k1EdjbGAE=",
+   "thinking": "",
+   "type": "thinking"
+  },
+  {
+   "caller": {
+    "type": "direct"
+   },
+   "id": "toolu_01CWxmVBdTf7VsbGhiM3jcou",
+   "input": {
+    "sql": "select week(first_buyer_offer_date) , count(*), sum(days_to_first_offer), sum(showings), date_diff('day', date '2025-01-06', min(first_buyer_offer_date))/7 w from raw.homes where market='M02' and first_buyer_offer_date is not null group by 1 order by 1 desc limit 3;\nselect sum(first_offers),sum(dtfo_sum),sum(showings_sum) from main.mart_segment_week where market='M02' and week between 52 and 55;\nselect count(*), sum(days_to_first_offer), sum(showings) from raw.homes where market='M02' and first_buyer_offer_date is not null and floor(date_diff('day', date '2025-01-06', first_buyer_offer_date)/7) between 52 and 55;\nselect count(*), sum(days_to_first_offer), sum(showings) from raw.homes where market='M02' and first_buyer_offer_date is not null and floor(date_diff('day', date '2025-01-06', list_date)/7) between 52 and 55;"
+   },
+   "name": "run_sql",
+   "toolset_name": null,
+   "type": "tool_use"
+  }
+ ],
+ "diagnostics": null,
+ "id": "msg_011CgJxFGYLQtuT5xqS4ZpxJ",
+ "model": "claude-sonnet-5-5",
+ "role": "assistant",
+ "stop_details": null,
+ "stop_reason": "tool_use",
+ "stop_sequence": null,
+ "type": "message",
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 0,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 1534,
+  "inference_geo": "global",
+  "input_tokens": 1214,
+  "output_tokens": 515,
+  "output_tokens_details": {
+   "thinking_tokens": 120
+  },
+  "server_tool_use": null,
+  "service_tier": "batch",
+  "speed": "standard"
+ }
+}

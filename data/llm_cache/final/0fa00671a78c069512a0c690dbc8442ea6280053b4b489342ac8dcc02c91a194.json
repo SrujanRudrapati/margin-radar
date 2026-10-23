@@ -1,0 +1,59 @@
+{
+ "container": null,
+ "content": [
+  {
+   "signature": "CAQSlQUKEAgTGAI4AUIIdGhpbmtpbmcSDBOpduDMeGc/qdalmhoM1H7kBBvysFuFvTadIjBglHJtK1QplGg8/cOM4NcQYaEoPsrZew84jJBeF8gJNu5XzXAgbIsiNPAxfQcvUg8qsgQ3XPLXLObLDlHM6wNLQaI96U1XfoO+bkNd1ZUszjCrFh6Y+/SpzayP0Tl7643ba9ogUPzTRNjveA811W1pRV4FJHkcFeTAofhsRGbUYDl6cVVHVaAmLOH7109uhAdmw2XRkLTg8szoagfJlU75e3L64koKwgr9Xn0uiBBKRm2uF3SQgem1el3RriiF/hrUziW8C+5/uIZpdx8XIxJNJJ1iejrbpTdtkahWcfJnNKDEavLwKTL1xh6k88L2wtfbxvyNGY9d0L/FRcVA6s3cVeDTxgGcepLDJHgRHpX1IpZz3hFQT6ja4VSoShqYac/GZpG0cYMuOFkN3CasKtqHkF96DeX819DmK3mN5m/86ovoiT9vwz+F3kRSQUE6zXRvCW+Zngt3uAN9X4U92k18kw+7L6O9eCCO4yz7bro+wSI5aM/eemoVpMmE+VbJZ1/Dl585CTW3myQla/YI334A+XUOP655XaH292GCS3MPvKFjtI3O0MW65pmZd8XwAjPj1CngU/4XyOGZifS5pkTA11IOnuVn0JnfkF5X60/AfSeeeKPrKogi12OHY/2XnWA+/nGFthFKLKMODKP3txJ/cRTDaTA1Xd/OBHa4ApqD16Sku4dzD13YtkrClwWuerJgJg5PZFNJcB7p+EYIs/bU/HrL9K3ViOkvo7Q1tSrq0/YoPMJHhPBHRByC3Ht3jDXHzJNCQWoE7F2bWjymXtWs8oq68FYgDWfrW3N7D9FKq6I3Z1H/GAE=",
+   "thinking": "",
+   "type": "thinking"
+  },
+  {
+   "caller": {
+    "type": "direct"
+   },
+   "id": "toolu_01XGs8T5rAtYtUJSh3Jg8UAk",
+   "input": {
+    "sql": "select distinct market from main.mart_segment_week"
+   },
+   "name": "run_sql",
+   "toolset_name": null,
+   "type": "tool_use"
+  },
+  {
+   "caller": {
+    "type": "direct"
+   },
+   "id": "toolu_01NsXqAwkCtzNWyKq4fMT5p2",
+   "input": {
+    "sql": "select distinct market from raw.homes"
+   },
+   "name": "run_sql",
+   "toolset_name": null,
+   "type": "tool_use"
+  }
+ ],
+ "diagnostics": null,
+ "id": "msg_011CgJwpKeAti4FDYNQJ5m3W",
+ "model": "claude-sonnet-5-5",
+ "role": "assistant",
+ "stop_details": null,
+ "stop_reason": "tool_use",
+ "stop_sequence": null,
+ "type": "message",
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 0,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 1534,
+  "inference_geo": "global",
+  "input_tokens": 94,
+  "output_tokens": 166,
+  "output_tokens_details": {
+   "thinking_tokens": 46
+  },
+  "server_tool_use": null,
+  "service_tier": "batch",
+  "speed": "standard"
+ }
+}

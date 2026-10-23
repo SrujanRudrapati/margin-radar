@@ -1,0 +1,47 @@
+{
+ "container": null,
+ "content": [
+  {
+   "signature": "CAQS+QUKEAgTGAI4AUIIdGhpbmtpbmcSDJLoJxLjQScsYOExjRoMTPQuLR0pSe4c2cSkIjAP32+pdo/goHh6RqZ0Knxbrn6D7oNNCbWmeYRzPf2jdh8Ux1afbTHa5+thYiqZKeYqlgUpsu5g+hC4qBkBB7spwJCHncdSnFE+dM4P72uD3GNbyF+yolbxZn23Y52kstgHkMoWD7aZm2wtl7nWg+XtTU4xUOXpe8SMzatLvy0SKcWCk/2MzLiwiY/bDoN8u/6kndlpdw3/e39na01UB1UBJu7wQKkpTFw+ofG3iYuZYapjXxPGR3nbXsyksgjZPHbEWQKxH5ebez1vq6AAfpmlJDinF4UGlX7kvVwmyVrRcoGn2yg5xbtcQ01p6ziSvzwlyMwG3bSTy9vbC8c88jg5D9QUCNCuAjHhCMjurSdyaUgHSR2caFF22jjXJnZPwB6nUxRGdRymRwPjqLdthPOY2DkXnfMr2AH6t9N8WxFQK6g6JsiC4LcHpzsGSWaDQdvHYcMeyGxfJu5zW/XhbZVDyDbvFx24I9cR9QnBc9jAynzLcjttnRn3w26szgj5ywHlpXCqfwsAMd4cIYlDY1E5rT+JXZoYwV+EGnk3Q02shZOSOYtVP02dWQgP0zR+c5xfBik6D8LnkgV1BSrf4nSd4w092K+pnzUsurV0gumwOE1J61Xjoxamg/DQf8Qaqp82GU0TSFZlyUkaOmV3uUyBiOT4DfHaYkMWN0xS9OJHsdHKlGckKR1GbGAcw+ydRL/M+dNeyDuyZCAAfVCmcmLHZGpy7BtFktEhLKuioX+8FqrgufCak6yUUzIlPmIRGm+I2rb9763Rqk5DcCkolptYzHCV9eK1/kefsQdvjAFkf2pX4vLJc8foPEhSEOAx1L4sk4c3Uf6CtVJneRYL9uZQlHxHXoAD5Paz7yM9wHGN2cYMjwtv2Zx9+x3WiHoo+kUz7sqxTNWcSORSvnk/O6NmlOGDkY0dyZoDlDdHTTZXAjX8MQQ4GuVZCRgB",
+   "thinking": "",
+   "type": "thinking"
+  },
+  {
+   "caller": {
+    "type": "direct"
+   },
+   "id": "toolu_01Wx482XErRdXmQS6jePjAxn",
+   "input": {
+    "sql": "select sum(dtfo_sum), sum(first_offers), sum(dtfo_sum)*1.0/sum(first_offers) from main.mart_segment_week where market='M04' and week between 49 and 52"
+   },
+   "name": "run_sql",
+   "toolset_name": null,
+   "type": "tool_use"
+  }
+ ],
+ "diagnostics": null,
+ "id": "msg_011CgJws71VaQzb6jCgt7xYW",
+ "model": "claude-sonnet-5-5",
+ "role": "assistant",
+ "stop_details": null,
+ "stop_reason": "tool_use",
+ "stop_sequence": null,
+ "type": "message",
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 0,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 1534,
+  "inference_geo": "global",
+  "input_tokens": 145,
+  "output_tokens": 194,
+  "output_tokens_details": {
+   "thinking_tokens": 76
+  },
+  "server_tool_use": null,
+  "service_tier": "batch",
+  "speed": "standard"
+ }
+}

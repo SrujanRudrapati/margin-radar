@@ -1,0 +1,47 @@
+{
+ "container": null,
+ "content": [
+  {
+   "signature": "CAQS/QUKEAgTGAI4AUIIdGhpbmtpbmcSDNHnFuzdthe01PNV1xoM17MylQUNNc5I7bhjIjDx4D4n4IJMGKGPRT0HONx3fXC82fsVDKKHcFRNhIw8qIBq4hQ9xrJLlh16fZvAI54qmgVecPtbr4HZpcExCyrxb2ytRMQ6e/8kAO6JSwqF21RvUwVmwB9iKodCejgc+IFYRkKOWQN5FxgORqzQHtZsCGk+k6PzUGLJ4beTqQHjWzKxb7YAJcSUMYCTg2txsyYJ2Tg+aLzH1Pw+aSSab4I7By+6ua+oG4u+aO9EIuJ567g/ZK0oOahVYfLTaopKxvVC3p364iaOrWsOuc2tnfDHvaMY1+2alm1l1A75a7PUMFEZHKLnsvcAvbpIywxsWxUygxxpUiAZolC4C5qJtjBECSpbc69DB25qqCJZ61l9+K/IHDvLp6MsbWBybzrgbzgw86k9RM1VrPhohMVAl683Kx01pGoU+Vc6mguYU/t8GjzaFYzQr3sITVJLlxPIWiRpwmL1ynDwFrPuumOKi7uKyhioBoNNhpCifZB0lJ2yCnei+4MuipxMkWlwvMVcvIxMAs6TbpsfaUPBsbw427A0PvJp5Q4tQJTrsAGJeyUPDeSjj2uqwyTGN5K+hFmrbJQv5xdfZpn7E4pIPITsQM9ORcFKEdafdKoSpzlBK98534wJVrrC46kWkx0H8eKwT9SuWVmGu5D55FiAyBvUnAkhQpiGlR/dhkfbwyzdeREpacNwpjmd1o0ECFriIxOuy0qaXOthPYiXSAF1W/oq6btIWAhtkoDCiIOQjL3Ra9PA+YUrrrINIuo47WcNcPRz4gF8l5FO8vGbI2SzxKs3Mb0lK4YgjMyAURIsvWfjfwErzRdNj+iy/6tGm+X/LF1tqxCDTjConm2Pv21sVMmGgv5JAkyuyNwaHRFJ7xYKhY5JHHQ2u5p0cbCC47I0hup0aLMumHaL2wzD+CjSINxV7roJqJMCf47vbLZXaZM5L5IYpRZ9y/myU3FeFkv8cjQYAQ==",
+   "thinking": "",
+   "type": "thinking"
+  },
+  {
+   "caller": {
+    "type": "direct"
+   },
+   "id": "toolu_01PwUkoBoPHvUw1JVWrDYnh1",
+   "input": {
+    "sql": "select min(offer_date), max(offer_date), min(close_date), max(close_date), count(*) from raw.homes"
+   },
+   "name": "run_sql",
+   "toolset_name": null,
+   "type": "tool_use"
+  }
+ ],
+ "diagnostics": null,
+ "id": "msg_011CgJwpxK43tSfrJh5dCNCp",
+ "model": "claude-sonnet-5-5",
+ "role": "assistant",
+ "stop_details": null,
+ "stop_reason": "tool_use",
+ "stop_sequence": null,
+ "type": "message",
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 0,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 1534,
+  "inference_geo": "global",
+  "input_tokens": 88,
+  "output_tokens": 174,
+  "output_tokens_details": {
+   "thinking_tokens": 88
+  },
+  "server_tool_use": null,
+  "service_tier": "batch",
+  "speed": "standard"
+ }
+}

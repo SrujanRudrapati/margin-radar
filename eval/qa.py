@@ -113,11 +113,12 @@ def sql_guard(sql: str) -> str:
 def open_sql(db: str | Path):
     """Read-only DuckDB connection for model-written SQL, with external access off: no replacement scans of
     files ('path.json'), no read_*/sniff_csv, no ATTACH. It opens a private temp copy of the database, because
-    DuckDB will not open one file twice in a process with different settings."""
+    DuckDB will not open one file twice in a process with different settings. One thread keeps the row order of
+    unordered queries stable, so replayed conversations see the same tool results."""
     with tempfile.TemporaryDirectory() as tmp:
         copy = Path(tmp) / Path(db).name
         shutil.copy(db, copy)
-        con = duckdb.connect(str(copy), read_only=True, config={"enable_external_access": False})
+        con = duckdb.connect(str(copy), read_only=True, config={"enable_external_access": False, "threads": 1})
         try:
             yield con
         finally:

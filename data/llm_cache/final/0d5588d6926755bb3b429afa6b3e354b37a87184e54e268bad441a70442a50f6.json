@@ -1,0 +1,42 @@
+{
+ "container": null,
+ "content": [
+  {
+   "caller": {
+    "type": "direct"
+   },
+   "id": "toolu_017fbWRxn9Pjq8eZ6mZyQ7Ep",
+   "input": {
+    "sql": "select sum(contracts), sum(offers), sum(contracts)*1.0/sum(offers) from main.mart_segment_week where band='B2' and week between 37 and 40"
+   },
+   "name": "run_sql",
+   "toolset_name": null,
+   "type": "tool_use"
+  }
+ ],
+ "diagnostics": null,
+ "id": "msg_011CgJwYHXUkRYAbGPWCfUAz",
+ "model": "claude-sonnet-5-5",
+ "role": "assistant",
+ "stop_details": null,
+ "stop_reason": "tool_use",
+ "stop_sequence": null,
+ "type": "message",
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 0,
+   "ephemeral_5m_input_tokens": 1534
+  },
+  "cache_creation_input_tokens": 1534,
+  "cache_read_input_tokens": 0,
+  "inference_geo": "global",
+  "input_tokens": 149,
+  "output_tokens": 105,
+  "output_tokens_details": {
+   "thinking_tokens": 0
+  },
+  "server_tool_use": null,
+  "service_tier": "batch",
+  "speed": "standard"
+ }
+}

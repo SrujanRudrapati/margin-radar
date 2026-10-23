@@ -48,4 +48,5 @@ def test_report_fields_smoke(tmp_path):
         s = report["by_split"][split]
         assert {"control_alert_weeks", "control_false_alerts_per_week", "wrong_episodes", "precision",
                 "recall_before_cm", "scenarios"} <= set(s)
-    assert {"control_zero_alerts", "recall_before_cm", "wrong_alerts_max_2"} <= set(report["gates"])
+    assert {f"{split}_{gate}" for split in ("all", "holdout")
+            for gate in ("control_zero_alerts", "recall_before_cm", "wrong_alerts")} <= set(report["gates"])
