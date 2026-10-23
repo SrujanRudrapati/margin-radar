@@ -3,10 +3,9 @@
 # Synthetic data — not Opendoor data.
 name: Deploy dashboard to Pages
 
+# Manual only until Pages is enabled in the repository settings; add `push: branches: [main]` to deploy on push.
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
 
 permissions:
   contents: read
@@ -20,6 +19,9 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -el {0}  # login shell, so the conda env is on PATH
     env:
       REPLAY: "1"
       VITE_BASE: /${{ github.event.repository.name }}/
@@ -30,14 +32,13 @@ jobs:
           environment-file: environment.yml
           activate-environment: margin-radar
           auto-activate-base: false
+          miniforge-version: latest  # conda-forge only; avoids the defaults channel
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
           cache: npm
           cache-dependency-path: web/package-lock.json
-      - name: Data, governed metrics, detector, briefs (replay)
-        run: make build detect briefs
-      - name: Static export
+      - name: Data, governed metrics and static export (replay; briefs are committed)
         run: make export
       - uses: actions/upload-pages-artifact@v3
         with:

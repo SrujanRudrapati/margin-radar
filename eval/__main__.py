@@ -29,7 +29,6 @@ BRIEF_WEEKS = (40, 45, 50, 60)  # seed-42 weeks with active alerts (B2 weeks 38-
 EVAL_DIR = ROOT / "eval"
 TOKEN_LOG = ROOT / "data" / "token_log.jsonl"
 RECORDING_COST = EVAL_DIR / "recording_cost.json"  # committed: what recording the eval's LLM responses cost
-NIGHT_CALL_CAP = 300  # the user's pre-approved live-call budget for the run
 TRUTH_42 = EVAL_DIR / "ground_truth.json"
 log = logging.getLogger("eval")
 
@@ -113,10 +112,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     p.add_argument("--skip-llm", action="store_true")
     args = p.parse_args(argv)
     budget = Budget(0)
+    if args.live and os.environ.get("REPLAY") == "1":
+        log.error("REPLAY=1 forbids live calls; unset REPLAY to record with --live")
+        return 2
     if args.live:
         planned = planned_calls()
-        remaining = max(0, NIGHT_CALL_CAP - token_totals(TOKEN_LOG)["live_calls"])
-        cap = min(planned, remaining)
+        cap = min(planned, int(os.environ.get("MAX_API_CALLS", 50)))  # CLAUDE.md budget rule 7; reruns resume
         log.info("Planned live calls (upper bound): %d (model %s); hard cap for this run: %d", planned,
                  model_for("final"), cap)
         if not confirm_live(planned, args.yes):

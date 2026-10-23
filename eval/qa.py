@@ -98,6 +98,10 @@ _FORBIDDEN = re.compile(r"\b(attach|detach|copy|install|load|pragma|export|impor
                         r"call|set|read_\w+|glob|httpfs)\b", re.IGNORECASE)
 
 
+_ORDER_BY = re.compile(r"\border\s+by\b", re.IGNORECASE)
+_WINDOW = re.compile(r"\bover\s*\([^)]*\)", re.IGNORECASE)  # ORDER BY inside OVER (...) orders a window, not rows
+
+
 def sql_guard(sql: str) -> str:
     text = sql.strip().rstrip(";").strip()
     if ";" in text:
@@ -214,18 +218,27 @@ def _query_metric(store: GovernedStore, metric: str, level: str, scope: str, wee
         raise ValueError(f"no data for {level} {scope!r}")
     value = row["value"].iloc[0]
     return {"metric": metric, "level": level, "scope": scope, "week": int(week), "window_weeks": int(window_weeks),
-            "raw_value": None if value is None else float(value), "query_id": panel.query_id}
+            "raw_value": None if value is None else _canonical(float(value)), "query_id": panel.query_id}
 
 
 def _run_sql(con, sql: str) -> dict:
     timer = threading.Timer(SQL_TIMEOUT_S, con.interrupt)  # a runaway cross join must not stall the batch
     timer.start()
     try:
-        rows = con.execute(f"select * from ({sql_guard(sql)}) as q limit {MAX_ROWS}").fetchall()
+        query = sql_guard(sql)
+        own_order = _ORDER_BY.search(_WINDOW.sub("", query))
+        order = "" if own_order else " order by all"  # stable rows (and LIMIT) when the model gave no order
+        rows = con.execute(f"select * from ({query}) as q{order} limit {MAX_ROWS}").fetchall()
     finally:
         timer.cancel()
     columns = [d[0] for d in con.description]
-    return {"columns": columns, "rows": [list(r) for r in rows]}
+    return {"columns": columns, "rows": [[_canonical(v) for v in r] for r in rows]}
+
+
+def _canonical(value):
+    """Floats to 10 significant digits: sums over a rebuilt database differ only in their last bits, and the tool
+    output is part of the next turn's replay cache key."""
+    return float(f"{value:.10g}") if isinstance(value, float) else value
 
 
 def _schema(con) -> str:

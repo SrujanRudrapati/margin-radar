@@ -1707,7 +1707,7 @@
             "id": "q01",
             "answerable": true,
             "gold": 0.46551724137931033,
-            "answer": 0.46551724137931033,
+            "answer": 0.4655172414,
             "abstained": false,
             "correct": true,
             "note": ""
@@ -1716,7 +1716,7 @@
             "id": "q02",
             "answerable": true,
             "gold": 0.12472160356347439,
-            "answer": 0.12472160356347439,
+            "answer": 0.1247216036,
             "abstained": false,
             "correct": true,
             "note": ""
@@ -1724,8 +1724,8 @@
           {
             "id": "q03",
             "answerable": true,
-            "gold": 0.18503632068608966,
-            "answer": 0.18503632068608966,
+            "gold": 0.18503632068608944,
+            "answer": 0.1850363207,
             "abstained": false,
             "correct": true,
             "note": ""
@@ -1734,7 +1734,7 @@
             "id": "q04",
             "answerable": true,
             "gold": 0.06975597287773998,
-            "answer": 0.06975597287773998,
+            "answer": 0.06975597288,
             "abstained": false,
             "correct": true,
             "note": ""
@@ -1752,7 +1752,7 @@
             "id": "q06",
             "answerable": true,
             "gold": 0.06579498343888095,
-            "answer": 0.06579498343888095,
+            "answer": 0.06579498344,
             "abstained": false,
             "correct": true,
             "note": ""
@@ -1769,8 +1769,8 @@
           {
             "id": "q08",
             "answerable": true,
-            "gold": 400884792.79,
-            "answer": 400884792.79,
+            "gold": 400884792.78999996,
+            "answer": 400884792.8,
             "abstained": false,
             "correct": true,
             "note": ""
@@ -1779,7 +1779,7 @@
             "id": "q09",
             "answerable": true,
             "gold": 0.2690677966101695,
-            "answer": 0.2690677966101695,
+            "answer": 0.2690677966,
             "abstained": false,
             "correct": true,
             "note": ""
@@ -1788,7 +1788,7 @@
             "id": "q10",
             "answerable": true,
             "gold": 36.10606060606061,
-            "answer": 36.10606060606061,
+            "answer": 36.10606061,
             "abstained": false,
             "correct": true,
             "note": ""
@@ -1796,8 +1796,8 @@
           {
             "id": "q11",
             "answerable": true,
-            "gold": 481501981.5300001,
-            "answer": 481501981.53,
+            "gold": 481501981.53000003,
+            "answer": 481501981.5,
             "abstained": false,
             "correct": true,
             "note": ""
@@ -1806,7 +1806,7 @@
             "id": "q12",
             "answerable": true,
             "gold": 0.06048053024026512,
-            "answer": 0.06048053024026512,
+            "answer": 0.06048053024,
             "abstained": false,
             "correct": true,
             "note": ""
@@ -1824,7 +1824,7 @@
             "id": "q14",
             "answerable": true,
             "gold": 0.05263157894736842,
-            "answer": 0.05263157894736842,
+            "answer": 0.05263157895,
             "abstained": false,
             "correct": true,
             "note": ""
@@ -1832,8 +1832,8 @@
           {
             "id": "q15",
             "answerable": true,
-            "gold": 1.1012139141216706,
-            "answer": 1.1012139141216706,
+            "gold": 1.1012139141216708,
+            "answer": 1.101213914,
             "abstained": false,
             "correct": true,
             "note": ""
@@ -1842,7 +1842,7 @@
             "id": "q16",
             "answerable": true,
             "gold": -337.80639277985244,
-            "answer": -337.80639277985244,
+            "answer": -337.8063928,
             "abstained": false,
             "correct": true,
             "note": ""
@@ -1860,7 +1860,7 @@
             "id": "q18",
             "answerable": true,
             "gold": 2.0991048593350383,
-            "answer": 2.0991048593350383,
+            "answer": 2.099104859,
             "abstained": false,
             "correct": true,
             "note": ""
@@ -1869,7 +1869,7 @@
             "id": "q19",
             "answerable": true,
             "gold": 0.030648485066540464,
-            "answer": 0.030648485066540464,
+            "answer": 0.03064848507,
             "abstained": false,
             "correct": true,
             "note": ""
@@ -1941,7 +1941,7 @@
             "id": "q01",
             "answerable": true,
             "gold": 0.46551724137931033,
-            "answer": 0.46551724137931033,
+            "answer": 0.4655172414,
             "abstained": false,
             "correct": true,
             "note": ""
@@ -1950,7 +1950,7 @@
             "id": "q02",
             "answerable": true,
             "gold": 0.12472160356347439,
-            "answer": 0.12472160356347439,
+            "answer": 0.1247216036,
             "abstained": false,
             "correct": true,
             "note": ""
@@ -1958,8 +1958,8 @@
           {
             "id": "q03",
             "answerable": true,
-            "gold": 0.18503632068608966,
-            "answer": 0.18503632068608944,
+            "gold": 0.18503632068608944,
+            "answer": 0.1850363207,
             "abstained": false,
             "correct": true,
             "note": ""
@@ -1968,7 +1968,7 @@
             "id": "q04",
             "answerable": true,
             "gold": 0.06975597287773998,
-            "answer": 0.06975597287773998,
+            "answer": 0.06975597288,
             "abstained": false,
             "correct": true,
             "note": ""
@@ -1986,7 +1986,7 @@
             "id": "q06",
             "answerable": true,
             "gold": 0.06579498343888095,
-            "answer": 0.06579498343888095,
+            "answer": 0.06579498344,
             "abstained": false,
             "correct": true,
             "note": ""
@@ -2003,8 +2003,8 @@
           {
             "id": "q08",
             "answerable": true,
-            "gold": 400884792.79,
-            "answer": 400884792.79,
+            "gold": 400884792.78999996,
+            "answer": 400884792.8,
             "abstained": false,
             "correct": true,
             "note": ""
@@ -2013,7 +2013,7 @@
             "id": "q09",
             "answerable": true,
             "gold": 0.2690677966101695,
-            "answer": 0.2690677966101695,
+            "answer": 0.2690677966,
             "abstained": false,
             "correct": true,
             "note": ""
@@ -2022,7 +2022,7 @@
             "id": "q10",
             "answerable": true,
             "gold": 36.10606060606061,
-            "answer": 36.10606060606061,
+            "answer": 36.10606061,
             "abstained": false,
             "correct": true,
             "note": ""
@@ -2030,7 +2030,7 @@
           {
             "id": "q11",
             "answerable": true,
-            "gold": 481501981.5300001,
+            "gold": 481501981.53000003,
             "answer": null,
             "abstained": false,
             "correct": false,
@@ -2058,7 +2058,7 @@
             "id": "q14",
             "answerable": true,
             "gold": 0.05263157894736842,
-            "answer": 0.05263157894736842,
+            "answer": 0.05263157895,
             "abstained": false,
             "correct": true,
             "note": ""
@@ -2066,7 +2066,7 @@
           {
             "id": "q15",
             "answerable": true,
-            "gold": 1.1012139141216706,
+            "gold": 1.1012139141216708,
             "answer": 1.101213914,
             "abstained": false,
             "correct": true,
@@ -2076,7 +2076,7 @@
             "id": "q16",
             "answerable": true,
             "gold": -337.80639277985244,
-            "answer": -337.806,
+            "answer": -337.8063928,
             "abstained": false,
             "correct": true,
             "note": ""
@@ -2094,7 +2094,7 @@
             "id": "q18",
             "answerable": true,
             "gold": 2.0991048593350383,
-            "answer": 2.099,
+            "answer": 2.099104859,
             "abstained": false,
             "correct": true,
             "note": ""
@@ -2103,7 +2103,7 @@
             "id": "q19",
             "answerable": true,
             "gold": 0.030648485066540464,
-            "answer": 0.030648485066540464,
+            "answer": 0.03064848507,
             "abstained": false,
             "correct": true,
             "note": ""
@@ -2221,28 +2221,28 @@
   },
   "cost": {
     "eval recording (committed)": {
-      "live_calls": 116,
-      "batch_calls": 102,
-      "replays": 229,
-      "input_tokens": 88465,
-      "output_tokens": 23321,
-      "cache_read_input_tokens": 171203,
-      "cache_creation_input_tokens": 8341,
-      "est_cost_usd": 0.3412
+      "live_calls": 157,
+      "batch_calls": 143,
+      "replays": 822,
+      "input_tokens": 112871,
+      "output_tokens": 26994,
+      "cache_read_input_tokens": 221701,
+      "cache_creation_input_tokens": 12077,
+      "est_cost_usd": 0.3937
     },
     "this run, live": {
       "live_calls": 0,
       "est_cost_usd": 0
     },
     "all logged calls on this machine": {
-      "live_calls": 141,
-      "batch_calls": 102,
-      "replays": 479,
-      "input_tokens": 183712,
-      "output_tokens": 48847,
-      "cache_read_input_tokens": 231197,
-      "cache_creation_input_tokens": 18317,
-      "est_cost_usd": 0.5268
+      "live_calls": 182,
+      "batch_calls": 143,
+      "replays": 1075,
+      "input_tokens": 208118,
+      "output_tokens": 52520,
+      "cache_read_input_tokens": 281695,
+      "cache_creation_input_tokens": 22053,
+      "est_cost_usd": 0.5793
     }
   }
 }

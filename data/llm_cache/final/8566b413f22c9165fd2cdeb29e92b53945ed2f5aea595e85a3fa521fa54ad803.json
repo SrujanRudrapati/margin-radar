@@ -1,0 +1,47 @@
+{
+ "container": null,
+ "content": [
+  {
+   "signature": "CAQSowcKEAgTGAI4AUIIdGhpbmtpbmcSDHIi0avD0IXCiBhD2xoMg3m7SkBxZnk0k8TxIjB2y5fFRbvjOqHMsrBd7Fd84jsSlZ/c7nXt1hvDwDe8YqBY6KQfcWKv1vBlcHA+7DMqwAa9PDmmOQfBGRLBiZtkqmrw+N3DNxkaKl2hhHrNibJmgDK2NKQYe237m8mQH+2+00AYgYyW4/5tgSq3Cbjl8QzRio4SDagnuL5dNrx0IaAgIrB2EeK6Nu3L5ezFKB+lcxEl5mJ6IFy4CWaJjpTtHI+M/ZDVtTXFC1ycGfv6HZl8kN5exXcOD5Q3BHQ9NVuJVsoUl8oI4nfBIobqyJwt86roVJwUdUvLTdO3WOBaM8yhIvcHBda9ePUAV//G/U2zhBfh/QHF8sdKqGEHdftJNimX9wDf6amj//iozCcE1jXAuAk8nVsH9Qa8oN7DFYAiFzFBNQIxKUgbEywTu90ShsxoEiqZ2rLEtW+Tf6Pk6KX1Z4DkKE8lHHE6NuLJM951auDoUF7Q0NNOJaVLXp3zZCougIOKfV9Qij8fSHsgUAXSYNqtDmBoY7iLd/ReFHDnFZV5PVlVRqJnK1Px8+KHWRDF6D4Xz38ziDvP8ENknK6GtjmPCzTg32UI1WJ/CkBOf9ww2rmCTQJfW4RhQRI9l1tpvmYDWpzDpf085N8Yi6M6EjFnZnlvPT7SR/JM++ZcCwu5zIdWKbP7Vapr5nfamKjsqg4cCJ5yut3drtpItMdH9fK1vpYMzFFZCBIovSRh8wgHKtkLLFykCfJgI6Zi16aZJVRy5RJDyQik7Weu1L8DjBj1eet0f+fcjXgU0NClHMQ24voS0UV4jtDm+4Mp1u/KNo4wWSZc+gfJgksciWvI6zUAtXJCK7icnhp2g0f6+4pgN6+XcW4/vNBsJ5t7YVKhaLuw692N23U5tXpANHYkQu2fFCfWdrXCE9/utI2WYj6IPe7itWIrYmCWEAJw6hqv6W2WS2gPF9O18cB5MMDbAhp2n+Bgid/vrqZbDikPGz1QBX7EOg30s3v3nh7eMTQnvu6MooHAbo5WENcO3OyMs9wn3NIKSX9xVoi/hTXIGjaUfpJyBcxoXg2LoVpwVbqT9taDz0KxaDezHjxfGHtq8M5YBaPDNKfTSE++S+X+qytYGdfaTtBJDA0I55simf/S6vfh0CKQ7JQpMmqxaticnPZJdvK4xnuwF6nYfm1RWpwc/d8OWbNS3QUoU55xGp8pGAE=",
+   "thinking": "",
+   "type": "thinking"
+  },
+  {
+   "caller": {
+    "type": "direct"
+   },
+   "id": "toolu_01FVtmeicxmdHqmwcZEBqfR2",
+   "input": {
+    "sql": "select m.week, m.c, r.c rc, m.a, r.a ra from (select week, sum(closes) c, sum(acquisition_usd) a from main.mart_segment_week group by 1) m left join (select date_diff('day',date '2025-01-06',close_date)/7 w, count(*) c, sum(offer_price) a from raw.homes where close_date is not null group by 1) r on r.w=m.week where m.week<8 or m.week between 38 and 41 order by 1"
+   },
+   "name": "run_sql",
+   "toolset_name": null,
+   "type": "tool_use"
+  }
+ ],
+ "diagnostics": null,
+ "id": "msg_011CgK9TEvDsqU491KeJCaev",
+ "model": "claude-sonnet-5-5",
+ "role": "assistant",
+ "stop_details": null,
+ "stop_reason": "tool_use",
+ "stop_sequence": null,
+ "type": "message",
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 0,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 1534,
+  "inference_geo": "global",
+  "input_tokens": 1753,
+  "output_tokens": 314,
+  "output_tokens_details": {
+   "thinking_tokens": 106
+  },
+  "server_tool_use": null,
+  "service_tier": "batch",
+  "speed": "standard"
+ }
+}

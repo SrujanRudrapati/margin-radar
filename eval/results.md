@@ -23,7 +23,7 @@ _Dollar figures are sample-scale ($ at the synthetic portfolio's ~$1.6B/yr). Det
 
 ## Detector — tuning seeds [1, 2, 3, 4, 5]
 
-- Control false alerts per week: 0.063 (16 alert-weeks over 255 evaluable control weeks)
+- Control false alerts per week: 0.062 (16 alert-weeks over 255 evaluable control weeks)
 - Wrong-scope alert episodes (injected runs): 3; per week 0.039
 - Control alert-weeks per seed: s1: 5, s2: 0, s3: 11, s4: 0, s5: 0
 - Precision (true alert episodes / all episodes): 0.625; recall before margin shows the problem: 0.333
@@ -37,9 +37,9 @@ _Dollar figures are sample-scale ($ at the synthetic portfolio's ~$1.6B/yr). Det
 ## Detector — holdout seeds [6, 7, 8, 9, 10]
 
 - Control false alerts per week: 0.243 (62 alert-weeks over 255 evaluable control weeks)
-- Wrong-scope alert episodes (injected runs): 5; per week 0.173
+- Wrong-scope alert episodes (injected runs): 5; per week 0.172
 - Control alert-weeks per seed: s6: 16, s7: 18, s8: 0, s9: 18, s10: 10
-- Precision (true alert episodes / all episodes): 0.667; recall before margin shows the problem: 0.600
+- Precision (true alert episodes / all episodes): 0.666; recall before margin shows the problem: 0.600
 
 | scenario | detected before margin | median lead (weeks) | min | max | median delay after onset (weeks) |
 |---|---|---|---|---|---|
@@ -49,10 +49,10 @@ _Dollar figures are sample-scale ($ at the synthetic portfolio's ~$1.6B/yr). Det
 
 ## Detector — all seeds [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
-- Control false alerts per week: 0.153 (78 alert-weeks over 510 evaluable control weeks)
-- Wrong-scope alert episodes (injected runs): 8; per week 0.106
+- Control false alerts per week: 0.152 (78 alert-weeks over 510 evaluable control weeks)
+- Wrong-scope alert episodes (injected runs): 8; per week 0.105
 - Control alert-weeks per seed: s1: 5, s2: 0, s3: 11, s4: 0, s5: 0, s6: 16, s7: 18, s8: 0, s9: 18, s10: 10
-- Precision (true alert episodes / all episodes): 0.652; recall before margin shows the problem: 0.467
+- Precision (true alert episodes / all episodes): 0.652; recall before margin shows the problem: 0.466
 
 | scenario | detected before margin | median lead (weeks) | min | max | median delay after onset (weeks) |
 |---|---|---|---|---|---|
@@ -79,9 +79,9 @@ _Dollar figures are sample-scale ($ at the synthetic portfolio's ~$1.6B/yr). Det
 
 | scope | live calls | input | output | cache read | est. cost (USD) |
 |---|---|---|---|---|---|
-| eval recording (committed) | 116 | 88465 | 23321 | 171203 | 0.3412 |
+| eval recording (committed) | 157 | 112871 | 26994 | 221701 | 0.3937 |
 | this run, live | 0 |  |  |  | 0 |
-| all logged calls on this machine | 141 | 183712 | 48847 | 231197 | 0.5268 |
+| all logged calls on this machine | 182 | 208118 | 52520 | 281695 | 0.5793 |
 
 ## Known limitations
 

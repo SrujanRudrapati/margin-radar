@@ -1,0 +1,47 @@
+{
+ "container": null,
+ "content": [
+  {
+   "signature": "CAQS3gYKEAgTGAI4AUIIdGhpbmtpbmcSDEkrMKU9vUB+gazw9hoMLk389euUfashwgwxIjBSjA+uSFId9RFuxF+wkof6JOvv/PhdE5GFOB4jrkvt2etxXDeqDtamZKm6n5YhhQ4q+wWSDRws98Sfqzmq8XX6hBvXfJqL9s0FgZXzuK0iG1HXXOVQFfPqSmrUw2LSggm5IKC8SNlfR7AzqRS32C6YB8Gip2lL/k/Zt5D49EurO7nvzgIV3t+nYV7J1SeWgNYn6/rBcFQHVyWxrLwWeOjrqRSDCGzSCIYptZnJqxm8tuM14w+Hpg9PfzX97XycRy9K6U7P2W1HbMUXbwr2B8vTITlWWPH9kAjPI30/MCraJU59VVTeP9j86g/2m/kEQC3Foj84cFa9yvz/hwN0S8xgz2Mb0a6K7cD6R9Q+93HM1Ed6JvJL6qE/C8lw4PCYcnlEU0h2Z1E9n3T7TejMN+/30oD9p6rgOQfPFskRCpKnZXcJBn0W2eYdT3PRb8Oj8p0kL7DON4PeSaowqkLAOnn8/E6KAJCvEDqBjhQJE+V8T+vpwHgsKVnNU+Vs6DlfM2jp2BuQUVmeZuoOlIvW7XfghDJB64pwohmGu/3eGAbcoeoG5nuybfc74vL4OqT+/dKVfK6LtMtnr027k8CCyi3TPyhiziVvpHzpk+IXfFa8B0ZKU7nC2EwSxtjFc0HePkbi+lSlKAs3bvWqczt6d4NPHTwUA8o6tvq5KJ9wt4ZVnLpu4huUsQTTLlMHhM5xXMxhedXplboU/LTRn67g3XO1a7tquk5TWaVFS4CEy8wuF16kV70DxdFA6JdCXBrZwQE/N2ealBuf/2TZRFlO195/sT4atIjhyjwZQuvzmwndrw69sn8yd1nu3xmjyXJtg3BOVsHSsCc7YUECba7+68DMC+IxgHFoJOlWN1HZ9tV2oyAW8JyNbhYnCCA0ro8+TtDdxmP8Z3ji5IuzvRktH83mlunK7IH1m1HJpP+x0fD8WFLGT6hBhawva4E6P+HIQJWLcebt/GYGS/+KadVrE0eoyGUWOH4i2ndq7QddLWy8O4iwBQcXiWYoNDW/w0B6Vm9hjtIRoa+C5lcBPpRWEZ2B6MNGfNxzTlEc5e5lrxU0zn9loXEvNn5psFmdxGuhGAE=",
+   "thinking": "",
+   "type": "thinking"
+  },
+  {
+   "caller": {
+    "type": "direct"
+   },
+   "id": "toolu_01WrUqBXQFayZPY1XFfxmty1",
+   "input": {
+    "sql": "select sum(offer_price) filter (where date_diff('day',date '2025-01-06',close_date)/7 <=40 and (resale_date is null or date_diff('day',date '2025-01-06',resale_date)/7 >40)) a, sum(offer_price) filter (where date_diff('day',date '2025-01-06',close_date)/7 <=40) tot, (select sum(acquisition_usd) from main.mart_segment_week where week<=40) m, (select sum(closes) from main.mart_segment_week where week<=40) c, count(*) filter (where date_diff('day',date '2025-01-06',close_date)/7 <=40) n from raw.homes"
+   },
+   "name": "run_sql",
+   "toolset_name": null,
+   "type": "tool_use"
+  }
+ ],
+ "diagnostics": null,
+ "id": "msg_011CgK9FCBvwLvEQjLrzqpiJ",
+ "model": "claude-sonnet-5-5",
+ "role": "assistant",
+ "stop_details": null,
+ "stop_reason": "tool_use",
+ "stop_sequence": null,
+ "type": "message",
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 0,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 1534,
+  "inference_geo": "global",
+  "input_tokens": 1333,
+  "output_tokens": 354,
+  "output_tokens_details": {
+   "thinking_tokens": 85
+  },
+  "server_tool_use": null,
+  "service_tier": "batch",
+  "speed": "standard"
+ }
+}

@@ -37,26 +37,26 @@ detect: data/radar_injected.duckdb data/radar_control.duckdb
 
 # Demo briefs: always REPLAY=1 (recorded responses only; never a live call). Week 6 abstains, week 33 is inside the
 # Q3 margin dip with no alerts (both deterministic, no LLM); week 40 is the recorded final-model sample brief.
-briefs: data/radar_injected.duckdb
+briefs: build
 	REPLAY=1 $(PY) -m agent brief --db data/radar_injected.duckdb --as-of-week 6 --out briefs
 	REPLAY=1 $(PY) -m agent brief --db data/radar_injected.duckdb --as-of-week 33 --out briefs
 	REPLAY=1 $(PY) -m agent brief --db data/radar_injected.duckdb --as-of-week 40 --purpose final --out briefs
 
 # Evaluation: replay-only (recorded LLM responses; never a live call). Writes eval/results.json + eval/results.md.
-eval: data/radar_injected.duckdb
+eval: build
 	REPLAY=1 $(PY) -m eval
 
 # Record missing eval LLM responses with CLAUDE_MODEL_FINAL. Prints the planned call count and asks first.
-record-final: data/radar_injected.duckdb
+record-final: build
 	$(PY) -m eval --live
 
 # Decision log (feedback loop): seed example decisions and score them against realized margin (deterministic, no LLM).
-decisions: data/radar_injected.duckdb
+decisions: build
 	$(PY) -m agent decisions seed --db data/radar_injected.duckdb --log data/decisions.duckdb > /dev/null
 	$(PY) -m agent decisions score --db data/radar_injected.duckdb --log data/decisions.duckdb > data/decision_scores.json
 
 # Lead-time markers for the dashboard (eval is the only reader of ground truth).
-markers: data/radar_injected.duckdb
+markers: build
 	$(PY) -m eval.markers
 
 # Dashboard API: always replay-only (never calls Claude).
