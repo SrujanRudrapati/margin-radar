@@ -109,3 +109,36 @@ def test_export_writes_static_files(client, tmp_path):
     manifest = export(client.app.state.services, tmp_path, weeks=[40], runs=["injected"])
     assert (tmp_path / "manifest.json").exists() and manifest["files"]
     assert (tmp_path / "radar" / "injected" / "40.json").exists()
+
+
+def test_startup_warms_alert_episodes_so_first_decision_view_is_fast(built_runs, tmp_path):
+    # replaying the detector over every week takes ~20 s; the server does it once in the background at startup
+    import time
+    from api.main import create_app
+    app = create_app(data_dir=built_runs["injected"].parent, briefs_dirs=[tmp_path], eval_dir=tmp_path,
+                     decisions_db=tmp_path / "decisions.duckdb")
+    with TestClient(app):
+        services = app.state.services
+        assert services.warmed.wait(timeout=300)
+        assert set(services._episodes) == {"injected", "control"}
+        start = time.monotonic()
+        services.decisions_view()
+        assert time.monotonic() - start < 5
+
+
+@pytest.mark.slow
+def test_warm_up_does_not_hold_the_request_lock_while_replaying(built_runs, tmp_path):
+    # requests share one lock; warm-up must do its ~20 s replay on its own connection, taking the lock only to store
+    import threading
+    import time
+    from api.main import create_app
+    services = create_app(data_dir=built_runs["injected"].parent, briefs_dirs=[tmp_path], eval_dir=tmp_path,
+                          decisions_db=tmp_path / "decisions.duckdb").state.services
+    with services._lock:  # a long-running request
+        worker = threading.Thread(target=services.warm, daemon=True)
+        worker.start()
+        time.sleep(60)  # long enough for the replay of both runs to finish if it is not waiting on the lock
+        assert not services.warmed.is_set()
+    start = time.monotonic()
+    assert services.warmed.wait(timeout=300)
+    assert time.monotonic() - start < 5, "the replay ran only after the lock was released"

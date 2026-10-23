@@ -4,6 +4,8 @@ Synthetic data — not Opendoor data.
 uvicorn api.main:app --port 8000
 """
 import os
+import threading
+from contextlib import asynccontextmanager
 
 os.environ["REPLAY"] = "1"  # before anything that could construct an LLM client
 
@@ -31,7 +33,12 @@ class DecisionIn(BaseModel):
 def create_app(data_dir: Path = ROOT / "data", briefs_dirs: list[Path] | None = None, eval_dir: Path = ROOT / "eval",
                decisions_db: Path = ROOT / "data" / "decisions.duckdb") -> FastAPI:
     services = Services(data_dir, briefs_dirs or [ROOT / "briefs", ROOT / "eval" / "briefs"], eval_dir, decisions_db)
-    app = FastAPI(title="Margin Radar API", description="Synthetic data — not Opendoor data.")
+    @asynccontextmanager
+    async def lifespan(_: FastAPI):
+        threading.Thread(target=services.warm, name="warm-episodes", daemon=True).start()
+        yield
+
+    app = FastAPI(title="Margin Radar API", description="Synthetic data — not Opendoor data.", lifespan=lifespan)
     app.state.services = services
     app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
                        allow_methods=["GET", "POST"], allow_headers=["*"])

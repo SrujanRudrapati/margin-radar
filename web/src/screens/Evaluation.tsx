@@ -78,7 +78,7 @@ function SplitView({ name, s }: { name: string; s: Split }) {
           <li key={key} className="grid gap-2 md:grid-cols-[16rem_1fr]">
             <div>
               <p className="font-semibold">{NAMES[key] ?? key}</p>
-              <p className="text-sm text-muted">Caught before margin showed it in {sc.detected_before_cm} of {sc.seeds} seeds</p>
+              <p className="text-sm text-muted">Caught before margin showed it in {sc.detected_before_cm} of {sc.seeds} seeds. The range covers those seeds only.</p>
             </div>
             <div className="self-center">
               {sc.median_lead_weeks === null ? <p className="text-sm text-muted">No early detection in these seeds.</p> : (

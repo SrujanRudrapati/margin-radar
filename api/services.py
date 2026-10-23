@@ -43,6 +43,7 @@ class Services:
         self._stores: dict[str, GovernedStore] = {}
         self._episodes: dict[str, list[dict]] = {}
         self._lock = threading.Lock()  # DuckDB connections are not shared across threads concurrently
+        self.warmed = threading.Event()  # set once both runs' alert episodes are cached (see warm)
 
     # --- plumbing -------------------------------------------------------------------------------------------
     def _store(self, run: str) -> GovernedStore:
@@ -155,13 +156,7 @@ class Services:
 
     def _all_episodes(self, run: str, store: GovernedStore) -> list[dict]:
         if run not in self._episodes:
-            episodes: dict[str, dict] = {}
-            for week in range(store.max_week + 1):
-                for a in detect(store, week).alerts:
-                    e = episodes.setdefault(a.alert_id, {"alert_id": a.alert_id, "kind": a.kind, "scope": a.scope,
-                                                         "onset_week": a.onset_week, "first_week": week})
-                    e["last_week"] = week
-            self._episodes[run] = list(episodes.values())
+            self._episodes[run] = _detect_episodes(store)
         return self._episodes[run]
 
     def cohort(self, run: str, week: int, level: str, scope: str, start: int, end: int) -> dict:
@@ -217,12 +212,34 @@ class Services:
                                payload["decided_week"], self._episode_index(store))
         return {**row, "ts": str(row["ts"])}
 
+    def warm(self) -> None:
+        """Replay the detector over every week of both runs (~20 s each) so no request pays for it. Uses its own
+        read-only connection, so requests are not blocked; the lock is held only to store the result."""
+        replayed = {}
+        for run in RUNS:
+            with GovernedStore(str(self.data_dir / f"radar_{run}.duckdb"), run) as store:
+                replayed[run] = _detect_episodes(store)
+        with self._lock:
+            for run, episodes in replayed.items():
+                self._episodes.setdefault(run, episodes)
+        self.warmed.set()
+
     def _episode_index(self, store: GovernedStore) -> dict[str, dict]:
         return {e["alert_id"]: e for e in self._all_episodes("injected", store)}
 
     @staticmethod
     def _read_json(path: Path) -> dict | None:
         return json.loads(path.read_text()) if path.exists() else None
+
+
+def _detect_episodes(store: GovernedStore) -> list[dict]:
+    episodes: dict[str, dict] = {}
+    for week in range(store.max_week + 1):
+        for a in detect(store, week).alerts:
+            e = episodes.setdefault(a.alert_id, {"alert_id": a.alert_id, "kind": a.kind, "scope": a.scope,
+                                                 "onset_week": a.onset_week, "first_week": week})
+            e["last_week"] = week
+    return list(episodes.values())
 
 
 def _f(x):
