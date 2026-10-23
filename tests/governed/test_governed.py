@@ -314,3 +314,10 @@ def test_cohort_curve_rejects_bad_scope(built_runs):
             store.cohort_curve("band", "B9'; drop table x; --", 30, 33, as_of_week=77)
         with pytest.raises(ValueError):
             store.cohort_curve("band", "B2", 33, 30, as_of_week=77)
+
+
+def test_cohort_curve_sql_breaks_ties_by_home_id(built_runs):
+    from detector.governed import GovernedStore
+    with GovernedStore(str(built_runs["injected"]), "injected") as store:
+        sql = store.cohort_curve("band", "B2", 30, 33, as_of_week=77).sql
+    assert "order by resale_date, close_date, home_id" in sql

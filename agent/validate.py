@@ -1,39 +1,51 @@
-"""Grounding checker: every number in a brief must match the cited fact after normalization.
+"""Grounding checker: every number in a brief must be a cited fact, copied exactly.
 
-Numbers that need no citation: ISO dates, week numbers, scope names (M02, B2, M02-B2-cash), list markers and the
-sample-scale label. Anything else must be followed by [q:<fact id>] and match that fact's value within its
-displayed precision. Fails loudly: callers get the full list of problems. Synthetic data — not Opendoor data.
+Numbers that need no citation: ISO dates, week numbers ("week 38", "weeks 30–40"), scope names (M02, B2,
+M02-B2-cash), quarter names and the sample-scale label. Any other number must be immediately followed by
+[q:<fact id>] and match that fact's display string exactly (a leading "+" is optional). Numbers written as words
+are rejected. Every reference must exist. check_structure() enforces the SPEC's required content. Fails loudly:
+callers get the full list of problems. Synthetic data — not Opendoor data.
 """
 import re
 
-from agent.facts import _NUMBER, Fact, parse_number
+from agent.facts import _NUMBER, Fact
 from common.business import SAMPLE_SCALE_LABEL
 
 CITE = re.compile(r"\[q:([A-Za-z0-9]+)\]")
 MAX_GAP = 40  # characters allowed between a number and its citation
+_WEEK_END = r"(?![\d%]|[.,]\d)"
 CONTEXT = [
     re.compile(re.escape(SAMPLE_SCALE_LABEL)),
-    re.compile(r"~?\$1\.6B(?:/yr| a year| per year)?"),
+    re.compile(r"~?\$1\.6B(?:/yr| a year| per year)"),
     re.compile(r"\b\d{4}-\d{2}-\d{2}\b"),
-    re.compile(r"\bweeks?\s+\d+(?![\d%]|[.,]\d)(?:\s*(?:–|-|to|and)\s*(?:week\s+)?\d+(?![\d%]|[.,]\d|\s*(?:pts|bps|days)))?",
-               re.IGNORECASE),
+    re.compile(rf"\bweeks\s+\d+\s*(?:–|-|to|and)\s*\d+{_WEEK_END}", re.IGNORECASE),
+    re.compile(rf"\bweeks?\s+\d+{_WEEK_END}", re.IGNORECASE),
+    re.compile(r"\b(?:per|each|every)\s+100\s+bps\b", re.IGNORECASE),
     re.compile(r"\bM0[1-6](?:-B[1-3](?:-(?:cash|CNML))?)?\b"),
     re.compile(r"\bB[1-3]\b"),
     re.compile(r"\bQ[1-4]\b"),
-    re.compile(r"^\s*\d+\.\s", re.MULTILINE),
 ]
-UNIT_MARK = {"usd": ("$",), "pct": ("%",), "pct_points": ("pts",), "bps": ("bps",), "days": ("days", "")}
+NUMBER_WORDS = re.compile(
+    r"\b(zero|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|"
+    r"seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand|million|"
+    r"billion|half|double|doubled|triple|tripled|twice|thrice|quadruple|quadrupled)\b", re.IGNORECASE)
+NOT_SURE = re.compile(r"^##\s+what we.re not sure about", re.IGNORECASE | re.MULTILINE)
+SCENARIO_PHRASES = ("scenario estimate", "unconfirmed until resales", "midpoint")
 
 
-def check(body: str, facts: dict[str, Fact]) -> list[str]:
-    return check_detailed(body, facts)[0]
+def check(body: str, facts: dict[str, Fact], known_refs: set[str] | None = None) -> list[str]:
+    return check_detailed(body, facts, known_refs)[0]
 
 
-def check_detailed(body: str, facts: dict[str, Fact]) -> tuple[list[str], int]:
+def check_detailed(body: str, facts: dict[str, Fact], known_refs: set[str] | None = None) -> tuple[list[str], int]:
     errors: list[str] = []
     cites = [(m.start(), m.end(), m.group(1)) for m in CITE.finditer(body)]
-    errors += [f"unknown reference [q:{ref}]" for _, _, ref in cites if ref not in facts and not ref.startswith("Q")]
+    for _, _, ref in cites:
+        if ref not in facts and not (known_refs is not None and ref in known_refs):
+            errors.append(f"unknown reference [q:{ref}]")
     masked = _mask(body, [(s, e) for s, e, _ in cites])
+    errors += [f"number written as a word: {m.group(0)!r}; use a cited figure or describe it without a number"
+               for m in NUMBER_WORDS.finditer(masked)]
     numbers = [m for m in _NUMBER.finditer(masked) if m.group("num")]
     for i, m in enumerate(numbers):
         token = m.group(0).strip()
@@ -42,13 +54,42 @@ def check_detailed(body: str, facts: dict[str, Fact]) -> tuple[list[str], int]:
         where = body[max(0, m.start() - 30): m.end() + 15].replace("\n", " ")
         if cite is None:
             errors.append(f"uncited number {token!r} in: ...{where}...")
-            continue
-        ref = cite[2]
-        if ref.startswith("Q"):
-            errors.append(f"{token!r} cites a query [q:{ref}]; numbers must cite a fact (q:D...)")
-        elif ref in facts and not _matches(token, facts[ref]):
-            errors.append(f"{token!r} does not match [q:{ref}] = {facts[ref].display} ({facts[ref].label})")
+        elif cite[2] not in facts:
+            errors.append(f"{token!r} cites [q:{cite[2]}], which is not a fact; numbers must cite a fact (q:D...)")
+        elif _norm(token) != _norm(facts[cite[2]].display):
+            fact = facts[cite[2]]
+            errors.append(f"{token!r} does not match [q:{cite[2]}], which displays {fact.display} ({fact.label}); "
+                          "copy the display exactly")
     return errors, len(numbers)
+
+
+def check_structure(body: str, actions: list[dict]) -> list[str]:
+    """Required content: every ranked action, in rank order; scenario labels and range; the uncertainty section."""
+    errors = []
+    if not NOT_SURE.search(body):
+        errors.append("missing the '## What we're not sure about' section")
+    headings = [(m.start(), m.group(0)) for m in re.finditer(r"^###\s.*$", body, re.MULTILINE)]
+    positions = []
+    for rank, action in enumerate(actions, start=1):
+        scope = action["scope"]
+        found = next((i for i, (_, h) in enumerate(headings) if re.search(rf"\b{re.escape(scope)}\b", h)), None)
+        if found is None:
+            errors.append(f"ranked action {rank} ({scope}) has no '### {scope} — ...' section")
+            continue
+        positions.append(found)
+        start = headings[found][0]
+        end = headings[found + 1][0] if found + 1 < len(headings) else len(body)
+        section = body[start:end]
+        if action["impact"]["basis"] == "scenario_estimate":
+            lower = section.lower()
+            errors += [f"{scope}: scenario estimate must say '{p}'" for p in SCENARIO_PHRASES if p not in lower]
+            for name in ("usd_low", "usd_mid", "usd_high"):
+                ref = action["impact"][name]["ref"]
+                if f"[{ref}]" not in section:
+                    errors.append(f"{scope}: cite the scenario {name.split('_')[1]} figure [{ref}]")
+    if positions != sorted(positions):
+        errors.append("actions must appear in rank order (highest $ at risk first)")
+    return errors
 
 
 def _mask(text: str, spans: list[tuple[int, int]]) -> str:
@@ -61,26 +102,4 @@ def _mask(text: str, spans: list[tuple[int, int]]) -> str:
 
 
 def _norm(s: str) -> str:
-    return s.replace("−", "-").replace(" ", "").lower()
-
-
-def _matches(token: str, fact: Fact) -> bool:
-    if _norm(token) == _norm(fact.display):
-        return True
-    marks = UNIT_MARK.get(fact.kind)
-    if marks is not None and not any(mark in token for mark in marks if mark) and "" not in marks:
-        return False
-    if marks is None and any(mark in token for mark in ("$", "%", "pts", "bps")):
-        return False
-    try:
-        value = parse_number(token)
-    except ValueError:
-        return False
-    return abs(value - fact.value) <= max(abs(fact.value) * 0.01, _half_step(token))
-
-
-def _half_step(token: str) -> float:
-    m = _NUMBER.search(token)
-    decimals = len(m["num"].split(".")[1]) if "." in m["num"] else 0
-    scale = {"K": 1e3, "M": 1e6, "B": 1e9, "%": 0.01, "pts": 0.01}.get(m["suffix"], 1.0)
-    return 0.5 * 10 ** (-decimals) * scale
+    return s.replace("−", "-").replace(" ", "").lower().lstrip("+")

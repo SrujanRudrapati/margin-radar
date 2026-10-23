@@ -81,10 +81,18 @@ class FactAwareLLM:
         tool_result = next(m["content"][0] for m in messages if isinstance(m["content"], list)
                            and m["content"] and m["content"][0].get("type") == "tool_result")
         alerts = json.loads(tool_result["content"])
-        mid = alerts["actions"][0]["impact"]["usd_mid"]
-        text = (f"## Top actions\n### {alerts['actions'][0]['scope']}\n- **Impact:** {mid['value']} [{mid['ref']}] "
-                "sample-scale.\n\n## What we're not sure about\nNothing more.") if self.good else \
-            "## Top actions\nMargin fell 7.3% everywhere."
+        sections = []
+        for action in alerts["actions"]:
+            impact = action["impact"]
+            line = f"### {action['scope']} — {action['kind']}\n- **Impact:** sample-scale"
+            if impact["basis"] == "scenario_estimate":
+                cites = " to ".join(f"{impact[k]['value']} [{impact[k]['ref']}]" for k in ("usd_low", "usd_high"))
+                mid = impact["usd_mid"]
+                line += (f" scenario estimate, unconfirmed until resales, ranked on its midpoint {mid['value']} "
+                         f"[{mid['ref']}]: {cites}.")
+            sections.append(line)
+        text = ("## Top actions\n" + "\n".join(sections) + "\n\n## What we're not sure about\nNothing more.") \
+            if self.good else "## Top actions\nMargin fell 7.3% everywhere."
         return {"stop_reason": "end_turn", "usage": {}, "content": [{"type": "text", "text": text}]}
 
 
@@ -129,3 +137,94 @@ def test_week_range_pattern_does_not_eat_following_figure():
     # Seen live: "week 35 to 46.6%" must not mask the "46" of the cited figure.
     body = "Contract rate rose in week 35 to 46.6% [q:D0000000001] in week 40; weeks 30 to 40 covered."
     assert check(body, FACTS) == []
+
+
+# --- Phase 4 final-review holes (each confirmed by the reviewer) ------------------------------------------
+
+@pytest.mark.parametrize("body", [
+    "Up to $1M [q:D0000000004].",          # fact is $1.3M: coarse rounding must not pass
+    "Mid $0M [q:D0000000003].",
+    "Score 4 [q:D0000000006].",             # fact displays 4.3
+])
+def test_coarse_rounding_rejected(body):
+    assert check(body, FACTS), body
+
+
+def test_plus_sign_optional_on_points():
+    assert check("A gap of 8.2 pts [q:D0000000002].", FACTS) == []
+
+
+@pytest.mark.parametrize("body", [
+    "In week 40 and 300 homes were affected.",
+    "From week 38 to 500 offers.",
+])
+def test_week_exemption_does_not_hide_numbers(body):
+    assert check(body, FACTS), body
+
+
+def test_week_ranges_still_exempt():
+    assert check("Weeks 30–40 and week 35 to week 40 were covered.", FACTS) == []
+
+
+@pytest.mark.parametrize("body", [
+    "Conversion doubled in B2.", "Losses near twelve million dollars.", "Three times the peer rate.",
+    "About half of contracts.",
+])
+def test_number_words_rejected(body):
+    assert check(body, FACTS), body
+
+
+def test_per_hundred_bps_sensitivity_phrase_allowed():
+    assert check("Each 100 bps of erosion would cost $888K [q:D0000000003].", FACTS) == []
+
+
+def test_fabricated_query_reference_rejected():
+    errors = check("Confirmed by resales [q:Qdeadbeef00].", FACTS, known_refs=set())
+    assert errors and "Qdeadbeef00" in errors[0]
+
+
+def test_known_query_reference_allowed_without_numbers():
+    assert check("Source: [q:Q0123456789].", FACTS, known_refs={"Q0123456789"}) == []
+
+
+def test_structure_requires_ranked_actions_in_order_and_scenario_labels():
+    from agent.validate import check_structure
+    actions = [{"scope": "B2", "impact": {"basis": "scenario_estimate",
+                                          "usd_low": {"ref": "q:D0000000003"}, "usd_mid": {"ref": "q:D0000000003"},
+                                          "usd_high": {"ref": "q:D0000000004"}}},
+               {"scope": "M05", "impact": {"basis": "measured"}}]
+    good = ("## Top actions\n### B2 — adverse selection\nScenario estimate, unconfirmed until resales, ranked on its "
+            "midpoint: $888K [q:D0000000003] to $1.3M [q:D0000000004].\n### M05 — renovation\nx\n"
+            "## What we're not sure about\ny")
+    assert check_structure(good, actions) == []
+    assert check_structure(good.replace("### M05", "### Other"), actions)                 # missing action
+    assert check_structure(good.replace("unconfirmed until resales", "pending"), actions)  # missing label
+    swapped = good.replace("### B2 — adverse selection", "### TMP").replace("### M05 — renovation", "### B2 — x")
+    assert check_structure(swapped.replace("### TMP", "### M05 —"), actions)               # wrong order
+    assert check_structure(good.replace("## What we're not sure about", "## Notes"), actions)
+
+
+def test_out_of_range_week_writes_abstain_brief(built_runs, tmp_path):
+    for week in (999, -1):
+        path = make_brief(built_runs["injected"], week, "dev", out_dir=tmp_path, llm=ExplodingLLM())
+        payload = json.loads(path.with_suffix(".json").read_text())
+        assert payload["status"] == "abstain" and "range" in path.read_text().lower()
+
+
+def test_query_log_is_rewritten_not_appended(built_runs, tmp_path):
+    make_brief(built_runs["injected"], 33, "dev", out_dir=tmp_path, llm=ExplodingLLM())
+    first = (tmp_path / "week_33.queries.jsonl").read_text()
+    make_brief(built_runs["injected"], 33, "dev", out_dir=tmp_path, llm=ExplodingLLM())
+    assert (tmp_path / "week_33.queries.jsonl").read_text() == first
+
+
+class StopsEarlyLLM:
+    def create(self, **kwargs):
+        return {"stop_reason": "max_tokens", "content": [{"type": "text", "text": "## Top"}], "usage": {}}
+
+
+def test_model_stop_fails_closed_with_record(built_runs, tmp_path):
+    from agent.brief import BriefFailed
+    with pytest.raises(BriefFailed):
+        make_brief(built_runs["injected"], 40, "dev", out_dir=tmp_path, llm=StopsEarlyLLM())
+    assert (tmp_path / "week_40.invalid.md").exists() and not (tmp_path / "week_40.md").exists()

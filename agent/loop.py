@@ -6,7 +6,7 @@ from agent.llm import with_prompt_caching
 from agent.tools import ToolError
 
 SYSTEM_PROMPT_PATH = Path(__file__).parent / "prompts" / "brief_system.md"
-MAX_TOKENS = 4096
+MAX_TOKENS = 12000  # room for adaptive thinking plus a full brief
 # Content-block keys to echo back per type (thinking blocks must go back unchanged on the same model).
 _KEEP = {"text": ("type", "text"), "tool_use": ("type", "id", "name", "input"),
          "thinking": ("type", "thinking", "signature"), "redacted_thinking": ("type", "data")}

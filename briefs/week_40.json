@@ -6,7 +6,7 @@
   "status": "valid",
   "model": "claude-sonnet-5-5",
   "purpose": "final",
-  "body": "## Top actions\n\n### B2 \u2014 adverse selection (scenario estimate)\n- **What changed:** The B2 contract rate rose to 46.6% [q:D81eb477cc6] in week 40. Peers were at 38.5% [q:D32352c2a1d], a gap of +8.2 pts [q:D67db236025]. The gap began opening in week 35. The uncalibrated drift score is 1.8 [q:Df1f11b4127]. The share of contracts above the peer-expected rate is 17.5% [q:Ddaf443f411].\n- **Why it's not seasonality:** Peer medians moved with the season. They were 32.0% [q:Dee15294bcf] in week 35 and 41.4% [q:D130f4ef5d3] in week 39. B2 stayed above peers throughout. The gap is noisy. It was +14.2 pts [q:D2f71651b36] in week 38 and +5.5 pts [q:D37c65708f3] in week 39. The direction has been consistent since week 35, but the size is not steady, and the score is modest.\n- **Adverse-selection verdict:** Yes, probable. Conversion rose while our spread did not change. B2 spread was 6.6% [q:D3cd5be75cf] against a peer median of 6.6% [q:D6a690a0148], a gap of +0.0 pts [q:Dc32519e453]. This pattern fits sellers accepting because the homes are worth less than our model thinks. It is not confirmed.\n- **Impact:** This is a scenario estimate, sample-scale. It is unconfirmed until resales, and it is ranked on its midpoint. The range is $444K [q:Dad0f537dd7] to $1.3M [q:D9a151e7a68], with a midpoint of $888K [q:D51a5835f9f]. That is 8 bps [q:Dc71f85eeb0] to 24 bps [q:D729860b50b] of portfolio contribution margin, with a midpoint of 16 bps [q:Df51c23682f]. As a sensitivity, not a loss: on the $253.4M [q:D958f373c21] exposure, each hundred basis points of margin erosion would cost $2.5M [q:D56f0dfd248].\n- **Action / owner:** Pricing should widen the B2 spread or add in-person inspection. Pricing should also audit the model valuation inputs.\n\n### M05 \u2014 renovation cost drift\n- **What changed:** The M05 renovation overrun reached 18.1% [q:Dc0ade0d9ae] in week 40. The peer median was 5.6% [q:D27257cee86], a gap of +11.7 pts [q:D935256294f]. The uncalibrated drift score is 4.4 [q:Dc322951ac0]. The overrun was 5.1% [q:D2cb889ceca] in week 33 and has climbed since.\n- **Why it's not seasonality:** Peers stayed in a narrow range, from 3.0% [q:D4382a25d1a] to 5.6% [q:D27257cee86]. M05 moved from 7.1% [q:D71206e31db] in week 35 to 13.1% [q:D74cd07dfde] in week 37. It has kept rising since.\n- **Adverse-selection verdict:** Not applicable. This is a cost problem, not a seller-conversion problem.\n- **Impact:** Measured from current leading-indicator data, sample-scale. It is not confirmed by resales. The impact is $758K [q:D150c3216ae], which is 59 bps [q:Ddf2db77d4d] of scope margin and 8 bps [q:Db58fe56dd4] of portfolio contribution margin. As a sensitivity, not a loss: on the $127.9M [q:D700f13ad0a] exposure, each hundred basis points of margin erosion would cost $1.3M [q:D8b330e87bb].\n- **Action / owner:** Renovation should re-baseline M05 renovation estimates and require an in-person assessment.\n\n## What we're not sure about\n- **B2 is a scenario, not a measured loss.** It stays unconfirmed until the affected homes resell. The weekly gap swings a lot, and the drift score of 1.8 [q:Df1f11b4127] is modest. I checked spread, but I did not test other explanations for the higher contract rate.\n- **M05 cause is unknown.** The data shows the overrun but not why it happened. I did not look at the scope of work, the vendors or the mix of homes.\n- **Watch items and abstentions:** The alert feed lists no watch items and no abstentions. I made no cohort-level margin claims.",
+  "body": "## Top actions\n\n### B2 \u2014 adverse selection (contract rate)\n- **What changed:** The contract rate in B2 rose to 46.6% [q:D81eb477cc6] in week 40. The peer median was 38.5% [q:D32352c2a1d], a gap of +8.2 pts [q:D67db236025]. The drift score is 1.8 [q:Df1f11b4127], an uncalibrated score. The share of contracts above the peer-expected rate is 17.5% [q:Ddaf443f411]. Onset was week 35.\n- **Why it's not seasonality:** Peers moved with the season and B2 moved away from them. In week 33 B2 was at -3.6 pts [q:Db903d2050b] against peers. The gap then widened to +13.7 pts [q:D5dd436fe8c] in week 37 and +14.2 pts [q:D2f71651b36] in week 38. It narrowed to +5.5 pts [q:D37c65708f3] in week 39 before widening again. The gap is persistent but noisy.\n- **Adverse-selection verdict:** Yes, as a pattern. Conversion rose while our spread stayed level with peers. B2 spread was 6.6% [q:D3cd5be75cf] against a peer median of 6.6% [q:D6a690a0148], a gap of +0.0 pts [q:Dc32519e453]. That fits sellers accepting more because the homes are worth less than our model thinks. This is unconfirmed until resales.\n- **Impact:** Scenario estimate, sample-scale, unconfirmed until resales and ranked on its midpoint. The range is $444K [q:Dad0f537dd7] to $1.3M [q:D9a151e7a68], with a midpoint of $888K [q:D51a5835f9f]. That is 8 bps [q:Dc71f85eeb0] to 24 bps [q:D729860b50b] of portfolio contribution margin, with a midpoint of 16 bps [q:Df51c23682f]. The scenario assumes a valuation shortfall of 1.0% [q:D12868fb46b] to 3.0% [q:Dc05bb4c888] on $253.4M [q:D958f373c21] of exposure. As a sensitivity, each 100 bps of erosion would cost $2.5M [q:D56f0dfd248].\n- **Action / owner:** Pricing should widen the B2 spread or add in-person inspection, and audit the model's valuation inputs.\n\n### M05 \u2014 renovation cost drift\n- **What changed:** Renovation overrun in M05 reached 18.1% [q:Dc0ade0d9ae] in week 40. The peer median was 5.6% [q:D27257cee86], a gap of +11.7 pts [q:D935256294f]. The drift score is 4.4 [q:Dc322951ac0], an uncalibrated score. Onset was week 37.\n- **Why it's not seasonality:** Peers stayed in a narrow band over recent weeks, from 3.0% [q:D4382a25d1a] to 5.6% [q:D27257cee86]. M05 climbed from 5.1% [q:D2cb889ceca] in week 33 to 13.1% [q:D74cd07dfde] in week 37, then kept rising.\n- **Adverse-selection verdict:** Not applicable. This is a cost-estimate problem, not a conversion signal.\n- **Impact:** Measured from current leading-indicator data, sample-scale: $758K [q:D150c3216ae]. That is 59 bps [q:Ddf2db77d4d] of M05 margin and 8 bps [q:Db58fe56dd4] of portfolio contribution margin, on $127.9M [q:D700f13ad0a] of exposure. As a sensitivity, each 100 bps of erosion would cost $1.3M [q:D8b330e87bb].\n- **Action / owner:** Renovation should re-baseline M05 renovation estimates and require in-person assessment.\n\n## What we're not sure about\n- The B2 adverse-selection call rests on conversion rising without a spread change. It is not confirmed by resales, and the dollar impact is a scenario, not a loss. The drift score is modest, and the gap fell sharply in week 39 before recovering. We can't yet say whether the week 39 dip was noise or a real pause.\n- For M05 we have not examined which renovation categories or vendors drive the overrun. We can't say whether it is a pricing-baseline error or an execution problem, and the recommended re-baseline assumes the former.\n- No watch items or abstentions were raised this week. We did not test the resale side of either action, so margin impact is not yet visible in resale data.",
   "citations": [
     {
       "ref": "D81eb477cc6",
@@ -178,11 +178,11 @@
       }
     },
     {
-      "ref": "Dee15294bcf",
-      "label": "contract_rate peers of B2 week 35",
-      "value": 0.320253,
-      "display": "32.0%",
-      "kind": "pct",
+      "ref": "Db903d2050b",
+      "label": "contract_rate B2 gap vs peers week 33",
+      "value": -0.0361663,
+      "display": "-3.6 pts",
+      "kind": "pct_points",
       "queries": [
         "Q528e719f4c",
         "Qed68e5ad5b"
@@ -201,11 +201,11 @@
       }
     },
     {
-      "ref": "D130f4ef5d3",
-      "label": "contract_rate peers of B2 week 39",
-      "value": 0.413697,
-      "display": "41.4%",
-      "kind": "pct",
+      "ref": "D5dd436fe8c",
+      "label": "contract_rate B2 gap vs peers week 37",
+      "value": 0.136658,
+      "display": "+13.7 pts",
+      "kind": "pct_points",
       "queries": [
         "Q528e719f4c",
         "Qed68e5ad5b"
@@ -837,6 +837,40 @@
       }
     },
     {
+      "ref": "D12868fb46b",
+      "label": "planning shortfall low (user-given)",
+      "value": 0.01,
+      "display": "1.0%",
+      "kind": "pct",
+      "queries": [
+        "Qb38341b581"
+      ],
+      "sql": {
+        "Qb38341b581": {
+          "metric": "unsold_inventory_usd",
+          "level": "band",
+          "sql": "with agg as (select band as scope, week, cast(sum(unsold_inventory_usd) as double) as unsold_inventory_usd from main.mart_segment_week where week <= 40 group by all), win as (select scope, week, unsold_inventory_usd from agg) select scope, week, unsold_inventory_usd as value, null as denominator from win where week >= 0 order by scope, week"
+        }
+      }
+    },
+    {
+      "ref": "Dc05bb4c888",
+      "label": "planning shortfall high (user-given)",
+      "value": 0.03,
+      "display": "3.0%",
+      "kind": "pct",
+      "queries": [
+        "Qb38341b581"
+      ],
+      "sql": {
+        "Qb38341b581": {
+          "metric": "unsold_inventory_usd",
+          "level": "band",
+          "sql": "with agg as (select band as scope, week, cast(sum(unsold_inventory_usd) as double) as unsold_inventory_usd from main.mart_segment_week where week <= 40 group by all), win as (select scope, week, unsold_inventory_usd from agg) select scope, week, unsold_inventory_usd as value, null as denominator from win where week >= 0 order by scope, week"
+        }
+      }
+    },
+    {
       "ref": "D958f373c21",
       "label": "A2527e410 exposure_usd",
       "value": 253371000.0,
@@ -1095,29 +1129,6 @@
       }
     },
     {
-      "ref": "D2cb889ceca",
-      "label": "reno_overrun_pct M05 week 33",
-      "value": 0.0514962,
-      "display": "5.1%",
-      "kind": "pct",
-      "queries": [
-        "Q7a0b8a692f",
-        "Qf0ba93ea02"
-      ],
-      "sql": {
-        "Q7a0b8a692f": {
-          "metric": "reno_overrun_pct",
-          "level": "market",
-          "sql": "with agg as (select market as scope, week, cast(sum(reno_actual_sum) as double) as reno_actual_sum, cast(sum(reno_estimate_sum) as double) as reno_estimate_sum, cast(sum(renos_completed) as double) as renos_completed from main.mart_segment_week where week <= 40 group by all), win as (select scope, week, sum(reno_actual_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_actual_sum, sum(reno_estimate_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_estimate_sum, sum(renos_completed) over (partition by scope order by week rows between 3 preceding and current row) as renos_completed from agg) select scope, week, case when week < 3 then null else case when renos_completed < 8 then null else (reno_actual_sum) / nullif(reno_estimate_sum, 0) - 1 end end as value, case when week < 3 then null else renos_completed end as denominator from win where week >= 0 order by scope, week"
-        },
-        "Qf0ba93ea02": {
-          "metric": "reno_overrun_pct",
-          "level": "segment",
-          "sql": "with agg as (select segment as scope, week, market, band, product, cast(sum(reno_actual_sum) as double) as reno_actual_sum, cast(sum(reno_estimate_sum) as double) as reno_estimate_sum, cast(sum(renos_completed) as double) as renos_completed from main.mart_segment_week where week <= 40 group by all), win as (select scope, week, market, band, product, sum(reno_actual_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_actual_sum, sum(reno_estimate_sum) over (partition by scope order by week rows between 3 preceding and current row) as reno_estimate_sum, sum(renos_completed) over (partition by scope order by week rows between 3 preceding and current row) as renos_completed from agg) select scope, week, market, band, product, case when week < 3 then null else case when renos_completed < 8 then null else (reno_actual_sum) / nullif(reno_estimate_sum, 0) - 1 end end as value, case when week < 3 then null else renos_completed end as denominator from win where week >= 0 order by scope, week"
-        }
-      }
-    },
-    {
       "ref": "D4382a25d1a",
       "label": "reno_overrun_pct peers of M05 week 36",
       "value": 0.0297177,
@@ -1141,10 +1152,10 @@
       }
     },
     {
-      "ref": "D71206e31db",
-      "label": "reno_overrun_pct M05 week 35",
-      "value": 0.0711023,
-      "display": "7.1%",
+      "ref": "D2cb889ceca",
+      "label": "reno_overrun_pct M05 week 33",
+      "value": 0.0514962,
+      "display": "5.1%",
       "kind": "pct",
       "queries": [
         "Q7a0b8a692f",

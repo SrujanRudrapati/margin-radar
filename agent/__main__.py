@@ -9,7 +9,7 @@ import sys
 from collections.abc import Sequence
 from pathlib import Path
 
-from agent.brief import GroundingError, make_brief
+from agent.brief import BriefFailed, make_brief
 from agent.llm import BudgetExceeded, MissingKey, ReplayMiss
 from common.banner import SYNTHETIC_BANNER
 
@@ -27,7 +27,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = p.parse_args(argv)
     try:
         path = make_brief(args.db, args.as_of_week, args.purpose, args.out)
-    except GroundingError as exc:
+    except BriefFailed as exc:
         log.error("%s", exc)
         return 2
     except (BudgetExceeded, ReplayMiss, MissingKey) as exc:

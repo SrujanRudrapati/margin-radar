@@ -64,6 +64,7 @@ class Toolbox:
         self.store, self.as_of = store, as_of_week
         self.book = FactBook(store)
         self.facts = self.book.facts
+        self.last_alerts: dict | None = None  # what get_alerts returned, for the structure check
 
     def run(self, name: str, args: dict) -> dict:
         handler = {"get_alerts": self.get_alerts, "query_metric": self.query_metric,
@@ -74,7 +75,7 @@ class Toolbox:
             return handler(**args)
         except ToolError:
             raise
-        except (TypeError, ValueError) as exc:
+        except (TypeError, ValueError, LookupError) as exc:
             raise ToolError(str(exc)) from exc
 
     # --- get_alerts ---------------------------------------------------------------------------------------
@@ -82,7 +83,7 @@ class Toolbox:
         result = detect(self.store, self.as_of)
         ranked = rank_actions(result, self.store)
         alerts = {a.alert_id: a for a in result.alerts}
-        return {
+        self.last_alerts = {
             "banner": SYNTHETIC_BANNER, "sample_scale_label": SAMPLE_SCALE_LABEL,
             "as_of_week": self.as_of, "week_start": self.store.week_start(self.as_of),
             "global_abstention": any(a.scope == "all" for a in result.abstentions),
@@ -91,6 +92,7 @@ class Toolbox:
             "watch": [{"scope": w.scope, "metric": w.metric, "note": w.note} for w in result.watch],
             "abstentions": sorted({(a.scope, a.metric or "all", _reason(a.reason)) for a in result.abstentions}),
         }
+        return self.last_alerts
 
     def _action(self, ranked: RankedAction, alert) -> dict:
         signal = alert.signals[0]

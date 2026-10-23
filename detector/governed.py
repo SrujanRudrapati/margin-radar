@@ -289,11 +289,11 @@ class GovernedStore:
         week = lambda col: f"date_diff('day', DATE '{start}', {col}) // 7"  # noqa: E731
         shares = ", ".join(f"({k / 10:.1f})" for k in range(1, 9))
         sql = (
-            f"with cohort as (select {SCOPE_SQL[level]} as scope, close_date, resale_date, resale_price, "
+            f"with cohort as (select {SCOPE_SQL[level]} as scope, home_id, close_date, resale_date, resale_price, "
             f"resale_price - (offer_price - fee_usd) - reno_actual_usd - holding_cost_usd - selling_cost_usd as cm_usd "
             f"from raw.homes where close_date is not null and {week('close_date')} between {a} and {b}), "
             f"scoped as (select * from cohort where scope = '{scope}'), "
-            f"sold as (select cm_usd, resale_price, row_number() over (order by resale_date, close_date) as rn "
+            f"sold as (select cm_usd, resale_price, row_number() over (order by resale_date, close_date, home_id) as rn "
             f"from scoped where resale_date is not null and {week('resale_date')} <= {as_of}), "
             f"n as (select count(*) as n_homes from scoped), "
             f"shares(share) as (values {shares}) "
