@@ -74,10 +74,13 @@ class FactAwareLLM:
     def create(self, *, system, messages, tools, max_tokens):
         self.calls += 1
         last = messages[-1]["content"]
-        if isinstance(last, str):
+        self.last_user_text = last if isinstance(last, str) else ""
+        if isinstance(last, str) and len(messages) == 1:
             return {"stop_reason": "tool_use", "usage": {},
                     "content": [{"type": "tool_use", "id": f"t{self.calls}", "name": "get_alerts", "input": {}}]}
-        alerts = json.loads(last[0]["content"])
+        tool_result = next(m["content"][0] for m in messages if isinstance(m["content"], list)
+                           and m["content"] and m["content"][0].get("type") == "tool_result")
+        alerts = json.loads(tool_result["content"])
         mid = alerts["actions"][0]["impact"]["usd_mid"]
         text = (f"## Top actions\n### {alerts['actions'][0]['scope']}\n- **Impact:** {mid['value']} [{mid['ref']}] "
                 "sample-scale.\n\n## What we're not sure about\nNothing more.") if self.good else \
@@ -99,7 +102,8 @@ def test_fails_closed_after_one_retry(built_runs, tmp_path):
     llm = FactAwareLLM(good=False)
     with pytest.raises(GroundingError):
         make_brief(built_runs["injected"], 40, "dev", out_dir=tmp_path, llm=llm)
-    assert llm.calls == 4  # two agent runs x (tool turn + final turn)
+    assert llm.calls == 3  # tool turn + draft + one revision turn in the same conversation
+    assert "grounding check" in llm.last_user_text
     assert (tmp_path / "week_40.invalid.md").exists() and not (tmp_path / "week_40.md").exists()
 
 
@@ -119,3 +123,9 @@ def test_no_alert_brief_makes_no_llm_call(built_runs, tmp_path):
     path = make_brief(built_runs["injected"], 33, "dev", out_dir=tmp_path, llm=ExplodingLLM())
     assert "no active alerts" in path.read_text().lower()
     assert json.loads((tmp_path / "week_33.json").read_text())["status"] == "no_alerts"
+
+
+def test_week_range_pattern_does_not_eat_following_figure():
+    # Seen live: "week 35 to 46.6%" must not mask the "46" of the cited figure.
+    body = "Contract rate rose in week 35 to 46.6% [q:D0000000001] in week 40; weeks 30 to 40 covered."
+    assert check(body, FACTS) == []

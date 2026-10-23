@@ -1,0 +1,15 @@
+{
+  "banner": "Synthetic data \u2014 not Opendoor data.",
+  "sample_scale_label": "sample-scale ($ at the synthetic portfolio's ~$1.6B/yr)",
+  "week": 33,
+  "week_start": "2025-08-25",
+  "status": "no_alerts",
+  "model": null,
+  "purpose": "dev",
+  "body": "## Top actions\nNo active alerts this week. Every leading indicator is within its normal range relative to peer segments in the same week, so seasonal moves (such as the spring peak and the summer margin dip) are not flagged.\n\n## What we're not sure about\nShifts that hit every segment at once cancel out in a peer comparison; the portfolio check only catches abrupt ones.",
+  "citations": [],
+  "grounding": {
+    "numbers_checked": 0,
+    "errors": []
+  }
+}

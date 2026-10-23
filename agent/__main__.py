@@ -33,6 +33,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     except (BudgetExceeded, ReplayMiss, MissingKey) as exc:
         log.error("%s", exc)
         return 3
+    except Exception as exc:  # API errors: report cleanly, never with the key
+        if type(exc).__module__.startswith("anthropic"):
+            log.error("Claude API error: %s", exc)
+            return 3
+        raise
     log.info("wrote %s", path)
     return 0
 

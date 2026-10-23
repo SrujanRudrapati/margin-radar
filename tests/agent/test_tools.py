@@ -100,3 +100,14 @@ def test_bad_arguments_raise_tool_error(toolbox):
         toolbox.run("compare_segments", {"metric": "contract_rate", "dimension": "band", "scope": "B9", "weeks": 4})
     with pytest.raises(ToolError):
         toolbox.run("nope", {})
+
+
+def test_strict_schemas_avoid_unsupported_keywords():
+    # The API rejects minimum/maximum on integer properties in strict tool schemas (400 seen live).
+    for tool in Toolbox.schemas:
+        for prop in tool["input_schema"]["properties"].values():
+            assert not {"minimum", "maximum"} & set(prop), (tool["name"], prop)
+
+
+def test_fmt_never_shows_negative_zero():
+    assert fmt(-0.0001, "pct_points") == "+0.0 pts" and fmt(-0.0004, "pct") == "0.0%" and fmt(-0.2, "bps") == "0 bps"

@@ -29,15 +29,36 @@ def user_prompt(as_of_week: int, week_start: str, feedback: str | None = None) -
     return text
 
 
-def run_agent(llm, toolbox, as_of_week: int, week_start: str, max_turns: int = 8, feedback: str | None = None) -> str:
+def run_agent(llm, toolbox, as_of_week: int, week_start: str, max_turns: int = 8, feedback: str | None = None,
+              transcript: list | None = None) -> str:
+    """Run the tool loop to a final brief body. Pass `transcript` (a list) to keep the conversation for revise()."""
+    messages = transcript if transcript is not None else []
+    messages[:] = [{"role": "user", "content": user_prompt(as_of_week, week_start, feedback)}]
+    return _converse(llm, toolbox, messages, max_turns)
+
+
+def revise(llm, toolbox, transcript: list, draft: str, errors: list[str], max_turns: int = 4) -> str:
+    """Ask for a corrected draft in the same conversation (the model sees its draft and the exact problems).
+
+    The draft's assistant turn is already in the transcript, unedited (thinking blocks included), because edited
+    history can be rejected under preserved thinking.
+    """
+    transcript.append({"role": "user", "content": (
+        "Your draft failed the grounding check. Rewrite the whole brief, fixing every problem below. Copy numbers "
+        "exactly as the tools display them, each immediately followed by its [q:ID]; describe in words anything "
+        "you cannot cite.\n" + "\n".join(f"- {e}" for e in errors))})
+    return _converse(llm, toolbox, transcript, max_turns)
+
+
+def _converse(llm, toolbox, messages: list, max_turns: int) -> str:
     system, tools = with_prompt_caching([{"type": "text", "text": system_prompt()}],
                                         [{**t, "strict": True} for t in toolbox.schemas])
-    messages = [{"role": "user", "content": user_prompt(as_of_week, week_start, feedback)}]
     for _ in range(max_turns):
         response = llm.create(system=system, messages=messages, tools=tools, max_tokens=MAX_TOKENS)
         stop = response.get("stop_reason")
         blocks = response.get("content") or []
         if stop == "end_turn":
+            messages.append({"role": "assistant", "content": [_echo(b) for b in blocks if b.get("type") in _KEEP]})
             return "\n".join(b["text"] for b in blocks if b.get("type") == "text").strip()
         if stop != "tool_use":
             raise AgentDidNotFinish(f"model stopped with stop_reason={stop!r}")

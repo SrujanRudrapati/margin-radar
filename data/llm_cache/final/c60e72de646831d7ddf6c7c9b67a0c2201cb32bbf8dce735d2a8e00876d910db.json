@@ -1,0 +1,52 @@
+{
+ "container": null,
+ "content": [
+  {
+   "citations": null,
+   "text": "## Top actions\n\n### B2 \u2014 adverse selection (scenario estimate)\n- **What changed:** The B2 contract rate rose to 46.6% [q:D81eb477cc6] in week 40. Peers were at 38.5% [q:D32352c2a1d], a gap of +8.2 pts [q:D67db236025]. The gap began opening in week 35. The uncalibrated drift score is 1.8 [q:Df1f11b4127]. The share of contracts above the peer-expected rate is 17.5% [q:Ddaf443f411].\n- **Why it's not seasonality:** Peer medians moved with the season. They were 32.0% [q:Dee15294bcf] in week 35 and 41.4% [q:D130f4ef5d3] in week 39. B2 stayed above peers through that whole stretch. The gap is not steady. It was +14.2 pts [q:D2f71651b36] in week 38 and +5.5 pts [q:D37c65708f3] in week 39. The direction has been consistent since week 35, but the size is noisy, and the score is modest.\n- **Adverse-selection verdict:** Yes, probable. Conversion rose while our spread did not change. B2 spread was 6.6% [q:D3cd5be75cf] against a peer median of 6.6% [q:D6a690a0148], a gap of +0.0 pts [q:Dc32519e453]. This pattern fits sellers accepting because the homes are worth less than our model thinks. It is not confirmed.\n- **Impact:** This is a scenario estimate, sample-scale. It is unconfirmed until resales, and it is ranked on its midpoint. The range is $444K [q:Dad0f537dd7] to $1.3M [q:D9a151e7a68], with a midpoint of $888K [q:D51a5835f9f]. That is 8 bps [q:Dc71f85eeb0] to 24 bps [q:D729860b50b] of portfolio contribution margin, with a midpoint of 16 bps [q:Df51c23682f]. Sensitivity: each 100 bps of margin erosion on the $253.4M [q:D958f373c21] exposure would cost $2.5M [q:D56f0dfd248].\n- **Action / owner:** Pricing should widen the spread or add in-person inspection for B2. Pricing should also audit the model valuation inputs.\n\n### M05 \u2014 renovation cost drift\n- **What changed:** The M05 renovation overrun reached 18.1% [q:Dc0ade0d9ae] in week 40. The peer median was 5.6% [q:D27257cee86], a gap of +11.7 pts [q:D935256294f]. The uncalibrated drift score is 4.4 [q:Dc322951ac0]. The overrun was 5.1% [q:D2cb889ceca] in week 33 and has climbed since.\n- **Why it's not seasonality:** Peers stayed in a narrow range, from 3.0% [q:D4382a25d1a] to 5.6% [q:D27257cee86]. M05 moved from 7.1% [q:D71206e31db] in week 35 to 13.1% [q:D74cd07dfde] in week 37. It has kept rising since.\n- **Adverse-selection verdict:** Not applicable. This is a cost problem, not a seller-conversion problem.\n- **Impact:** Measured from current leading-indicator data, sample-scale, not confirmed by resales. The impact is $758K [q:D150c3216ae], or 59 bps [q:Ddf2db77d4d] of scope margin and 8 bps [q:Db58fe56dd4] of portfolio contribution margin. Sensitivity: each 100 bps of margin erosion on the $127.9M [q:D700f13ad0a] exposure would cost $1.3M [q:D8b330e87bb].\n- **Action / owner:** Renovation should re-baseline M05 renovation estimates and require an in-person assessment.\n\n## What we're not sure about\n- **B2 is a scenario, not a measured loss.** It stays unconfirmed until the affected homes resell. The weekly gap swings a lot, and the drift score of 1.8 [q:Df1f11b4127] is modest. I checked spread, but I did not test other explanations for the higher contract rate.\n- **M05 cause is unknown.** The data shows the overrun but not why it happened. I did not look at the scope of work, the vendors or the mix of homes.\n- **Watch items and abstentions:** The alert feed lists no watch items and no abstentions. I made no cohort-level margin claims.",
+   "type": "text"
+  }
+ ],
+ "context_management": null,
+ "diagnostics": null,
+ "id": "msg_011CgJpmkk9PY1F75ArtrxVP",
+ "input_transformations": null,
+ "model": "claude-sonnet-5-5",
+ "role": "assistant",
+ "stop_details": null,
+ "stop_reason": "end_turn",
+ "stop_sequence": null,
+ "type": "message",
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 0,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 2910,
+  "fallback_credit": null,
+  "inference_geo": "global",
+  "input_tokens": 5882,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 0,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2910,
+    "input_tokens": 5882,
+    "model": null,
+    "output_tokens": 1524,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 1524,
+  "output_tokens_details": {
+   "thinking_tokens": 0
+  },
+  "server_tool_use": null,
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

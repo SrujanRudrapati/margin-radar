@@ -28,6 +28,9 @@ def residual_kind(metric_kind: str) -> str:
 
 
 def fmt(value: float, kind: str) -> str:
+    decimals = {"pct": 3, "pct_points": 3, "bps": 0, "count": 0, "days": 1, "score": 1}.get(kind)
+    if decimals is not None and round(value, decimals) == 0:
+        value = 0.0  # never display a negative zero
     if kind == "usd":
         sign, v = ("-" if value < 0 else ""), abs(value)
         if v >= 1e6:

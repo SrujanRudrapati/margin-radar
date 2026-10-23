@@ -34,7 +34,7 @@ def _schema(name: str, description: str, properties: dict) -> dict:
                              "additionalProperties": False}}
 
 
-WEEKS = {"type": "integer", "minimum": 1, "maximum": MAX_WEEKS, "description": "how many weeks to return, ending at the brief's week"}
+WEEKS = {"type": "integer", "description": f"how many weeks to return (1 to {MAX_WEEKS}), ending at the brief's week"}
 SCHEMAS = [
     _schema("get_alerts", "Active margin alerts for the brief's week: the top actions ranked by sample-scale $ at "
             "risk, each with its signal, impact (sample-scale $ and bps of contribution margin), action and owner; "
@@ -52,7 +52,8 @@ SCHEMAS = [
     _schema("cohort_curve", "Cohort bleed curve: contribution margin of the first 10%..80% of a purchase cohort's "
             "homes to sell, as of the brief's week.",
             {"level": {"type": "string", "enum": ["market", "band", "portfolio"]}, "scope": {"type": "string"},
-             "close_week_start": {"type": "integer", "minimum": 0}, "close_week_end": {"type": "integer", "minimum": 0}}),
+             "close_week_start": {"type": "integer", "description": "first purchase week of the cohort (>= 0)"},
+             "close_week_end": {"type": "integer", "description": "last purchase week of the cohort (<= the brief's week)"}}),
 ]
 
 

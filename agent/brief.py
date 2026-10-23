@@ -8,7 +8,7 @@ from pathlib import Path
 
 from agent.config import model_for
 from agent.llm import LLM
-from agent.loop import run_agent
+from agent.loop import revise, run_agent
 from agent.render import render
 from agent.tools import Toolbox
 from agent.validate import CITE, check_detailed
@@ -50,10 +50,11 @@ def make_brief(db: str | Path, as_of_week: int, purpose: str = "dev", out_dir: s
         toolbox = Toolbox(store, as_of_week)
         llm = llm or LLM(model_for(purpose), purpose, run_tag=f"brief-{stem}")
         model = getattr(llm, "model", None)
-        body = run_agent(llm, toolbox, as_of_week, week_start, max_turns=max_turns)
+        transcript: list = []
+        body = run_agent(llm, toolbox, as_of_week, week_start, max_turns=max_turns, transcript=transcript)
         errors, checked = check_detailed(body, toolbox.facts)
         if errors:
-            body = run_agent(llm, toolbox, as_of_week, week_start, max_turns=max_turns, feedback="\n".join(errors[:25]))
+            body = revise(llm, toolbox, transcript, body, errors[:25])
             errors, checked = check_detailed(body, toolbox.facts)
         cited = list(dict.fromkeys(m.group(1) for m in CITE.finditer(body) if m.group(1) in toolbox.facts))
         status = "invalid" if errors else "valid"

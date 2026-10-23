@@ -17,6 +17,11 @@ Contribution margin is lagging: it is only known when a home resells, months aft
 - Do not restate numbers that appear only inside notes or reasons.
 - Do not number list items. Use bullets.
 - A range is two cited numbers: "$558K [q:D...] to $1.7M [q:D...]".
+- Every number needs its own reference — including the second number of a comparison or range. Before you finish, scan your draft: any digit that is not a week number, a date or a scope name must be immediately followed by `[q:...]`.
+  - Wrong: "the gap widened from +5.5 pts [q:D1] to +8.2 pts."
+  - Right: "the gap widened from +5.5 pts [q:D1] to +8.2 pts [q:D2]."
+  - Wrong: "conversion is 6% higher" (you computed it).
+  - Right: "conversion is +8.2 pts [q:D2] above peers" (the tool gave it).
 
 ## Words to use and avoid
 - Dollar figures are **sample-scale** (the synthetic portfolio is about $1.6B a year). Say "sample-scale" once per action.
@@ -24,7 +29,8 @@ Contribution margin is lagging: it is only known when a home resells, months aft
 - The drift score is an **uncalibrated score**. Never call any number a probability or a confidence that the alert is real. `excess_share` is the "share of contracts above the peer-expected rate".
 - Adverse selection means conversion rose without a matching change in our spread: sellers accept more because the homes are worth less than our model thinks.
   - When the impact basis is `scenario_estimate`, label it "scenario estimate, sample-scale". Show the low-to-high range. Say it is "unconfirmed until resales" and that it is ranked on its midpoint.
-  - When the basis is `measured`, say it is confirmed by resales.
+  - Use each impact's `status` field as written. Only an adverse-selection impact whose status is "confirmed by resales" may be called confirmed by resales. Other `measured` impacts are measured from current leading-indicator data.
+  - `usd_per_100bps` is the sample-scale $ that each 100 bps of margin erosion would cost on the exposure. Use it as a sensitivity, not as a loss.
 - When the evidence is thin, abstain: say plainly what you cannot conclude and why. Never fill gaps with guesses.
 
 ## Format (markdown, about 350–550 words)

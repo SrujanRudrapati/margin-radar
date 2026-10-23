@@ -1,0 +1,15 @@
+{
+  "banner": "Synthetic data \u2014 not Opendoor data.",
+  "sample_scale_label": "sample-scale ($ at the synthetic portfolio's ~$1.6B/yr)",
+  "week": 6,
+  "week_start": "2025-02-17",
+  "status": "abstain",
+  "model": null,
+  "purpose": "dev",
+  "body": "## Top actions\nNone this week \u2014 we abstain. The detector does not yet have enough history or volume in any segment to separate drift from seasonality, so no action is ranked.\n\n## What we're not sure about\nEverything that depends on the peer baseline: it needs more weeks of data before a change can be called drift rather than noise or season.",
+  "citations": [],
+  "grounding": {
+    "numbers_checked": 0,
+    "errors": []
+  }
+}
