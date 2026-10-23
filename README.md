@@ -57,12 +57,12 @@ From `eval/results.json`. Every detector number below is on the **true holdout, 
 | LLM evaluation (seed 42, final model) | Result | Gate |
 |---|---|---|
 | Briefs published (weeks 40, 45, 50, 60) | 4/4 | pass |
-| Numbers grounded in cited facts | 107/107 (100%) | pass |
+| Numbers grounded in cited facts | 105/105 (100%) | pass |
 | Brief accuracy | every brief 100% of sections, 0 direction errors | pass |
 | Top action on an injected scope | 4/4 | pass |
 | 20 questions: semantic layer vs raw SQL | 20/20 vs 19/20 | — |
 | Abstains on 5 unanswerable questions | 5/5 | pass |
-| Cost to record the eval's responses (all recordings to date) | 170 live calls, $0.6511 estimated | — |
+| Cost to record the eval's responses (all recordings to date) | 181 live calls, $0.8578 estimated | — |
 
 ## Limitations
 
@@ -70,6 +70,7 @@ From `eval/results.json`. Every detector number below is on the **true holdout, 
 - **Sample-scale dollars.** Dollar figures are at the synthetic portfolio's ~$1.6B/yr, always shown as sample-scale and in bps. They are never scaled to a real business.
 - **Uncalibrated scores.** Detector scores rank how unusual a move is. They are not probabilities.
 - **The detector gates fail.** At ~20k offers over 78 weeks (median 2 sales per segment-week), scenario A (time to a first buyer offer 40% longer in one market) sits below the noise floor and is never caught. The control run still has 29 false alert-weeks across 10 seeds. See `docs/DECISIONS.md` D16–D17 and D28–D31.
+- **Adverse-selection recall is unstable across seed sets.** A second, never-inspected seed set (the leakage check in `eval/holdout_comparison.md`) caught B far less often than the holdout did. Treat B's holdout rate as one draw, not a stable rate.
 - **One design choice predates the true holdout.** The expanding-baseline design (D16) was chosen on seeds 1–10, before seeds 11–20 existed. The renovation shrinkage was tuned on seeds 1–5 only.
 - **Adverse-selection impact is a scenario estimate** (a 1–3% valuation shortfall) until resales confirm it.
 

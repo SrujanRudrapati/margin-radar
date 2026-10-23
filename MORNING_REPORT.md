@@ -41,7 +41,7 @@ Source: `eval/results.json` and `eval/results.md`. Rates are truncated, never ro
 
 **LLM evaluations** (seed 42, `CLAUDE_MODEL_FINAL` = claude-sonnet-5-5):
 - Briefs at weeks 40, 45, 50, 60: 4/4 published (valid).
-- Grounding: 107/107 numbers match their cited facts, 100%. The first drafts had 4 errors in total, all fixed by the single revision (briefs re-recorded today after the D31 detector change).
+- Grounding: 105/105 numbers match their cited facts, 100%. The first drafts had 3 errors in total, all fixed by the single revision (briefs re-recorded today after the D31 and D33 detector changes).
 - Brief accuracy: minimum 1.00 of sections accurate, 0 direction errors.
 - Top-ranked action on an injected scope: 4/4. Every action section labels its $ as sample-scale: 4/4.
 - 20 questions, semantic layer vs raw SQL: **20/20 vs 19/20**. Note that raw-SQL mode can read `mart_segment_week`, the semantic layer's own pre-aggregated input, so this flatters raw SQL.
@@ -112,19 +112,20 @@ open http://localhost:5173
 
 > Contribution margin is a lagging number. We only learn it when a home resells, so a pricing mistake made at purchase surfaces months later. Every 100 bps is about $90M a year at a $9B run rate. Margin Radar watches the leading indicators instead: first-offer rate, contract rate and renovation overrun, for every market, price band and product, every week.
 >
-> The key move is comparing each segment with its peers in the same week. Seasonality, like the spring peak and the summer margin dip, moves everyone together, so it cancels and doesn't alert. Across ten clean holdout runs, none of the false alerts fell in the Q3 dip quarter.
+> The key move is comparing each segment with its peers in the same week. Seasonality, like the spring peak and the summer margin dip, moves everyone together, so it cancels and doesn't alert. On the ten clean holdout runs, none of the remaining false alerts fell in the Q3 dip quarter.
 >
 > I tested it on ten synthetic runs that no setting was tuned on. Each run injected three problems into a randomly chosen market or price band, starting in a random week. It caught adverse selection a median of **9.5 weeks** before sold-home margin showed it, in **8 of 10** runs. It caught the renovation overrun a median of **5.5 weeks** early, in **8 of 10**. Adverse selection is the subtle one. Conversion goes *up*, which looks like good news, while our spread is flat against peers. That's the pattern of sellers accepting because the home is worth less than our model thinks.
 >
-> Each week Claude writes a brief, but it never computes a number. Its tools return governed facts with query IDs, and a checker rejects any number that doesn't match a cited fact exactly. In the evaluation, **107 of 107** numbers were grounded. It also abstains: it declined **5 of 5** unanswerable questions.
+> Each week Claude writes a brief, but it never computes a number. Its tools return governed facts with query IDs, and a checker rejects any number that doesn't match a cited fact exactly. In the evaluation, **105 of 105** numbers were grounded. It also abstains: it declined **5 of 5** unanswerable questions.
 >
-> What doesn't work yet: it missed the slow-buyer problem in all ten runs. At roughly 15 listings a week per market, that signal sits below the noise. On clean runs it still fires **0.056** false alerts a week: 29 alert-weeks across ten runs, and none at all in six of them. It was 74 before I shrank thin segments toward their peers. I report both misses rather than tuning them away. Dollar figures are sample-scale, at this synthetic portfolio's ~$1.6B a year.
+> What doesn't work yet: it missed the slow-buyer problem in all ten runs. At roughly 15 listings a week per market, that signal sits below the noise. On clean runs it still fires **0.056** false alerts a week: 29 alert-weeks across ten runs, and none at all in six of them. It was 74 before I shrank thin segments toward their peers. And adverse-selection recall swings a lot between seed sets: a second untouched set caught it far less often. I report all of this rather than tuning it away. Dollar figures are sample-scale, at this synthetic portfolio's ~$1.6B a year.
 
 ## 7. Weaknesses an interviewer might probe
 
 - **"Your detector fails its own gates."** Yes, all three, on the true holdout. B and C each reach 8/10, but A is 0/10, so the recall gate fails. There are 29 control alert-weeks and 5 wrong-scope episodes. At ~20k offers over 78 weeks (a median of 2 sales per segment-week), scenario A is below the noise floor. Lowering thresholds caught more but fired on the control run (D8, D9, D16). I kept the gates and reported the miss.
 - **"Is the holdout really held out?"** Mostly, as of today. No setting was tuned on seeds 11–20, and each draws its own scopes and onset weeks (D28). The new detector was kept only under a rule written before it saw them (D29). But I inspected one holdout control run (seed 18) while diagnosing the false alerts, so seeds 21–30, never inspected, serve as a leakage check (D32). One caveat: the expanding-baseline design (D16) was chosen on seeds 1–10, before 11–20 existed.
 - **"Still too many false alerts on a clean run."** 0.056 alert-weeks per week across 10 holdout control runs (29 / 510), down from 74 before renovation shrinkage. Six of the ten runs have none, and the worst has 14. What's left: one B2 adverse-selection episode, two demand-softening episodes and two one-week portfolio shifts. None fall in the Q3 dip.
+- **"Is 8 of 10 for adverse selection stable?"** No. A second, never-inspected seed set (21–30, a leakage check, not the quoted result) caught it far less often; the numbers are in `eval/holdout_comparison.md`. I haven't investigated why.
 - **"Did the shrinkage cost anything?"** Yes, on the demo seed. Seed 42's M05 renovation alert now comes at week 43, 3 weeks before margin shows it, instead of 6. On the holdout, C went from 7/10 to 8/10 with a median lead of 5.5 weeks.
 - **"Doesn't peer comparison miss market-wide shocks?"** Yes. Simultaneous all-segment shifts cancel. A portfolio check catches only abrupt ones.
 - **"How do you know the dollar figure?"** Renovation drift is measured. Adverse selection is a scenario estimate (a 1–3% valuation shortfall, ranked on the midpoint) and stays unconfirmed until resales. On seed 42 the B2 episode ends before the cohort has enough resales, so the "confirmed by resales" switch never turns on. That's an xfail test, kept honest.
