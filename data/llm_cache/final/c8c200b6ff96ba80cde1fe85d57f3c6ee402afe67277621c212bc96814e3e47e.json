@@ -1,0 +1,59 @@
+{
+ "container": null,
+ "content": [
+  {
+   "signature": "CAQS6gYKEAgTGAI4AUIIdGhpbmtpbmcSDAgcGme+ITAHszgKRxoMSXNEFKC6hOAvpgCFIjBVSDCewvveEI1D7emmTGhMM5zpEneg3vgpOs1/GW4OCUCwvLOSxdK+z+PXZu/NEfwqhwYG9Xu80/aRSJvf8rDWbePAeN4YmlMHPHekr2+nGiS0fnZg1A1XL6ZYiisVQoTTmWM60vjsuI7CCfO9qSDJdBiH0qqQdem1msUT0y+JAZz43HwhqFfCQWv1NHajen622tHlVf+6+thEYFIu41+snSxjpcJLdTqt9mDnV8nD/IWy0nlHMajPivLhWtry3co+FvVncZWU0mTFPM7gSSbEIRhOmzm7Prpvgy5kA5kHdTIiTvWjnCAZ7wtNxckIfQa9olxfBxo2nj9lkDPwwbMzYy+pe6g/eUJC0dBl6iZvOPEdDN3uhmnB0LWFB3a1RiMjUKNw0jftG9FL1DaqGbTgHHbUgQlbDI9ixkVyYqOL7ShVWEOwQQleTvai3cYZ4kd2ODdSbK2I+XPTU/NoHZ8k3/Ki0mUU/0zDwc4lTzFazp9r/kRT3W/p/A7a0hObVsj+6YvtSMkjTiMMA7Y80LDTahICdXF8POhFUSoyWfuH/65tr+t3hCS9l7t+BrlRrfsCO63/JsVq0AB9+Rf5sqwK2pTAZKeh0oanDwfjEeGmDf5Gsr2YOD8ILEci2wqP16dUK/A5vckf9l/r2UbYB9PutZ4NnP6enpa31/dmRuHq3eCrkpbZC0YJWc3QL47kQOjq8tyJBbXBDFghl5pbrVIaBuEEokzDUInpFJbc6oxkXjaaf9QlafkyxKvxQBUgeO/HHp0OPo+jmt9rnSCjms31eaMvmDVpJkbPd3/0BS3movEb46+s38oUNFflcjfVT6twyIrtHQXeOutSJtTWVN3bZPwKl2HqKLnj06X4hjnvbRhJ2pBbCCMjJ9U9Iv0EIQZ001808Ln+D4sEkQctJJWcadSgq8T3pXt8PmFw1+7Wy+G42IZpLhLx6LwYo8J+iapGyV0r7HVOrv5i8/CHWBGroqIolhucEM0X+Z2raxD48Ieg6k2ia+sEtcP0HL6TLv4QcScfTi0VyRzEo7qSGbJkDQa/+FksXNjCc5G9Nn2cZSX0TyToQHlpUarKiUWer68em32Nlwa4otXCGAE=",
+   "thinking": "",
+   "type": "thinking"
+  },
+  {
+   "caller": {
+    "type": "direct"
+   },
+   "id": "toolu_01PXfYcU4eYFATcWrCCkuH8S",
+   "input": {
+    "sql": "select week, sum(first_offers) fo, sum(dtfo_sum) d, sum(showings_sum) s, sum(resales) r from main.mart_segment_week where market='M02' and week between 50 and 55 group by 1 order by 1"
+   },
+   "name": "run_sql",
+   "toolset_name": null,
+   "type": "tool_use"
+  },
+  {
+   "caller": {
+    "type": "direct"
+   },
+   "id": "toolu_01KQVnknqsLwnuTUgR468nEf",
+   "input": {
+    "sql": "select home_id, list_date, first_buyer_offer_date, days_to_first_offer, showings, resale_date, offer_week from raw.homes where market='M02' and first_buyer_offer_date is not null limit 8"
+   },
+   "name": "run_sql",
+   "toolset_name": null,
+   "type": "tool_use"
+  }
+ ],
+ "diagnostics": null,
+ "id": "msg_011CgJwpVNZWQTxGSqUbJuY6",
+ "model": "claude-sonnet-5-5",
+ "role": "assistant",
+ "stop_details": null,
+ "stop_reason": "tool_use",
+ "stop_sequence": null,
+ "type": "message",
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 0,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 1534,
+  "inference_geo": "global",
+  "input_tokens": 151,
+  "output_tokens": 367,
+  "output_tokens_details": {
+   "thinking_tokens": 122
+  },
+  "server_tool_use": null,
+  "service_tier": "batch",
+  "speed": "standard"
+ }
+}

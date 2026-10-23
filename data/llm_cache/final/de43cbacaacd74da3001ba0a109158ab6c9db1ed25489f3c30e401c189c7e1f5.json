@@ -1,0 +1,59 @@
+{
+ "container": null,
+ "content": [
+  {
+   "signature": "CAQSogUKEAgTGAI4AUIIdGhpbmtpbmcSDOl9IPVLrWG15QKlqRoMvGPmvoUomdAuaNtiIjAToy9AJELAqqo7ZG4pBgHHKh/vMd1gS+LulPRWSb/DcrD/nEGgQST+K06Y4BFyl2YqvwTvsGguKMht7MPyCNoc7t4+R+aL/t4NnJG0v0npOPCLVZQKBtN1CcVGzWTqmo8x57GbJ1hU/bFRX3v1KnLDnp20x+SwJAn17e+NTqQj3NiEUAhoJHc4P6ouU1E7JV3cWtMsmOwjRcOuQw7Hulw/N5x8/yvBS4e3BMsQsm6uyxNa22Penta0BAeTtaRkt0l+zm2AfG2hoSZOygOTMqvLxSwbkr2U04y0pdDPGJUvb4cOM+GWPclwatPsjdpxmiRjVSaRz4/hsRDGj1fV6lgQR0/KdPNjOa3rKaApHRd6NYZ1mdSXc1e9eZXmuud4zM0zAMq8wN+cEh2C23Un6+nkI+YgrnIWEwxyu1/GPWJD0mUjjJakoE9fsJ4DX5dLHegRNyjvLTepEzgL8hqpYqb0jCeisaxBiKPOZVz9gg40JTGE1pkkU7dXb928JMCyeFBcrwOZLI/KsdkcOqo/vbvno3sWo/3M94//f8Rr7Czya3KSPaf+cdZ8nmYxWzN4XKSYCrIbc3GL5QXaF/rihO2apoydXNXMND/WzArcPaYBYQJ/pbR0yvup02uXr0hKm96m4kaBiUKd2qQ+TdSVryilbgMo5B4w6L8hByB1Oh/UAqP56VZ9UYWzIY1/z/rdT6kjx4mJz4S1Jg4nmFuc1ld98Xt3CxUJDOXO/j/JfPD5Dt4P95FytFdJYl9q5BwqtMSPvlgEUfzSPlOx2xYgyLhx7CmkKhgxyoytTvQ4zOhL1ce8kJreBBx5wiqYEJwZeFn2ChgB",
+   "thinking": "",
+   "type": "thinking"
+  },
+  {
+   "caller": {
+    "type": "direct"
+   },
+   "id": "toolu_01VCpnaMnDPF9RnDnxx5Sk3q",
+   "input": {
+    "sql": "select sum(fell_through) f, sum(contracts) c, sum(company_declined) d, sum(closes) cl from main.mart_segment_week where week between 23 and 35"
+   },
+   "name": "run_sql",
+   "toolset_name": null,
+   "type": "tool_use"
+  },
+  {
+   "caller": {
+    "type": "direct"
+   },
+   "id": "toolu_01V6VFhTXuDvXSfHgD3Utabk",
+   "input": {
+    "sql": "select outcome, count(*) from raw.homes group by 1"
+   },
+   "name": "run_sql",
+   "toolset_name": null,
+   "type": "tool_use"
+  }
+ ],
+ "diagnostics": null,
+ "id": "msg_011CgJwpJANdzn5uvqr6r8p5",
+ "model": "claude-sonnet-5-5",
+ "role": "assistant",
+ "stop_details": null,
+ "stop_reason": "tool_use",
+ "stop_sequence": null,
+ "type": "message",
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 0,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 1534,
+  "inference_geo": "global",
+  "input_tokens": 161,
+  "output_tokens": 218,
+  "output_tokens_details": {
+   "thinking_tokens": 48
+  },
+  "server_tool_use": null,
+  "service_tier": "batch",
+  "speed": "standard"
+ }
+}
