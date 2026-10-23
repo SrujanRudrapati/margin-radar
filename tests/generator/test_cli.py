@@ -64,3 +64,20 @@ def test_flags_select_and_move_injections(tmp_path):
 def test_rejects_unknown_market(tmp_path):
     with pytest.raises(SystemExit):
         main(["--out-dir", str(tmp_path), "--a-market", "M99"])
+
+
+def test_rejects_empty_inject(tmp_path):
+    with pytest.raises(SystemExit):
+        main(["--out-dir", str(tmp_path), "--inject", ""])
+
+
+def test_out_dir_with_quote(tmp_path):
+    d = tmp_path / "it's here"
+    main(["--seed", "3", "--out-dir", str(d), "--inject", "C"])
+    assert _query(d / "radar.duckdb", "select count(distinct run_id) from raw.homes")[0][0] == 2
+
+
+def test_cli_logs_banner(tmp_path, caplog):
+    caplog.set_level("INFO", logger="generator")
+    main(["--seed", "3", "--out-dir", str(tmp_path), "--inject", "C"])
+    assert "Synthetic data — not Opendoor data." in caplog.text

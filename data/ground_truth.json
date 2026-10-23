@@ -23,7 +23,8 @@
       "start_date": "2025-08-04",
       "cm_first_visible_week": 39,
       "cm_first_visible_date": "2025-10-06",
-      "cm_lag_weeks": 9
+      "cm_lag_weeks": 9,
+      "cm_first_visible_week_solo": 39
     },
     {
       "scenario": "B",
@@ -49,9 +50,10 @@
       ],
       "start_week": 30,
       "start_date": "2025-08-04",
-      "cm_first_visible_week": 47,
-      "cm_first_visible_date": "2025-12-01",
-      "cm_lag_weeks": 17
+      "cm_first_visible_week": 45,
+      "cm_first_visible_date": "2025-11-17",
+      "cm_lag_weeks": 15,
+      "cm_first_visible_week_solo": 47
     },
     {
       "scenario": "C",
@@ -72,7 +74,8 @@
       "start_date": "2025-08-04",
       "cm_first_visible_week": 46,
       "cm_first_visible_date": "2025-11-24",
-      "cm_lag_weeks": 16
+      "cm_lag_weeks": 16,
+      "cm_first_visible_week_solo": 46
     }
   ]
 }

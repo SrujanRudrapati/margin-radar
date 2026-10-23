@@ -24,7 +24,7 @@ def _week(value: str) -> int:
 
 def _injections(value: str) -> set[str]:
     names = {v.strip().upper() for v in value.split(",") if v.strip()}
-    if not names <= {"A", "B", "C"}:
+    if not names or not names <= {"A", "B", "C"}:
         raise argparse.ArgumentTypeError("--inject takes a comma list of A, B, C")
     return names
 
@@ -45,6 +45,7 @@ def _parse(argv: Sequence[str] | None) -> argparse.Namespace:
 
 def main(argv: Sequence[str] | None = None) -> None:
     args = _parse(argv)
+    log.info(SYNTHETIC_BANNER)
     scenarios = tuple(
         s for s in default_scenarios(args.a_market, args.a_start_week, args.b_band, args.b_start_week,
                                      args.c_market, args.c_start_week)
@@ -63,9 +64,9 @@ def main(argv: Sequence[str] | None = None) -> None:
     }
     (args.out_dir / "ground_truth.json").write_text(json.dumps(truth, indent=2) + "\n")
     for t in truth["scenarios"]:
-        log.info("%s %s=%s start week %s, visible in sold-cohort CM at week %s (lag %s weeks)",
+        log.info("%s %s=%s start week %s, visible in sold-cohort CM at week %s (lag %s weeks; solo run: week %s)",
                  t["scenario"], t["scope_type"], t["scope"], t["start_week"],
-                 t["cm_first_visible_week"], t["cm_lag_weeks"])
+                 t["cm_first_visible_week"], t["cm_lag_weeks"], t["cm_first_visible_week_solo"])
 
 
 if __name__ == "__main__":

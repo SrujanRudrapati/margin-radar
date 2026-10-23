@@ -17,10 +17,16 @@ def write_parquet(out: SimOutput, run_dir: Path) -> None:
 def load_duckdb(db_path: Path, run_dirs: dict[str, Path]) -> None:
     """Replace raw.<table> with the union of all runs, tagged by run_id."""
     with duckdb.connect(str(db_path)) as con:
+        con.execute("begin transaction")
         con.execute("create schema if not exists raw")
         for table in TABLES:
             selects = [
-                f"select '{run_id}' as run_id, * from read_parquet('{run_dir / f'{table}.parquet'}')"
+                f"select {_literal(run_id)} as run_id, * from read_parquet({_literal(str(run_dir / f'{table}.parquet'))})"
                 for run_id, run_dir in run_dirs.items()
             ]
             con.execute(f"create or replace table raw.{table} as " + " union all by name ".join(selects))
+        con.execute("commit")
+
+
+def _literal(value: str) -> str:
+    return "'" + value.replace("'", "''") + "'"

@@ -128,7 +128,19 @@ def test_c_leaves_everything_else_identical(run_c, control):
     )
 
 
-def test_all_three_combined_matches_union_of_effects(injected, run_a, run_b, run_c, control):
+def test_combined_run_leaves_unscoped_homes_identical(injected, control):
     a, b, c = (_only(n)[0] for n in "ABC")
     untouched = lambda h: (h["market"] != a.scope) & (h["market"] != c.scope) & (h["band"] != b.scope)
     _assert_identical(injected, control, untouched)
+
+
+def test_effects_stack_in_overlapping_segments(injected, control):
+    a, b = _only("A")[0], _only("B")[0]
+    overlap = lambda h: (h["market"] == a.scope) & (h["band"] == b.scope) & (h["offer_week"] >= b.start_week)  # noqa: E731
+    rate = lambda h: h[overlap(h)]["contract_date"].notna().mean()  # noqa: E731
+    assert 1.15 <= rate(injected.homes) / rate(control.homes) <= 1.35
+    cols = ["home_id", "market", "band", "list_date", "days_to_first_offer"]
+    both = injected.homes[cols].merge(control.homes[cols], on="home_id", suffixes=("_i", "_c")).dropna()
+    hit = both[(both["market_c"] == a.scope) & (both["band_c"] == b.scope) & (_week(both["list_date_c"]) >= a.start_week)]
+    assert len(hit) > 20
+    assert 1.36 <= (hit["days_to_first_offer_i"] / hit["days_to_first_offer_c"]).mean() <= 1.44

@@ -2,8 +2,9 @@ from dataclasses import replace
 
 import pytest
 
-from generator.ground_truth import compute_ground_truth
+from generator.ground_truth import compute_ground_truth, first_visible_week
 from generator.scenarios import default_scenarios
+from generator.simulate import simulate
 
 SEED = 42
 
@@ -19,6 +20,7 @@ def test_one_entry_per_scenario_with_required_keys(truth):
         assert {
             "scenario", "effects", "scope_type", "scope", "segments", "start_week", "start_date",
             "cm_first_visible_week", "cm_first_visible_date", "cm_lag_weeks",
+            "cm_first_visible_week_solo",
         } <= set(t)
         assert t["start_week"] == 30
         assert t["start_date"] == "2025-08-04"
@@ -54,3 +56,19 @@ def test_bigger_shock_is_visible_no_later():
     (base,) = compute_ground_truth(SEED, (c,))
     (big,) = compute_ground_truth(SEED, (replace(c, effects={"reno_overrun": 1.6}),))
     assert big["cm_first_visible_week"] <= base["cm_first_visible_week"]
+
+
+def test_visible_week_is_measured_on_the_shipped_combined_run(truth):
+    # The injected run that ships carries all three scenarios at once, and B's band overlaps A's and
+    # C's markets, so the KPI must use the combined run; the solo run is kept for attribution only.
+    scenarios = default_scenarios()
+    combined, control = simulate(SEED, scenarios).homes, simulate(SEED).homes
+    for s in scenarios:
+        assert truth[s.name]["cm_first_visible_week"] == first_visible_week(s, combined, control)
+        assert truth[s.name]["cm_first_visible_week_solo"] == first_visible_week(s, simulate(SEED, (s,)).homes, control)
+
+
+def test_single_scenario_combined_equals_solo():
+    c = next(s for s in default_scenarios() if s.name == "C")
+    (t,) = compute_ground_truth(SEED, (c,))
+    assert t["cm_first_visible_week"] == t["cm_first_visible_week_solo"]

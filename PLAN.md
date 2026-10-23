@@ -52,14 +52,14 @@
   - **B:** band `B2`, offer→contract conversion ×1.25 for offers from week 30 at unchanged spread, and resale ×0.97 against the model for the same homes (adverse selection).
   - **C:** market `M05`, renovation actual ×1.18 for renovations starting from week 30.
 - **Control:** the same seed with no injections. All random draws are taken up front, so homes outside a scenario's scope are identical between runs, and tests assert this.
-- **Ground truth** (`data/ground_truth.json`, never loaded into DuckDB): the margin-visible week is the first resale week where the scope's sold-cohort margin, with that scenario run alone, is ≥ 50 bps below control for 2 consecutive weeks. Seed 42: A visible at week 39 (lag 9 weeks), B at week 47 (lag 17), C at week 46 (lag 16).
+- **Ground truth** (`data/ground_truth.json`, never loaded into DuckDB): the margin-visible week is the first resale week where the scope's sold-cohort margin in the shipped combined injected run is ≥ 50 bps below control for 2 consecutive weeks. The same measure with the scenario run alone is kept as `cm_first_visible_week_solo`, for attribution. Seed 42: A visible at week 39 (lag 9 weeks), B at week 45 (lag 15; 47 solo, because B2 overlaps A's and C's markets), C at week 46 (lag 16).
 - **Headline KPIs:** *detection delay* = first alert week − `start_week` (target ≤ 21 days). *Lead time* = `cm_first_visible_week` − first alert week.
 
 ---
 
 ## Phase 1: Generator + 3 injected scenarios + control run ✅ built 2026-10-22
 
-**DoD (met):** `make data` writes `data/parquet/{injected,control}/{homes,price_cuts}.parquet`, `data/radar.duckdb` (`raw.homes` and `raw.price_cuts` with `run_id`) and `data/ground_truth.json`. `make test` gives 49 passed.
+**DoD (met):** `make data` writes `data/parquet/{injected,control}/{homes,price_cuts}.parquet`, `data/radar.duckdb` (`raw.homes` and `raw.price_cuts` with `run_id`) and `data/ground_truth.json`. `make test` gives 55 passed (after the code-review fixes).
 
 **Files:** `common/{banner,business}.py`, `generator/{config,scenarios,simulate,metrics,ground_truth,io,__main__}.py`, `tests/conftest.py`, `tests/test_scaffold.py`, `tests/generator/test_{volumes,funnel,margin,seasonality,injections,ground_truth,cli}.py`, `environment.yml`, `pyproject.toml`, `Makefile`.
 
@@ -67,7 +67,7 @@
 - `generator.simulate.simulate(seed: int, scenarios: Sequence[Scenario] = (), cutoff_week: int = 78) -> SimOutput(homes, price_cuts)`. `cutoff_week` gives point-in-time truncation for no-look-ahead tests.
 - `generator.scenarios.Scenario(name, scope_type, scope, start_week, effects)` and `default_scenarios(...)`.
 - `generator.metrics.contribution_margin_usd(homes)` and `sold_cohort_cm(homes)`. CM = resale − (offer − 5% fee) − actual renovation − holding − selling (3%). Financing is excluded. dbt must reproduce this (parity test in Phase 2).
-- `generator.ground_truth.compute_ground_truth(seed, scenarios) -> list[dict]`.
+- `generator.ground_truth.compute_ground_truth(seed, scenarios) -> list[dict]` and `first_visible_week(scenario, injected_homes, control_homes) -> int | None`.
 - CLI: `python -m generator --seed 42 --out-dir data [--inject A,B,C] [--a-market M02 --a-start-week 30 --b-band B2 --b-start-week 30 --c-market M05 --c-start-week 30]`.
 
 
