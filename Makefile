@@ -68,7 +68,7 @@ web/node_modules: web/package-lock.json
 	touch web/node_modules
 
 # Pre-render every API response to JSON and build the static dashboard into web/dist (no server, no Claude).
-export: decisions markers web/node_modules
+export: build decisions markers web/node_modules
 	REPLAY=1 $(PY) -m api.export --out web/public/data
 	cd web && npm run build:static
 

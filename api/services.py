@@ -5,6 +5,7 @@ read (lead-time markers come from eval/lead_time.json). Synthetic data — not O
 """
 import dataclasses
 import json
+import logging
 import math
 import re
 import threading
@@ -20,6 +21,7 @@ from detector.impact import rank_actions
 from detector.peers import peer_residuals, rollup
 from detector.rules import TRIGGERS, detect
 
+log = logging.getLogger("api")
 RUNS = ("injected", "control")
 DIMENSIONS = ("market", "band")
 DEFAULT_WEEK = 40
@@ -44,8 +46,16 @@ class Services:
         self._episodes: dict[str, list[dict]] = {}
         self._lock = threading.Lock()  # DuckDB connections are not shared across threads concurrently
         self.warmed = threading.Event()  # set once both runs' alert episodes are cached (see warm)
+        self.warming = threading.Event()  # set while the startup warm-up runs
 
     # --- plumbing -------------------------------------------------------------------------------------------
+    def close(self) -> None:
+        """Close the run databases (read-only connections still block writers in other processes)."""
+        with self._lock:
+            for store in self._stores.values():
+                store.close()
+            self._stores.clear()
+
     def _store(self, run: str) -> GovernedStore:
         if run not in RUNS:
             raise ValueError(f"run must be one of {RUNS}")
@@ -123,6 +133,7 @@ class Services:
                            "cells": cells})
 
     def drilldown(self, run: str, metric: str, dimension: str, scope: str) -> dict:
+        self._await_warm()
         if metric not in TRIGGERS:
             raise ValueError(f"metric must be one of {list(TRIGGERS)}")
         if dimension not in DIMENSIONS:
@@ -143,11 +154,12 @@ class Services:
             for w in weeks:
                 r = score(own["residual"], w, metric, se)
                 scores.append(r.z_latest if isinstance(r, DriftScore) else None)
-            episodes = [e for e in self._all_episodes(run, store) if e["scope"] == scope]
+            kind = TRIGGERS[metric][1]  # only this metric's alerts and ground truth belong on its chart
+            episodes = [e for e in self._all_episodes(run, store) if e["scope"] == scope and e["kind"] == kind]
         truth = None
         if run == "injected":
             markers = self._read_json(self.eval_dir / "lead_time.json") or {}
-            truth = next((m for m in markers.get("scenarios", []) if m["scope"] == scope), None)
+            truth = next((m for m in markers.get("scenarios", []) if m["scope"] == scope and m["kind"] == kind), None)
         return _clean({"banner": SYNTHETIC_BANNER, "run": run, "metric": metric, "dimension": dimension, "scope": scope,
                        "weeks": [int(w) for w in weeks], "value": [_f(values.get(w)) for w in weeks],
                        "peer": [_f(x) for x in own["peer_level"]], "gap": [_f(x) for x in own["residual"]],
@@ -198,6 +210,7 @@ class Services:
                 "lead_time": self._read_json(self.eval_dir / "lead_time.json")}
 
     def decisions_view(self, decision: str | None = None, kind: str | None = None, scope: str | None = None) -> dict:
+        self._await_warm()
         rows = self.decisions.list(decision=decision, kind=kind, scope=scope)
         with self._lock:
             store = self._store("injected")
@@ -206,6 +219,7 @@ class Services:
                        "score": {k: v for k, v in report.items() if k != "rows"}, "scored_rows": report["rows"]})
 
     def add_decision(self, payload: dict) -> dict:
+        self._await_warm()
         with self._lock:
             store = self._store("injected")
             row = log_decision(self.decisions, store, payload["alert_id"], payload["decision"], payload["reason"],
@@ -215,14 +229,25 @@ class Services:
     def warm(self) -> None:
         """Replay the detector over every week of both runs (~20 s each) so no request pays for it. Uses its own
         read-only connection, so requests are not blocked; the lock is held only to store the result."""
-        replayed = {}
-        for run in RUNS:
-            with GovernedStore(str(self.data_dir / f"radar_{run}.duckdb"), run) as store:
-                replayed[run] = _detect_episodes(store)
-        with self._lock:
-            for run, episodes in replayed.items():
-                self._episodes.setdefault(run, episodes)
-        self.warmed.set()
+        self.warming.set()
+        try:
+            replayed = {}
+            for run in RUNS:
+                with GovernedStore(str(self.data_dir / f"radar_{run}.duckdb"), run) as store:
+                    replayed[run] = _detect_episodes(store)
+            with self._lock:
+                for run, episodes in replayed.items():
+                    self._episodes.setdefault(run, episodes)
+        except Exception:
+            log.exception("warm-up failed; requests will replay the detector themselves")
+        finally:
+            self.warmed.set()  # also on failure, so waiting requests fall back instead of hanging
+
+    def _await_warm(self) -> None:
+        """Called before taking the lock: a request that needs alert episodes waits for the running warm-up rather
+        than replaying the detector itself while holding the lock every endpoint shares."""
+        if self.warming.is_set():
+            self.warmed.wait()
 
     def _episode_index(self, store: GovernedStore) -> dict[str, dict]:
         return {e["alert_id"]: e for e in self._all_episodes("injected", store)}

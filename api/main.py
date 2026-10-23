@@ -35,8 +35,10 @@ def create_app(data_dir: Path = ROOT / "data", briefs_dirs: list[Path] | None = 
     services = Services(data_dir, briefs_dirs or [ROOT / "briefs", ROOT / "eval" / "briefs"], eval_dir, decisions_db)
     @asynccontextmanager
     async def lifespan(_: FastAPI):
+        services.warming.set()  # before the thread starts, so no early request slips past the wait
         threading.Thread(target=services.warm, name="warm-episodes", daemon=True).start()
         yield
+        services.close()
 
     app = FastAPI(title="Margin Radar API", description="Synthetic data — not Opendoor data.", lifespan=lifespan)
     app.state.services = services
