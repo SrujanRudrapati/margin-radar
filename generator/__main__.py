@@ -1,0 +1,73 @@
+"""python -m generator: write injected + control runs (same seed) to Parquet and data/radar.duckdb."""
+import argparse
+import json
+import logging
+from collections.abc import Sequence
+from pathlib import Path
+
+from common.banner import SYNTHETIC_BANNER
+from generator.config import BANDS, MARKETS, N_WEEKS, START_DATE
+from generator.ground_truth import compute_ground_truth
+from generator.io import load_duckdb, write_parquet
+from generator.scenarios import default_scenarios
+from generator.simulate import simulate
+
+log = logging.getLogger("generator")
+
+
+def _week(value: str) -> int:
+    week = int(value)
+    if not 0 <= week < N_WEEKS:
+        raise argparse.ArgumentTypeError(f"week must be in [0, {N_WEEKS - 1}]")
+    return week
+
+
+def _injections(value: str) -> set[str]:
+    names = {v.strip().upper() for v in value.split(",") if v.strip()}
+    if not names <= {"A", "B", "C"}:
+        raise argparse.ArgumentTypeError("--inject takes a comma list of A, B, C")
+    return names
+
+
+def _parse(argv: Sequence[str] | None) -> argparse.Namespace:
+    p = argparse.ArgumentParser(prog="generator", description=SYNTHETIC_BANNER)
+    p.add_argument("--seed", type=int, default=42)
+    p.add_argument("--out-dir", type=Path, default=Path("data"))
+    p.add_argument("--inject", type=_injections, default={"A", "B", "C"})
+    p.add_argument("--a-market", choices=MARKETS, default="M02")
+    p.add_argument("--a-start-week", type=_week, default=30)
+    p.add_argument("--b-band", choices=list(BANDS), default="B2")
+    p.add_argument("--b-start-week", type=_week, default=30)
+    p.add_argument("--c-market", choices=MARKETS, default="M05")
+    p.add_argument("--c-start-week", type=_week, default=30)
+    return p.parse_args(argv)
+
+
+def main(argv: Sequence[str] | None = None) -> None:
+    args = _parse(argv)
+    scenarios = tuple(
+        s for s in default_scenarios(args.a_market, args.a_start_week, args.b_band, args.b_start_week,
+                                     args.c_market, args.c_start_week)
+        if s.name in args.inject
+    )
+    run_dirs = {"injected": args.out_dir / "parquet" / "injected", "control": args.out_dir / "parquet" / "control"}
+    write_parquet(simulate(args.seed, scenarios), run_dirs["injected"])
+    write_parquet(simulate(args.seed), run_dirs["control"])
+    load_duckdb(args.out_dir / "radar.duckdb", run_dirs)
+    truth = {
+        "banner": SYNTHETIC_BANNER,
+        "seed": args.seed,
+        "start_date": START_DATE.isoformat(),
+        "n_weeks": N_WEEKS,
+        "scenarios": compute_ground_truth(args.seed, scenarios),
+    }
+    (args.out_dir / "ground_truth.json").write_text(json.dumps(truth, indent=2) + "\n")
+    for t in truth["scenarios"]:
+        log.info("%s %s=%s start week %s, visible in sold-cohort CM at week %s (lag %s weeks)",
+                 t["scenario"], t["scope_type"], t["scope"], t["start_week"],
+                 t["cm_first_visible_week"], t["cm_lag_weeks"])
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
+    main()

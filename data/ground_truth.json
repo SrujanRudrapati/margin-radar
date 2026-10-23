@@ -1,0 +1,78 @@
+{
+  "banner": "Synthetic data \u2014 not Opendoor data.",
+  "seed": 42,
+  "start_date": "2025-01-06",
+  "n_weeks": 78,
+  "scenarios": [
+    {
+      "scenario": "A",
+      "effects": {
+        "days_to_first_offer": 1.4
+      },
+      "scope_type": "market",
+      "scope": "M02",
+      "segments": [
+        "M02-B1-cash",
+        "M02-B1-CNML",
+        "M02-B2-cash",
+        "M02-B2-CNML",
+        "M02-B3-cash",
+        "M02-B3-CNML"
+      ],
+      "start_week": 30,
+      "start_date": "2025-08-04",
+      "cm_first_visible_week": 39,
+      "cm_first_visible_date": "2025-10-06",
+      "cm_lag_weeks": 9
+    },
+    {
+      "scenario": "B",
+      "effects": {
+        "conversion": 1.25,
+        "resale_vs_model": 0.97
+      },
+      "scope_type": "band",
+      "scope": "B2",
+      "segments": [
+        "M01-B2-cash",
+        "M01-B2-CNML",
+        "M02-B2-cash",
+        "M02-B2-CNML",
+        "M03-B2-cash",
+        "M03-B2-CNML",
+        "M04-B2-cash",
+        "M04-B2-CNML",
+        "M05-B2-cash",
+        "M05-B2-CNML",
+        "M06-B2-cash",
+        "M06-B2-CNML"
+      ],
+      "start_week": 30,
+      "start_date": "2025-08-04",
+      "cm_first_visible_week": 47,
+      "cm_first_visible_date": "2025-12-01",
+      "cm_lag_weeks": 17
+    },
+    {
+      "scenario": "C",
+      "effects": {
+        "reno_overrun": 1.18
+      },
+      "scope_type": "market",
+      "scope": "M05",
+      "segments": [
+        "M05-B1-cash",
+        "M05-B1-CNML",
+        "M05-B2-cash",
+        "M05-B2-CNML",
+        "M05-B3-cash",
+        "M05-B3-CNML"
+      ],
+      "start_week": 30,
+      "start_date": "2025-08-04",
+      "cm_first_visible_week": 46,
+      "cm_first_visible_date": "2025-11-24",
+      "cm_lag_weeks": 16
+    }
+  ]
+}
