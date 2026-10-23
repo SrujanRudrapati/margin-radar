@@ -1,0 +1,11 @@
+.env
+.venv/
+__pycache__/
+node_modules/
+data/*.duckdb
+data/parquet/
+data/token_log.jsonl
+data/feedback.jsonl
+data/llm_cache/dev/
+.pytest_cache/
+.coverage
