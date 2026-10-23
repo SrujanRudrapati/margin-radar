@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Survey-sheet palette: cool paper, slate ink, plum reserved for margin risk, steel for the peer baseline. */
+:root {
+  --paper: 243 245 244;   /* #F3F5F4 */
+  --panel: 255 255 255;
+  --ink: 29 42 51;        /* #1D2A33 */
+  --muted: 92 108 116;
+  --grid: 201 210 208;    /* #C9D2D0 */
+  --risk: 142 44 72;      /* #8E2C48 plum */
+  --riskwash: 245 228 234;
+  --peer: 91 127 149;     /* #5B7F95 steel */
+  --calm: 46 110 98;
+  --focus: 31 94 180;
+  color-scheme: light;
+}
+:root.dark {
+  --paper: 23 33 40;      /* #172128 */
+  --panel: 30 43 51;
+  --ink: 228 234 234;     /* #E4EAEA */
+  --muted: 150 167 172;
+  --grid: 52 67 75;
+  --risk: 224 120 154;    /* #E0789A */
+  --riskwash: 70 35 50;
+  --peer: 143 178 198;    /* #8FB2C6 */
+  --calm: 120 190 170;
+  --focus: 140 180 255;
+  color-scheme: dark;
+}
+html { font-family: "Public Sans", system-ui, sans-serif; font-variant-numeric: tabular-nums; }
+body { @apply bg-paper text-ink antialiased; }
+:focus-visible { outline: 2px solid rgb(var(--focus)); outline-offset: 2px; border-radius: 3px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+.num { font-variant-numeric: tabular-nums; }
