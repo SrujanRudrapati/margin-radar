@@ -66,7 +66,9 @@ def test_market_shift_shows_in_rollup():
     assert delta.xs("M02", level="scope").to_numpy() == pytest.approx(0.10, abs=1e-9)
     others = delta.drop("M02", level="scope")
     assert others.abs().max() < 0.02
-    assert set(roll.columns) >= {"scope", "week", "residual", "weight", "n_segments"}
+    assert set(roll.columns) >= {"scope", "week", "residual", "weight", "n_segments", "peer_level"}
+    m01 = roll.set_index(["scope", "week"]).loc[("M01", 5)]
+    assert 0.25 < m01["peer_level"] < 0.40
 
 
 def test_thin_segment_excluded():

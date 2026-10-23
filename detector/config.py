@@ -7,13 +7,16 @@ generator: seasonality is separated by peer comparison, not by known seasonal pa
 WINDOW_WEEKS = 4
 MIN_PEERS = {"market": 3, "band": 2}
 MIN_SEGMENT_SAMPLE = 8  # per-segment sample floor for peer residuals (DECISIONS D6)
-HISTORY_WEEKS = 16
+HISTORY_WEEKS = 26
 MIN_HISTORY_WEEKS = 8
 EVAL_WEEKS = 8
-Z_ALERT = 3.0
+Z_ALERT = 3.25
 Z_CONSECUTIVE = 2
 CUSUM_K = 0.5
-CUSUM_H = 5.0
+CUSUM_H = 8.0
+# Residuals come from overlapping WINDOW_WEEKS windows, so successive z are autocorrelated; CUSUM runs on
+# z / sqrt(WINDOW_WEEKS) to keep its false-alarm rate near the independent-sample design (3% vs 29%).
+CUSUM_SCALE = WINDOW_WEEKS ** 0.5
 Z_EXPLAIN = 2.0
 PORTFOLIO_Z = 4.0
 PORTFOLIO_BASELINE_WEEKS = 8
