@@ -1,6 +1,8 @@
 # Margin Radar Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+>
+> **Execution method (user, 2026-10-22):** Phase 2 uses subagent-driven-development (a fresh implementer per task and a fresh reviewer before the next task). Phases 3–8 use executing-plans, with requesting-code-review at the end of each phase. One branch per phase; commit after each passing task; merge to main with tests passing. `docs/SPEC.md` is authoritative for Phases 4–8 wherever this plan is less detailed. Where they conflict, the decisions in this plan's Global Constraints win (separate DBs, peer-relative detection, excess_share, sample-scale $).
 
 **Goal:** A cohort early-warning and action agent for an iBuyer, built on synthetic data. It spots contribution-margin (CM) erosion by segment from funnel leading indicators within days of onset instead of months, ranks actions by $ of CM at risk, and writes a weekly brief where every number traces to a governed query ID.
 
@@ -17,6 +19,7 @@
 - Expected seasonality must NOT alert: a spring volume peak and a ~500 bps Q2→Q3 CM dip.
 - Business constants (`common/business.py`): `OPEX_PCT = 0.024`, `INTEREST_PCT = 0.02`, `CM_FLOOR_PCT = 0.045`. The $9B run-rate constants are removed in Task 5.
 - **Dollar scale** *(user)*: every $ figure in code output, the UI and briefs is labeled `SAMPLE_SCALE_LABEL = "sample-scale ($ at the synthetic portfolio's ~$1.6B/yr)"`. Every impact is reported both in sample-scale $ and in bps of contribution margin. Nothing scales to $9B anywhere, and a test guards it.
+- **Scores are not probabilities** *(user)*: the detector score (z / CUSUM) is shown as an "uncalibrated score". No number is ever presented as the probability that an alert is real.
 - **Detector independence** *(user)*: `detector/` never imports `generator` and never uses the generator's seasonal parameters. Seasonality is separated by peer comparison only.
 - **Run isolation** *(user, from code review)*: each run has its own database, `data/radar_injected.duckdb` and `data/radar_control.duckdb`, with two dbt targets (`injected`, `control`). The semantic layer works against either. `eval/ground_truth.json` lives under `/eval`, and only `/eval` code may read it or open both databases. `/detector` and `/agent` never import `generator` or `eval`, and never name a run's file; they receive one database path. `tests/test_boundaries.py` enforces this.
 - API key: read only from `.env` as `MARGIN_RADAR_API_KEY` via python-dotenv and passed as `anthropic.Anthropic(api_key=os.environ["MARGIN_RADAR_API_KEY"])`. The string `ANTHROPIC_API_KEY` must not appear anywhere in the repo. The key is never printed, logged or committed.
@@ -309,11 +312,11 @@ class DetectorResult:
   - **reno_cost_drift:** rollup residual of `reno_overrun_pct` × (scope `reno_estimate_sum` / `resale_usd`, trailing 13 weeks) × 1e4.
   - **demand_softening:** excess days on market = `avg_days_to_first_offer` × (peer_rate / observed_rate − 1), × `holding_cost_bps_per_day`. This is labeled a lower bound, since price-cut losses aren't modeled.
   - **adverse_selection** *(user)*: `basis="scenario_estimate"`, `status="unconfirmed until resales"`.
-    - $ at risk = exposed homes × average price × resale shortfall × probability, at shortfall 1% / 2% / 3% (low / mid / high).
+    - $ at risk = exposed homes × average price × resale shortfall × excess_share, at shortfall 1% / 2% / 3% (low / mid / high).
     - **Exposed homes** = homes in the scope closed since `onset_week` and not yet resold, + `FORWARD_WEEKS` × trailing-4-week mean weekly `closes`.
     - **Average price** = trailing-13-week `acquisition_usd` / `closes` for the scope.
-    - **Probability** = the excess share of contracts: contract_rate rollup residual / observed rollup contract_rate, clipped to [0, 1]. These are the contracts the peer baseline wouldn't have produced. *(planner's call: you specified "× probability" without a definition)*
-    - bps equivalent: `scope_bps` = shortfall × probability × 1e4, so 100–300 bps × p.
+    - **excess_share** *(user)* = share of contracts above the peer-expected rate: contract_rate rollup residual / observed rollup contract_rate, clipped to [0, 1]. Never call it, or any other number, the probability that an alert is real.
+    - bps equivalent: `scope_bps` = shortfall × excess_share × 1e4, so 100–300 bps × excess_share.
     - Once the scope has ≥ `MIN_DENOMINATOR` resales of homes offered after `onset_week`, switch to `basis="measured"` and `status="confirmed by resales"`, with erosion = −(rollup residual of `resale_vs_model_bps` on that cohort).
     - `ADVERSE_SELECTION_SHORTFALL = (0.01, 0.02, 0.03)` goes in `detector/config.py`. It is a user-given planning range, not a generator parameter.
   - **portfolio_shift:** `basis="sensitivity"`. Only `usd_per_100bps` and exposure are reported.
@@ -331,7 +334,7 @@ class DetectorResult:
   - `test_ranking_sorted_by_rank_key`.
   - `test_every_impact_number_has_ref_id`.
   - `test_impact_formula_hand_fixture`.
-  - `test_adverse_selection_scenario_range`: hand fixture with 100 exposed homes, $400K price and p = 0.2 gives usd low / mid / high = $80K / $160K / $240K, scope bps = 20 / 40 / 60, `basis="scenario_estimate"`, label starting `"scenario estimate, sample-scale"`, and `status="unconfirmed until resales"`.
+  - `test_adverse_selection_scenario_range`: hand fixture with 100 exposed homes, $400K price and excess_share = 0.2 gives usd low / mid / high = $80K / $160K / $240K, scope bps = 20 / 40 / 60, `basis="scenario_estimate"`, label starting `"scenario estimate, sample-scale"`, and `status="unconfirmed until resales"`.
   - `test_adverse_selection_ranks_on_midpoint`: it outranks a measured alert with a smaller $ and is outranked by a larger one.
   - `test_adverse_selection_switches_to_measured_after_resales`.
   - `test_b2_first_alert_has_scenario_estimate`: on seed 42, B2 at its first alert week has `usd_mid > 0`.
@@ -477,7 +480,7 @@ The three scenario briefs are the only LLM spend. Recording them with the final 
 **LLM brief gates, one seed (42) with `CLAUDE_MODEL_FINAL` only** *(user, BUDGET RULES)*:
 - Grounding 100%.
 - Abstention correct 100%.
-- Semantic accuracy ≥ 90%. A section is semantically accurate when it names its alert's scope ID, names no other alert's scope, and uses direction words consistent with the signal direction ("rose / increased / up" for "+", "fell / slowed / down" for "−"). This is checked deterministically.
+- **Brief accuracy** *(user)*: ≥ 90% of sections accurate **and** zero direction errors; report both numbers. A section is accurate when it names its alert's scope ID, names no other alert's scope, and uses direction words consistent with the signal direction ("rose / increased / up" for "+", "fell / slowed / down" for "−"). This is checked deterministically.
 - The top-ranked action names a true scope in each scenario brief.
 - Every $ figure is labeled sample-scale.
 
@@ -504,11 +507,11 @@ If a gate fails on the holdout after honest tuning, report the numbers to the us
 - Produces: `run_brief_eval(weeks, purpose, live: bool) -> BriefReport` with `grounding_rate, abstention_correct, top_action_correct, invalid_count, calls, input_tokens, output_tokens, cache_read_tokens, est_cost_usd | None`. Tokens and cost are summed from `token_log.jsonl` lines tagged with this eval's `run_tag`. `planned_calls(weeks) = n_llm_briefs × 8 × 2`.
 - `python -m eval [--live] [--final] [--yes]`: when `--live` and `planned_calls > 20`, print `Planned live calls: N (model M). Proceed? [y/N]` and abort unless `y` or `--yes`.
 - Brief eval runs on **seed 42 only**, at the demo brief weeks, and live recording uses `CLAUDE_MODEL_FINAL` only. The signature becomes `run_brief_eval(weeks, live: bool) -> BriefReport` (no seed or model arguments). `planned_calls` = 3 LLM briefs × 8 turns × 2 attempts = 48, so the user must confirm before recording.
-- `BriefReport` also has `semantic_accuracy: float` and `sample_scale_labeled: bool`. `semantic_accuracy(brief, result) -> float` lives in `eval/semantic.py`.
+- `BriefReport` also has `section_accuracy: float`, `direction_errors: int` and `sample_scale_labeled: bool`. `brief_accuracy(brief, result) -> BriefAccuracy(section_accuracy, direction_errors)` lives in `eval/brief_accuracy.py`. ("Semantic-layer accuracy" in SPEC.md is a different metric: NL questions answered via the semantic layer vs raw SQL.)
 - `write_report(detector_report, brief_report, path)` produces markdown with the banner, a gates table (PASS/FAIL, tuning vs holdout seeds), KPIs, a tokens table, estimated cost, and a "Known limitations" block: simultaneous all-segment shifts; the demand-softening impact is a lower bound; adverse-selection impact is a scenario estimate until resales confirm it.
 
 - [ ] **Step 1:** Write the tests:
-  - `test_semantic_accuracy_checks_scope_and_direction`: a hand-built brief with one wrong-direction section out of 2 gives 0.5.
+  - `test_brief_accuracy_checks_scope_and_direction`: a hand-built brief with one wrong-direction section out of 2 gives section_accuracy 0.5 and direction_errors 1.
   - `test_brief_eval_is_single_seed_final_model`: the live path constructs `LLM` with `purpose="final"` only.
   - `test_planned_calls_prompt_over_20`: monkeypatch `input` → `"n"`; it aborts with exit 0 and no LLM constructed.
   - `test_report_has_banner_and_cost`.
@@ -646,7 +649,7 @@ README sections:
 5. How it works: deterministic first, fact IDs, abstention.
 6. Run locally: conda, `.env` with `MARGIN_RADAR_API_KEY` (only needed for recording), `make demo`, `make eval`, `make test`.
 7. Cost: tokens and $ from the report.
-8. Limitations: synthetic data; sample-scale dollars (~$1.6B/yr portfolio); **simultaneous all-segment shifts** (peer-relative residuals cancel them, and the portfolio check only catches abrupt ones); demand-softening impact is a lower bound; adverse-selection impact is a scenario estimate (1–3% resale shortfall × probability) until resales confirm it; no auth or rate limiting.
+8. Limitations: synthetic data; sample-scale dollars (~$1.6B/yr portfolio); **simultaneous all-segment shifts** (peer-relative residuals cancel them, and the portfolio check only catches abrupt ones); demand-softening impact is a lower bound; adverse-selection impact is a scenario estimate (1–3% resale shortfall × excess_share) until resales confirm it; detector scores (z, CUSUM) are uncalibrated, not probabilities; no auth or rate limiting.
 
 - [ ] **Step 1:** Write the tests:
   - `test_readme_banner`.
