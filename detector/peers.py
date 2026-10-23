@@ -15,7 +15,10 @@ Dimension = Literal["market", "band"]
 _DIMS = ("market", "band", "product")
 
 
-def peer_residuals(panel: MetricPanel, dimension: Dimension) -> pd.DataFrame:
+def peer_residuals(panel: MetricPanel, dimension: Dimension, shrink_k: float = 0.0) -> pd.DataFrame:
+    """Residual = (value − leave-one-out peer median) × n / (n + k). With k > 0 a segment with a small sample n is
+    shrunk toward its peers (empirical-Bayes style), so thin segments drift in and out of a rollup smoothly instead of
+    at the sample floor. Only the detector's scoring passes k (DECISIONS D29); reported gaps use k = 0."""
     if panel.level != "segment":
         raise ValueError("peer_residuals needs a segment-level panel")
     if dimension not in MIN_PEERS:
@@ -26,8 +29,10 @@ def peer_residuals(panel: MetricPanel, dimension: Dimension) -> pd.DataFrame:
     groups = [d for d in _DIMS if d != dimension] + ["week"]
     frame["peer_median"], frame["n_peers"] = _leave_one_out(frame, dimension, groups)
     ok = frame["value"].notna() & (frame["n_peers"] >= MIN_PEERS[dimension])
-    frame["residual"] = np.where(ok, frame["value"] - frame["peer_median"], np.nan)
-    frame["weight"] = np.where(ok, pd.to_numeric(frame["denominator"], errors="coerce").fillna(0), 0.0)
+    n = pd.to_numeric(frame["denominator"], errors="coerce").fillna(0)
+    shrink = n / (n + shrink_k) if shrink_k > 0 else 1.0
+    frame["residual"] = np.where(ok, (frame["value"] - frame["peer_median"]) * shrink, np.nan)
+    frame["weight"] = np.where(ok, n, 0.0)
     frame["metric"] = panel.metric
     return frame.drop(columns="denominator").reset_index(drop=True)
 

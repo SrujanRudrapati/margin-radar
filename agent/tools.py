@@ -11,7 +11,7 @@ from detector.drift import DriftScore, score
 from detector.governed import GovernedStore
 from detector.impact import Impact, RankedAction, rank_actions
 from detector.peers import peer_residuals, rollup
-from detector.rules import detect
+from detector.rules import detect, detector_rollup, drift_inputs
 from agent.facts import METRIC_KIND, FactBook, residual_kind
 
 TOP_ACTIONS = 3
@@ -173,11 +173,14 @@ class Toolbox:
                                                        kind, refs, "volume-weighted leave-one-out peer median"),
                          "gap": self.book.cite(f"{metric} {scope} gap vs peers week {week}", own.loc[week, "residual"],
                                                gap_kind, refs, "scope minus peers")})
-        drift = score(own["residual"], self.as_of, metric, own["se"].fillna(0.0))
+        # The score is the detector's own (its floor and shrinkage, D29); the gaps above are observed.
+        scored, scored_id = detector_rollup(self.store, metric, dimension, self.as_of)
+        inputs = drift_inputs(scored, metric).get(scope)
+        drift = score(inputs[0], self.as_of, metric, inputs[1]) if inputs else None
         latest = None
         if isinstance(drift, DriftScore):
             latest = {"score": self.book.cite(f"{metric} {scope} drift score week {self.as_of}", drift.z_latest,
-                                              "score", refs, "uncalibrated drift score"),
+                                              "score", (scored_id,), "uncalibrated drift score (the detector's)"),
                       "fired": drift.fired, "direction": drift.direction, "note": SCORE_NOTE}
         return {"metric": metric, "dimension": dimension, "scope": scope,
                 "why": "peers share the same weeks, so seasonality moves them together; the gap is the drift",

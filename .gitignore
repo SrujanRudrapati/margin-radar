@@ -23,3 +23,5 @@ web/public/data/
 web/*.tsbuildinfo
 web/tsconfig.tsbuildinfo
 docs/screenshots/*.tmp
+.claude/skills/
+.DS_Store

@@ -111,3 +111,25 @@ def test_strict_schemas_avoid_unsupported_keywords():
 
 def test_fmt_never_shows_negative_zero():
     assert fmt(-0.0001, "pct_points") == "+0.0 pts" and fmt(-0.0004, "pct") == "0.0%" and fmt(-0.2, "bps") == "0 bps"
+
+
+def test_compare_segments_gap_is_observed_and_score_matches_detector(built_runs):
+    from detector.rules import detect, observed_rollup
+    store = GovernedStore(str(built_runs["injected"]), "injected")
+    try:
+        box = Toolbox(store, 60)
+        out = box.compare_segments("reno_overrun_pct", "market", "M05", 4)
+        value = lambda cell: box.book.facts[cell["ref"][2:]].value  # noqa: E731
+        complete = [r for r in out["rows"] if all(r[k] is not None for k in ("gap", "scope_value", "peer_median"))]
+        assert complete
+        observed = observed_rollup(store, "reno_overrun_pct", "market", 60)[0].set_index(["scope", "week"])["residual"]
+        for row in complete:
+            # the cited gap is the observed (unshrunk) residual; it tracks value minus peers only roughly, because
+            # the scope value is a pooled ratio and the gap a volume-weighted mean of segment-vs-peer residuals
+            assert value(row["gap"]) == pytest.approx(observed.loc[("M05", row["week"])], rel=1e-5)
+            assert value(row["gap"]) == pytest.approx(value(row["scope_value"]) - value(row["peer_median"]), rel=0.05)
+        alert = next(a for a in detect(store, 60).alerts if (a.kind, a.scope) == ("reno_cost_drift", "M05"))
+        assert value(out["latest"]["score"]) == pytest.approx(alert.signals[0].z, rel=1e-5)
+        assert out["latest"]["fired"] is True
+    finally:
+        store.close()

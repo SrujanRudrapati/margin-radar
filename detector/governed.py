@@ -162,7 +162,8 @@ class GovernedStore:
         self._defs, self._non_additive = load_definitions()
         self._items: dict[str, MetricPanel | DerivedFact] = {}
         self._frames: dict[str, pd.DataFrame] = {}  # private frames behind panel query IDs
-        self._con = duckdb.connect(db_path, read_only=True)
+        # One run per store: no ATTACH of another database file and no file scans (DECISIONS D21).
+        self._con = duckdb.connect(db_path, read_only=True, config={"enable_external_access": False})
         try:
             self._check_mart()
             self.max_week = self._find_max_week()

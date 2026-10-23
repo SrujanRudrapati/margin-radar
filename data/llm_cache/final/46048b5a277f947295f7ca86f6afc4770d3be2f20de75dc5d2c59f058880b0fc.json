@@ -1,0 +1,67 @@
+{
+ "container": null,
+ "content": [
+  {
+   "signature": "CAQStwYKEAgTGAI4AUIIdGhpbmtpbmcSDBZxuSsjFqdSTzPxhxoMM9Q7QooAoSybIVMgIjBEsDVUC6N8kukLv3ofonXWlx6R4WL2KwlRQTmjLs5/gJdRZhI1k0w9AOy+CgDj0k8q1AWffuvd0bNS43QgY8uzynCsqYqXgM7vDhZ7vwUax/2upIbcvqe4QFoJPjZ1ejFxX33yCUCG0MqoYPJkOPs0jHlkb6DWtm9QWN/kCwzULGhULkk0BYX3Mafma8mWo958t2iMtgY4cZZpBmBhAv/zQCYjNnOK8wmSWAp7YJS+BB+UQkVRZ4UsHkZ7nGmCsGz9oL+MOOxKiqIUmV+4Ql+9blUOtuRx/qITHN49KkrS7SneWcobRvBeYQRtbnKPirv9BQRnwnxdUdLztutcgG2jcQ8uDh9bvpZ4ehuF1H8qg6AWrDWPtgSkjVORrIOE/jc/Q+isv/Z54pBCrSVWUxQWSgRcfbm7Bj1qGv5sMn0K4yKhEkD1zCM8CBHfcNcixKFRdYywYfruPKus3goqt5/cRI3PZRg/lL8ZMVCEJlBkffZ5PsPKlPcSR9n7Odssds9TCBnaSKI2tLAP9mReQjfnVj4HQC/+5JZMbSYTKpqQn0y8N/Ellf6jv+YDrfZckUfxjA80hfNE5CD06bfQnGkJfrY1tSt59UBVFupkKLFGgUEM+Xlnh0tWJuwH/baoGuHwEwJNAoBIRa1H1zCJwpayRb/nJGnbk8SJh8yzP8JtvGNc+hn7vwCqocNP5nz6oel1hs1ZMCNU7Hga9Mssy5vnGTq7GRsI+ki3eaNA/25aTby4wiXw/d0V32nYVRERRfiL0UkOPt1G6ErCircqBqrbYApwCE/P2zYn0eSyZgkTNWUxQ6snu+CgaBfVAAuy8F0El9VoGdOqlt0YTblqDKvX6CrgfCeffdmu+zGKKMI5J8aWzhWX6vsuEnBOdmzK73PeTQKVs5gO+UPGXKJf0K6g0HwUiSgPyaLph9Cw5TRws4LzPK8f6OrFzBASCX3gmhhBt+1Yu37IDP43j+YnXsjI4Dnl/ZmG+9QS0vmO5uTRqlZUF1aNKJqhEi+KmIisXURGvgeCBhR0GAE=",
+   "thinking": "",
+   "type": "thinking"
+  },
+  {
+   "caller": {
+    "type": "direct"
+   },
+   "id": "toolu_01Lwu2e3VFhLRK6SySQt1f94",
+   "input": {
+    "dimension": "band",
+    "metric": "avg_spread_pct",
+    "scope": "B2",
+    "weeks": 6
+   },
+   "name": "compare_segments",
+   "toolset_name": null,
+   "type": "tool_use"
+  }
+ ],
+ "context_management": null,
+ "diagnostics": null,
+ "id": "msg_011CgKeneUDogATproZPDLUQ",
+ "input_transformations": null,
+ "model": "claude-sonnet-5-5",
+ "role": "assistant",
+ "stop_details": null,
+ "stop_reason": "tool_use",
+ "stop_sequence": null,
+ "type": "message",
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 0,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 3071,
+  "fallback_credit": null,
+  "inference_geo": "global",
+  "input_tokens": 5767,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 0,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 3071,
+    "input_tokens": 5767,
+    "model": null,
+    "output_tokens": 195,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 195,
+  "output_tokens_details": {
+   "thinking_tokens": 68
+  },
+  "server_tool_use": null,
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

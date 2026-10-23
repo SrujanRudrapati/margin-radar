@@ -13,16 +13,27 @@ import subprocess
 import sys
 from pathlib import Path
 
+import numpy as np
+
 from detector.governed import GovernedStore
 from detector.rules import detect
 from eval.kpis import false_alert_stats, scenario_kpis, true_pairs
+from generator.config import BANDS, MARKETS
 
 ROOT = Path(__file__).resolve().parents[1]
 DBT_BIN = Path(sys.executable).parent / "dbt"
 TUNING_SEEDS = tuple(range(1, 6))
-HOLDOUT_SEEDS = tuple(range(6, 11))
-MIN_RECALL = 8  # of 10 seeds, per scenario
-MAX_WRONG = 2   # wrong-scope alert episodes across all injected runs
+SEEN_SEEDS = tuple(range(6, 11))  # last night's holdout: its results were seen, so it no longer counts (D30)
+# True holdout (DECISIONS D28, D32): no setting tuned on it; scopes and onset weeks are drawn per seed.
+TRUE_HOLDOUT_SEEDS = tuple(range(11, 21))
+# Onsets after the first week the drift baseline can score (burn-in 8 + 12 history + 8 eval gap) and early enough
+# for sold-home margin to show the problem before week 78.
+ONSET_WEEK_RANGE = (28, 46)
+# Confirmation seeds (DECISIONS D32): drawn like the holdout and run once with the final detector. Nothing was ever
+# inspected or decided on them; they check whether looking at holdout seed 18 while diagnosing D29 leaked.
+CONFIRM_SEEDS = tuple(range(21, 31))
+MIN_RECALL = 8  # of 10 seeds, per scenario (scaled to the split size)
+MAX_WRONG = 2   # wrong-scope alert episodes per 10 injected runs
 log = logging.getLogger("eval")
 
 
@@ -36,23 +47,41 @@ def source_hash() -> str:
     return digest.hexdigest()[:16]
 
 
+def scenario_args(seed: int) -> dict:
+    """Seeds 1–10 keep the fixed design (M02, B2, M05, onset week 30). True-holdout seeds draw their own."""
+    if seed not in TRUE_HOLDOUT_SEEDS + CONFIRM_SEEDS:
+        return {}
+    rng = np.random.default_rng([seed, 20261023])
+    a_market, c_market = (str(m) for m in rng.choice(MARKETS, size=2, replace=False))
+    lo, hi = ONSET_WEEK_RANGE
+    a_start, b_start, c_start = (int(w) for w in rng.integers(lo, hi + 1, size=3))
+    return {"a_market": a_market, "a_start_week": a_start, "b_band": str(rng.choice(list(BANDS))),
+            "b_start_week": b_start, "c_market": c_market, "c_start_week": c_start}
+
+
+def generator_cli_args(args: dict) -> list[str]:
+    return [item for name, value in args.items() for item in (f"--{name.replace('_', '-')}", str(value))]
+
+
 def run_seed(seed: int, root: Path) -> dict:
     work = root / f"seed_{seed}"
     cache = work / "detections.json"
     key = source_hash()
+    args = scenario_args(seed)
     if cache.exists():
         cached = json.loads(cache.read_text())
-        if cached.get("source_hash") == key:
+        if cached.get("source_hash") == key and cached.get("scenario_args", {}) == args:
             return cached
     work.mkdir(parents=True, exist_ok=True)
     truth_path = work / "ground_truth.json"
-    _run([sys.executable, "-m", "generator", "--seed", str(seed), "--out-dir", str(work), "--truth-path", str(truth_path)])
+    _run([sys.executable, "-m", "generator", "--seed", str(seed), "--out-dir", str(work), "--truth-path", str(truth_path),
+          *generator_cli_args(args)])
     runs = {}
     for run_id in ("injected", "control"):
         db = work / f"radar_{run_id}.duckdb"
         _dbt_build(db, run_id, work)
         runs[run_id] = _detect_all(db, run_id)
-    result = {"seed": seed, "source_hash": key, "truth": json.loads(truth_path.read_text())["scenarios"], "runs": runs}
+    result = {"seed": seed, "source_hash": key, "scenario_args": args, "truth": json.loads(truth_path.read_text())["scenarios"], "runs": runs}
     cache.write_text(json.dumps(result))
     return result
 
@@ -141,21 +170,30 @@ def split_gates(s: dict, n_seeds: int, prefix: str) -> dict:
                                           "rule": f"0 control alert-weeks ({prefix} seeds)"},
         f"{prefix}_recall_before_cm": {"pass": all(v["detected_before_cm"] >= min_recall for v in s["scenarios"].values()),
                                        "value": {k: f"{v['detected_before_cm']}/{v['seeds']}" for k, v in s["scenarios"].items()},
-                                       "rule": f">= {MIN_RECALL}/10 of {prefix} seeds per scenario alert on the true scope before margin shows it"},
+                                       "rule": f">= {min_recall:g}/{n_seeds} of {prefix} seeds per scenario alert on the true scope before margin shows it"},
         f"{prefix}_wrong_alerts": {"pass": s["wrong_episodes"] <= max_wrong, "value": s["wrong_episodes"],
                                    "rule": f"<= {max_wrong:g} wrong-scope alert episodes ({prefix} injected runs)"},
     }
 
 
-def run_detector_eval(seeds=range(1, 11), root: Path = ROOT / "eval" / "runs", tuning_seeds=TUNING_SEEDS,
-                      holdout_seeds=HOLDOUT_SEEDS) -> dict:
+def run_detector_eval(seeds=range(1, 31), root: Path = ROOT / "eval" / "runs", tuning_seeds=TUNING_SEEDS,
+                      seen_seeds=SEEN_SEEDS, holdout_seeds=TRUE_HOLDOUT_SEEDS, confirm_seeds=CONFIRM_SEEDS) -> dict:
     root = Path(root)
     results = []
     for seed in seeds:
         log.info("seed %s ...", seed)
         results.append(run_seed(seed, root))
-    by_split = {"tuning": summarize(results, list(tuning_seeds)), "holdout": summarize(results, list(holdout_seeds)),
-                "all": summarize(results, list(seeds))}
-    gates = {**split_gates(by_split["all"], len(list(seeds)), "all"), **split_gates(by_split["holdout"], len(list(holdout_seeds)), "holdout")}
-    per_seed = [{"seed": r["seed"], "truth": r["truth"]} for r in results]
+    return assemble(results, tuning_seeds, seen_seeds, holdout_seeds, confirm_seeds)
+
+
+def assemble(results: list[dict], tuning_seeds, seen_seeds, holdout_seeds, confirm_seeds=()) -> dict:
+    """Gates use the true holdout only (D30). Tuning and seen splits are shown for transparency, and the confirmation
+    split (D32) as a leakage check; none of them is gated or quoted as a result."""
+    if not list(holdout_seeds):
+        raise ValueError("no holdout seeds: detector gates are scored on the true holdout only (DECISIONS D30)")
+    splits = {"holdout": list(holdout_seeds), "tuning": list(tuning_seeds), "seen": list(seen_seeds),
+              "confirm": list(confirm_seeds)}
+    by_split = {name: summarize(results, seeds) for name, seeds in splits.items() if seeds}
+    gates = split_gates(by_split["holdout"], len(splits["holdout"]), "holdout")
+    per_seed = [{"seed": r["seed"], "truth": r["truth"], "scenario_args": r.get("scenario_args", {})} for r in results]
     return {"per_seed": per_seed, "by_split": by_split, "gates": gates}

@@ -20,3 +20,4 @@ dependencies:
       - fastapi==0.161.1
       - uvicorn==0.54.0
       - httpx==0.28.1
+      - playwright==1.64.1  # dev only: dashboard screenshots (docs/screenshots); then `playwright install chromium`
