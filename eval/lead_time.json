@@ -31,11 +31,11 @@
       "kind": "reno_cost_drift",
       "scope": "M05",
       "scope_type": "market",
-      "first_alert_week": 40,
+      "first_alert_week": 43,
       "start_week": 30,
       "cm_first_visible_week": 46,
-      "delay_weeks": 10,
-      "lead_weeks": 6,
+      "delay_weeks": 13,
+      "lead_weeks": 3,
       "before_cm": true
     }
   ]

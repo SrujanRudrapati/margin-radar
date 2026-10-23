@@ -1,0 +1,57 @@
+{
+ "container": null,
+ "content": [
+  {
+   "signature": "CAQSrQYKEAgTGAI4AUIIdGhpbmtpbmcSDC58VYWThlSpxAY01RoMpXbCwkyT0jifVYb2IjCnA7doiZCXXa2qHFPyzB4mvIxteO0t50A5PJSHVQsbFei6OyY65+UfdAQWWIYzmy8qygWv/fzpEagwWB75DYQo/ztZjAe2m1ZHydbGcXTnJ21ADLMor2ly4KRjTgSCYNkJRjNZDYvAnvxFW7MNIIB8v5qumQdlWF4HqSa2j8MgCwi+GDKY5WeHem0gK3Ng9nBazmRnGxe9ikYdpgjiEWDFUFfLVgeyj3cj6KvB+oBKnBVM8hM/JJeG1wxYLDASlmQ40JmmEZYf142vMvfffX8AyelwQbO46IC73y0MXSpqKrvMXDgwdyfwei+lbn44MHafZu+O1iw9Mk5SOgnEHpdok9KfujuaCuadbZr2T9EJf7gYWh98EMUDJ5b/PFw/EYe0NJ4gMoy8OYM2fjmrXwofBD8ac2iD4q8BNTAzJMcaZf/U4YXfOZH6FGTXmNSqPRxcO/Un0AudBlilLEjVmr75fnWPYCd5smqyvlZmxY26lSvq69dEccrUtfv/RJaGcIbXcrmZry2u6kHh5gSQzqQMsYEjXsOrX7Y5jhWjPoESxF77f+31h0oTz+P/afI8PuMXhFD6loGoEiq+8hJVIrIoppANFm2X/Uz9v93uL/caPUQP7APAp7QCPXZezZezszm8pTKohCqRGVJ6W7EJjUchXIheKS4yLmZCBX99fACTZnPeeCdszGDPDUr6EUbcd2bKrCRo9utBzET/X/stZIHkUGyo6nh3llljZFg0TR0b7xAXpOn8/DQSXws7/ScWlppTpvmkoNc9fPRjAhltCL/zSWFKvs2vjVEECm1weTZgVXk4p2twsVcwUktuHtSmB729ZTM7PXja3eDgVNpM/xG0oCgF5KWaMAMAcBbMiFyvFm1H9XEKcOvM48GOpBxzJsmU2YelMbz5FA0HfCcJoF+VLgLa6EAA7KIKIZwEl789VD8tZV7+Js5sGCAaZ2M9y3oGZf9Xr0n3L7oM9jEfBL62C5iXIsy6YksBEPJfdsmIK+iWGj7u9jd0dfbf6vYYAQ==",
+   "thinking": "",
+   "type": "thinking"
+  },
+  {
+   "citations": null,
+   "text": "## Top actions\n\n### B2 \u2014 adverse selection (scenario estimate)\n\n- **What changed:** The B2 contract rate rose to 46.6% [q:D81eb477cc6] in week 40. The peer median was 38.5% [q:D32352c2a1d], so the gap is +8.2 pts [q:D67db236025]. The uncalibrated drift score is 1.9 [q:Df1f11b4127]. The share of contracts above the peer-expected rate is 17.5% [q:Ddaf443f411]. The drift began in week 35.\n- **Why it's not seasonality:** Peer bands move together with the season, and B2 moved apart from them. In week 33 B2 was below peers at -3.6 pts [q:Db903d2050b]. In week 35 it was above them at +6.9 pts [q:D5b2cc4fc17]. The gap then reached +14.2 pts [q:D2f71651b36] in week 38. It narrowed to +5.5 pts [q:D37c65708f3] in week 39 and widened again in week 40. The gap is volatile, but it has stayed positive since week 34.\n- **Adverse-selection verdict:** Yes, this fits the pattern. Conversion rose while our spread did not change. B2 average spread was 6.6% [q:D3cd5be75cf] against a peer median of 6.6% [q:D6a690a0148], a gap of +0.0 pts [q:Dc32519e453]. Sellers appear to be accepting more because the homes may be worth less than our model thinks. Resales have not confirmed this.\n- **Impact:** This is a scenario estimate, sample-scale. It is unconfirmed until resales, and it is ranked on its midpoint.\n  - Range: $444K [q:Dad0f537dd7] to $1.3M [q:D9a151e7a68], with a midpoint of $888K [q:D51a5835f9f].\n  - In bps of portfolio contribution margin: 8 bps [q:Dc71f85eeb0] to 24 bps [q:D729860b50b], with a midpoint of 16 bps [q:Df51c23682f].\n  - Within B2 alone the range is 18 bps [q:Dd092a07017] to 53 bps [q:D38b4b895ae].\n  - The assumed shortfall runs from 1.0% [q:D12868fb46b] to 3.0% [q:Dc05bb4c888] on an exposure of $253.4M [q:D958f373c21].\n  - As a sensitivity, each 100 bps of erosion would cost $2.5M [q:D56f0dfd248].\n- **Action / owner:** Pricing should widen the B2 spread or add in-person inspection. Pricing should also audit the model valuation inputs for B2.\n\n## What we're not sure about\n\n- **Margin not yet observed:** The impact is a scenario estimate. No resale data confirms that B2 homes were overpriced. The range depends on the assumed shortfall.\n- **Noisy signal:** The drift score is uncalibrated and is not a probability that the alert is real. The weekly gap swings widely, including the week 39 dip. A single week is not enough to size the problem.\n- **Cause not isolated:** Flat spread and higher conversion point to adverse selection. I did not check other explanations, such as a lead-mix change or a competitor pulling back. I cannot rule them out.\n- **Watch items and abstentions:** The alerts tool returned no watch items and no abstentions this week. I made no other peer comparisons beyond contract rate and spread for B2.",
+   "type": "text"
+  }
+ ],
+ "context_management": null,
+ "diagnostics": null,
+ "id": "msg_011CgKWtN5jJ9kmV1TChengX",
+ "input_transformations": null,
+ "model": "claude-sonnet-5-5",
+ "role": "assistant",
+ "stop_details": null,
+ "stop_reason": "end_turn",
+ "stop_sequence": null,
+ "type": "message",
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 0,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 3071,
+  "fallback_credit": null,
+  "inference_geo": "global",
+  "input_tokens": 3763,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 0,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 3071,
+    "input_tokens": 3763,
+    "model": null,
+    "output_tokens": 1275,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 1275,
+  "output_tokens_details": {
+   "thinking_tokens": 96
+  },
+  "server_tool_use": null,
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

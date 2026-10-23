@@ -1,0 +1,52 @@
+{
+ "container": null,
+ "content": [
+  {
+   "citations": null,
+   "text": "## Top actions\n\n### B2 \u2014 adverse selection\n- **What changed:** The contract rate in B2 ran above peers from week 35. The gap was +13.7 pts [q:D9b7cca71ce] in week 37 and +14.2 pts [q:D10f014e7f3] in week 38. By week 45 the contract rate was 40.4% [q:D0e7e7902cd] against a peer median of 38.2% [q:Da4b39f7815], a gap of +2.3 pts [q:D4c614083d2]. The gap has narrowed a lot since its peak. The uncalibrated score is only 0.5 [q:Dbc823172e4].\n- **Why it's not seasonality:** Peer bands move together with the season. Over weeks 35 to 45 the B2 gap stayed positive while the peers' rate moved on its own path. The gap was at +6.9 pts [q:D837717b7df] in week 35 and has not turned negative since.\n- **Adverse-selection verdict:** Yes, as a pattern. Contract rate rose while our spread did not move. B2 spread was 6.6% [q:D1b66f39508] in week 45 against a peer median of 6.6% [q:D12753180e3], a gap of +0.0 pts [q:D42f631cea3]. The estimate is not backed by resales yet. About 5.7% [q:Da15ef17c74] of contracts sit above the peer-expected rate.\n- **Impact:** This is a scenario estimate, sample-scale. It runs from $164K [q:D69f095ffd0] to $492K [q:D1bfe4e7ed5], with a midpoint of $328K [q:Dc6e052072f]. In portfolio contribution margin that is 3 bps [q:D8859acb6f8] to 8 bps [q:D81644df68b], with a midpoint of 5 bps [q:D8f2e765ae8]. It is unconfirmed until resales and is ranked on its midpoint. The exposure is $288.5M [q:Df908b6b18e], so each 100 bps of erosion would cost $2.9M [q:D0be2d1d569].\n- **Action / owner:** Pricing should widen the spread or add in-person inspection for B2, and audit the model valuation inputs.\n\n### M05 \u2014 renovation cost drift\n- **What changed:** Renovation overrun in M05 reached 21.6% [q:D428e0d48ae] in week 45. The peer median was 0.2% [q:D8c8772d4fa], and the gap to peers was +5.8 pts [q:Dd3f684356b]. The overrun began to climb around week 37, when it was 13.1% [q:Da7cbf2ac84]. The uncalibrated score is 5.3 [q:D9a5602728c].\n- **Why it's not seasonality:** Peer markets stayed low, at 3.9% [q:D9af48c03e2] in week 37 and 0.2% [q:D5c121577c8] in week 44. M05 kept rising, so the move is specific to M05.\n- **Adverse-selection verdict:** Not applicable. This is a cost-estimate problem on renovation, not a seller-acceptance problem.\n- **Impact:** Measured from current leading-indicator data, sample-scale, at $255K [q:D3770031067]. That is 3 bps [q:D0f037211c7] of portfolio contribution margin and 20 bps [q:Dc9457bc484] of M05 margin. The exposure is $124.7M [q:D9c98237df7], so each 100 bps of erosion would cost $1.2M [q:D3f611c2fc8].\n- **Action / owner:** Renovation should re-baseline M05 renovation estimates and require in-person assessment.\n\n## What we're not sure about\n- **B2 alert strength:** The B2 gap has faded toward peers and its score is low. The alert still fires, but we can't tell whether the pressure is easing or only getting harder to see. The dollar range is a scenario until resales confirm it. A cohort check would help once resales arrive.\n- **B2 spread:** Our spread was flat against peers throughout. That fits adverse selection. We have not looked at valuation inputs, so we can't say why the model overvalues these homes.\n- **M05 gap definition:** The tool's gap figures do not equal the scope value minus the peer median shown beside them, and I have not reconciled the two. The alert's gap was +4.7 pts [q:Ddcb630750b] and its score was 4.4 [q:D3c27a7bf61]. The week 45 comparison shows a larger gap and score, so the drift is not easing.\n- **Watch items and abstentions:** The alert tool returned none. We make no claim about other markets or bands.",
+   "type": "text"
+  }
+ ],
+ "context_management": null,
+ "diagnostics": null,
+ "id": "msg_011CgKWuqBAuRUqDVH8hX8n5",
+ "input_transformations": null,
+ "model": "claude-sonnet-5-5",
+ "role": "assistant",
+ "stop_details": null,
+ "stop_reason": "end_turn",
+ "stop_sequence": null,
+ "type": "message",
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 0,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 3071,
+  "fallback_credit": null,
+  "inference_geo": "global",
+  "input_tokens": 8053,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 0,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 3071,
+    "input_tokens": 8053,
+    "model": null,
+    "output_tokens": 1567,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 1567,
+  "output_tokens_details": {
+   "thinking_tokens": 0
+  },
+  "server_tool_use": null,
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}
