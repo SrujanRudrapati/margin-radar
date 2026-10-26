@@ -19,10 +19,14 @@ export function EvaluationScreen() {
   if (!e.available) return <Empty>No evaluation results yet. Run make eval to produce them.</Empty>;
   const gates: [string, Gate][] = [...Object.entries(e.detector?.gates ?? {}), ...Object.entries(e.llm?.gates ?? {})] as [string, Gate][];
   const splits = e.detector?.by_split as Record<string, Split> | undefined;
+  const bHold = splits?.holdout?.scenarios.B, bConf = splits?.confirm?.scenarios.B;
   return (
     <section aria-labelledby="eval-title">
       <h1 id="eval-title" className="text-2xl font-bold">How well it works, measured honestly</h1>
-      <p className="mt-1 max-w-[72ch] text-muted">Gates are scored on the true holdout, seeds 11 to 20: each seed draws its own scopes and onset weeks, and no setting was tuned on them (one control run, seed 18, was inspected to diagnose false alerts, and the keep-or-revert call for the detector change was made on them). Seeds 21 to 30 were never looked at before this run and check for leakage. Seeds 1 to 5 tuned the detector; seeds 6 to 10 were seen in an earlier run. Gates are never loosened to pass.</p>
+      <p className="mt-1 max-w-[72ch] text-muted">Gates are scored on the true holdout, seeds 11 to 20: each seed draws its own scopes and onset weeks, they were held out from tuning; keep/revert was decided on them (D32), and one control run, seed 18, was inspected to diagnose false alerts. Seeds 21 to 30 were never looked at before this run and check for leakage. Seeds 1 to 5 tuned the detector; seeds 6 to 10 were seen in an earlier run. Gates are never loosened to pass.</p>
+      {bHold && bConf && (
+        <p className="mt-2 max-w-[72ch] text-muted">Adverse-selection recall before margin: <span className="num">{bHold.detected_before_cm}/{bHold.seeds}</span> held-out, <span className="num">{bConf.detected_before_cm}/{bConf.seeds}</span> on a second untouched set; with n=10 each the difference isn't significant (pooled <span className="num">{bHold.detected_before_cm + bConf.detected_before_cm}/{bHold.seeds + bConf.seeds}</span>). A known limit, not investigated.</p>
+      )}
       <table className="mt-6 w-full max-w-4xl text-left text-[15px]">
         <caption className="sr-only">Evaluation gates</caption>
         <thead className="border-b border-grid text-sm text-muted"><tr><th className="py-2 pr-3">Gate</th><th className="pr-3">Result</th><th className="pr-3">Measured</th><th>Rule</th></tr></thead>

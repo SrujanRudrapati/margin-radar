@@ -2,7 +2,7 @@ Synthetic data — not Opendoor data.
 
 # Old vs new detector on the true holdout (seeds 11–20)
 
-No setting was tuned on seeds 11–20, and each seed draws its own scopes and onset weeks (DECISIONS D28). One holdout control run (seed 18) was inspected while diagnosing the false alerts (D32), so a second, never-inspected set, seeds 21–30, is reported at the end as a leakage check. "Old" is the detector as of commit `9ac8b7b`, with the D29 knobs off. Its holdout numbers were recorded before any change was made. "New" adds renovation-overrun shrinkage (floor 4, k = 35), chosen on seeds 1–5 only (D29, D31). Rates are truncated, never rounded up. The gate rules are unchanged (D30).
+Seeds 11–20 were held out from tuning; keep/revert was decided on them (D32). Each seed draws its own scopes and onset weeks (DECISIONS D28). One holdout control run (seed 18) was inspected while diagnosing the false alerts (D32), so a second, never-inspected set, seeds 21–30, is reported at the end as a leakage check. "Old" is the detector as of commit `9ac8b7b`, with the D29 knobs off. Its holdout numbers were recorded before any change was made. "New" adds renovation-overrun shrinkage (floor 4, k = 35), chosen on seeds 1–5 only (D29, D31). Rates are truncated, never rounded up. The gate rules are unchanged (D30).
 
 | Measure (seeds 11–20) | Old | New | Gate |
 |---|---|---|---|
@@ -58,7 +58,7 @@ While diagnosing the old detector's false alerts I inspected one holdout control
 
 What this says:
 - False alerts and C hold up on the unseen set.
-- B is much weaker on 21–30: 3 seeds missed outright (22, 23, 25) and 3 caught only after margin showed it (24, 27, 28). I have not investigated why. With 10 seeds per set, draw-to-draw variance in scope and onset is a likely part of it. Either way, B's 8/10 on 11–20 should not be read as a stable rate.
+- B is much weaker on 21–30: 3 seeds missed outright (22, 23, 25) and 3 caught only after margin showed it (24, 27, 28). I have not investigated why. With 10 seeds per set, draw-to-draw variance in scope and onset is a likely part of it. With n=10 each the difference isn't significant (pooled 12/20), but B's 8/10 on 11–20 should not be read as a stable rate.
 - In Q3 2025 the control false-alert rate is 0.036 per week, against 0.019 overall. That's one 4-week episode, too little to call a cluster, but "false alerts never fall in the dip" is not supported. Say "they don't cluster in the dip on the holdout".
 
 ## Reported gaps after the review (D33)

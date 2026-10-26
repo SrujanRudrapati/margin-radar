@@ -43,11 +43,11 @@ Screenshots (light, dark, mobile): `docs/screenshots/`.
 
 ## Results
 
-From `eval/results.json`. Every detector number below is on the **true holdout, seeds 11–20**. No setting was tuned on these seeds, and each one draws its own scenario scopes (which market or price band) and onset weeks (weeks 28–46). The thresholds and the renovation shrinkage were tuned on seeds 1–5. Gates are reported as measured and are never loosened. Rates are truncated, never rounded up. Lead ranges cover only the seeds caught in time. Old vs new detector, and a leakage check on never-inspected seeds 21–30: `eval/holdout_comparison.md`.
+From `eval/results.json`. Every detector number below is on the **true holdout, seeds 11–20**. These seeds were held out from tuning; keep/revert was decided on them (D32). Each one draws its own scenario scopes (which market or price band) and onset weeks (weeks 28–46). The thresholds and the renovation shrinkage were tuned on seeds 1–5. Gates are reported as measured and are never loosened. Rates are truncated, never rounded up. Lead ranges cover only the seeds caught in time. Old vs new detector, and a leakage check on never-inspected seeds 21–30: `eval/holdout_comparison.md`.
 
 | Measure (seeds 11–20) | Result | Gate |
 |---|---|---|
-| B: adverse selection (one price band), caught before margin showed it | 8/10, median lead 9.5 weeks (5–13) | ≥ 8/10: meets it |
+| B: adverse selection (one price band), caught before margin showed it | 8/10 held-out, 4/10 on a second untouched set; with n=10 each the difference isn't significant (pooled 12/20). Held-out median lead 9.5 weeks (5–13) | ≥ 8/10 on 11–20: meets it |
 | C: renovation overrun (one market), caught before margin | 8/10, median lead 5.5 weeks (1–12) | ≥ 8/10: meets it |
 | A: buyers slow down (one market), caught before margin | 0/10 | ≥ 8/10: **fail** (so the recall gate fails) |
 | False alerts per week, control run | 0.056 (29 alert-weeks / 510) | 0 alert-weeks: **fail** |
@@ -70,7 +70,7 @@ From `eval/results.json`. Every detector number below is on the **true holdout, 
 - **Sample-scale dollars.** Dollar figures are at the synthetic portfolio's ~$1.6B/yr, always shown as sample-scale and in bps. They are never scaled to a real business.
 - **Uncalibrated scores.** Detector scores rank how unusual a move is. They are not probabilities.
 - **The detector gates fail.** At ~20k offers over 78 weeks (median 2 sales per segment-week), scenario A (time to a first buyer offer 40% longer in one market) sits below the noise floor and is never caught. The control run still has 29 false alert-weeks across 10 seeds. See `docs/DECISIONS.md` D16–D17 and D28–D31.
-- **Adverse-selection recall is unstable across seed sets.** A second, never-inspected seed set (the leakage check in `eval/holdout_comparison.md`) caught B far less often than the holdout did. Treat B's holdout rate as one draw, not a stable rate.
+- **Adverse-selection recall is a known limit:** 8/10 held-out, 4/10 on a second untouched set; with n=10 each the difference isn't significant (pooled 12/20). Seeds 21–30 are the leakage check in `eval/holdout_comparison.md`. Not investigated. Hypotheses: draw variance at n=10; scope (which price band is drawn); onset (a late onset leaves less time before margin shows it); volume (too few sales per segment-week in the drawn band).
 - **One design choice predates the true holdout.** The expanding-baseline design (D16) was chosen on seeds 1–10, before seeds 11–20 existed. The renovation shrinkage was tuned on seeds 1–5 only.
 - **Adverse-selection impact is a scenario estimate** (a 1–3% valuation shortfall) until resales confirm it.
 

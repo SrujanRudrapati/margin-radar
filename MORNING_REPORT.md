@@ -23,14 +23,14 @@ Each phase ended with a fresh reviewer on the whole branch. Critical and Importa
 
 ## 2. Evaluation results
 
-Source: `eval/results.json` and `eval/results.md`. Rates are truncated, never rounded up. Every detector number is on the **true holdout, seeds 11–20**. No setting was tuned on these seeds (one control run was inspected while diagnosing, D32), and each one draws its own scenario scopes and onset weeks (weeks 28–46). Thresholds and the D31 shrinkage were tuned on seeds 1–5. Seed 42 is the in-sample demo.
+Source: `eval/results.json` and `eval/results.md`. Rates are truncated, never rounded up. Every detector number is on the **true holdout, seeds 11–20**. These seeds were held out from tuning; keep/revert was decided on them (D32). Each one draws its own scenario scopes and onset weeks (weeks 28–46). Thresholds and the D31 shrinkage were tuned on seeds 1–5. Seed 42 is the in-sample demo.
 
 **Lead time per scenario** (weeks between the first alert and sold-home margin showing the problem; ranges cover only the seeds caught before margin did):
 
 | Scenario | True holdout 11–20 | Seed 42 (demo, in-sample) |
 |---|---|---|
 | A: buyers slow down in one market (time to first buyer offer ×1.4) | 0/10 caught | missed |
-| B: adverse selection in one band (conversion ×1.25, resale ×0.97) | 8/10, median 9.5 (5–13) | B2: alert wk 38, margin wk 45, 7 weeks |
+| B: adverse selection in one band (conversion ×1.25, resale ×0.97) | 8/10 held-out, 4/10 on a second untouched set; with n=10 each the difference isn't significant (pooled 12/20). Held-out median 9.5 (5–13) | B2: alert wk 38, margin wk 45, 7 weeks |
 | C: renovation overrun in one market (×1.18) | 8/10, median 5.5 (1–12) | M05: alert wk 43, margin wk 46, 3 weeks |
 
 **Precision / recall (11–20):** precision (true alert episodes / all episodes) 0.814; recall before margin shows the problem 0.533.
@@ -114,18 +114,18 @@ open http://localhost:5173
 >
 > The key move is comparing each segment with its peers in the same week. Seasonality, like the spring peak and the summer margin dip, moves everyone together, so it cancels and doesn't alert. On the ten clean holdout runs, none of the remaining false alerts fell in the Q3 dip quarter.
 >
-> I tested it on ten synthetic runs that no setting was tuned on. Each run injected three problems into a randomly chosen market or price band, starting in a random week. It caught adverse selection a median of **9.5 weeks** before sold-home margin showed it, in **8 of 10** runs. It caught the renovation overrun a median of **5.5 weeks** early, in **8 of 10**. Adverse selection is the subtle one. Conversion goes *up*, which looks like good news, while our spread is flat against peers. That's the pattern of sellers accepting because the home is worth less than our model thinks.
+> I tested it on ten synthetic runs, held out from tuning; keep/revert was decided on them (D32). Each run injected three problems into a randomly chosen market or price band, starting in a random week. It caught adverse selection a median of **9.5 weeks** before sold-home margin showed it, in **8 of 10** held-out runs, and **4 of 10** on a second untouched set. With ten runs each, that difference isn't significant (pooled **12 of 20**). It caught the renovation overrun a median of **5.5 weeks** early, in **8 of 10**. Adverse selection is the subtle one. Conversion goes *up*, which looks like good news, while our spread is flat against peers. That's the pattern of sellers accepting because the home is worth less than our model thinks.
 >
 > Each week Claude writes a brief, but it never computes a number. Its tools return governed facts with query IDs, and a checker rejects any number that doesn't match a cited fact exactly. In the evaluation, **105 of 105** numbers were grounded. It also abstains: it declined **5 of 5** unanswerable questions.
 >
-> What doesn't work yet: it missed the slow-buyer problem in all ten runs. At roughly 15 listings a week per market, that signal sits below the noise. On clean runs it still fires **0.056** false alerts a week: 29 alert-weeks across ten runs, and none at all in six of them. It was 74 before I shrank thin segments toward their peers. And adverse-selection recall swings a lot between seed sets: a second untouched set caught it far less often. I report all of this rather than tuning it away. Dollar figures are sample-scale, at this synthetic portfolio's ~$1.6B a year.
+> What doesn't work yet: it missed the slow-buyer problem in all ten runs. At roughly 15 listings a week per market, that signal sits below the noise. On clean runs it still fires **0.056** false alerts a week: 29 alert-weeks across ten runs, and none at all in six of them. It was 74 before I shrank thin segments toward their peers. I report all of this rather than tuning it away. Dollar figures are sample-scale, at this synthetic portfolio's ~$1.6B a year.
 
 ## 7. Weaknesses an interviewer might probe
 
 - **"Your detector fails its own gates."** Yes, all three, on the true holdout. B and C each reach 8/10, but A is 0/10, so the recall gate fails. There are 29 control alert-weeks and 5 wrong-scope episodes. At ~20k offers over 78 weeks (a median of 2 sales per segment-week), scenario A is below the noise floor. Lowering thresholds caught more but fired on the control run (D8, D9, D16). I kept the gates and reported the miss.
-- **"Is the holdout really held out?"** Mostly, as of today. No setting was tuned on seeds 11–20, and each draws its own scopes and onset weeks (D28). The new detector was kept only under a rule written before it saw them (D29). But I inspected one holdout control run (seed 18) while diagnosing the false alerts, so seeds 21–30, never inspected, serve as a leakage check (D32). One caveat: the expanding-baseline design (D16) was chosen on seeds 1–10, before 11–20 existed.
+- **"Is the holdout really held out?"** Mostly, as of today. Seeds 11–20 were held out from tuning; keep/revert was decided on them (D32). Each draws its own scopes and onset weeks (D28). The new detector was kept only under a rule written before it saw them (D29). But I inspected one holdout control run (seed 18) while diagnosing the false alerts, so seeds 21–30, never inspected, serve as a leakage check (D32). One caveat: the expanding-baseline design (D16) was chosen on seeds 1–10, before 11–20 existed.
 - **"Still too many false alerts on a clean run."** 0.056 alert-weeks per week across 10 holdout control runs (29 / 510), down from 74 before renovation shrinkage. Six of the ten runs have none, and the worst has 14. What's left: one B2 adverse-selection episode, two demand-softening episodes and two one-week portfolio shifts. None fall in the Q3 dip.
-- **"Is 8 of 10 for adverse selection stable?"** No. A second, never-inspected seed set (21–30, a leakage check, not the quoted result) caught it far less often; the numbers are in `eval/holdout_comparison.md`. I haven't investigated why.
+- **"Is 8 of 10 for adverse selection stable?"** Unknown: 8/10 held-out, 4/10 on a second untouched set; with n=10 each the difference isn't significant (pooled 12/20). It's a known limit, not investigated (README limitations lists the hypotheses).
 - **"Did the shrinkage cost anything?"** Yes, on the demo seed. Seed 42's M05 renovation alert now comes at week 43, 3 weeks before margin shows it, instead of 6. On the holdout, C went from 7/10 to 8/10 with a median lead of 5.5 weeks.
 - **"Doesn't peer comparison miss market-wide shocks?"** Yes. Simultaneous all-segment shifts cancel. A portfolio check catches only abrupt ones.
 - **"How do you know the dollar figure?"** Renovation drift is measured. Adverse selection is a scenario estimate (a 1–3% valuation shortfall, ranked on the midpoint) and stays unconfirmed until resales. On seed 42 the B2 episode ends before the cohort has enough resales, so the "confirmed by resales" switch never turns on. That's an xfail test, kept honest.

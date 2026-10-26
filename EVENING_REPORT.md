@@ -131,11 +131,11 @@ From `data/token_log.jsonl`, live calls only:
 >
 > The key move is comparing each segment with its peers in the same week. Seasonality, like the spring peak and the summer margin dip, moves everyone together, so it cancels and doesn't alert. On the ten clean holdout runs, none of the remaining false alerts fell in the Q3 dip quarter.
 >
-> I tested it on ten synthetic runs that no setting was tuned on. Each run injected three problems into a randomly chosen market or price band, starting in a random week. It caught adverse selection a median of **9.5 weeks** before sold-home margin showed it, in **8 of 10** runs. It caught the renovation overrun a median of **5.5 weeks** early, in **8 of 10**. Adverse selection is the subtle one. Conversion goes *up*, which looks like good news, while our spread is flat against peers. That's the pattern of sellers accepting because the home is worth less than our model thinks.
+> I tested it on ten synthetic runs, held out from tuning; keep/revert was decided on them (D32). Each run injected three problems into a randomly chosen market or price band, starting in a random week. It caught adverse selection a median of **9.5 weeks** before sold-home margin showed it, in **8 of 10** held-out runs, and **4 of 10** on a second untouched set. With ten runs each, that difference isn't significant (pooled **12 of 20**). It caught the renovation overrun a median of **5.5 weeks** early, in **8 of 10**. Adverse selection is the subtle one. Conversion goes *up*, which looks like good news, while our spread is flat against peers. That's the pattern of sellers accepting because the home is worth less than our model thinks.
 >
 > Each week Claude writes a brief, but it never computes a number. Its tools return governed facts with query IDs, and a checker rejects any number that doesn't match a cited fact exactly. In the evaluation, **105 of 105** numbers were grounded. It also abstains: it declined **5 of 5** unanswerable questions.
 >
-> What doesn't work yet: it missed the slow-buyer problem in all ten runs. At roughly 15 listings a week per market, that signal sits below the noise. On clean runs it still fires **0.056** false alerts a week: 29 alert-weeks across ten runs, and none at all in six of them. It was 74 before I shrank thin segments toward their peers. And adverse-selection recall swings a lot between seed sets: a second untouched set caught it far less often. I report all of this rather than tuning it away. Dollar figures are sample-scale, at this synthetic portfolio's ~$1.6B a year.
+> What doesn't work yet: it missed the slow-buyer problem in all ten runs. At roughly 15 listings a week per market, that signal sits below the noise. On clean runs it still fires **0.056** false alerts a week: 29 alert-weeks across ten runs, and none at all in six of them. It was 74 before I shrank thin segments toward their peers. I report all of this rather than tuning it away. Dollar figures are sample-scale, at this synthetic portfolio's ~$1.6B a year.
 
 Changes from last night's version:
 - Lead times are now on runs with random scopes and onsets: B 9.5 weeks (was 9 on 6–10), C 5.5 weeks (was 8).
@@ -146,8 +146,8 @@ Changes from last night's version:
 
 ## 8. Weaknesses an interviewer might probe (new or changed today)
 
-- **"Is the holdout really held out?"** Mostly. No setting was tuned on 11–20. But I inspected one holdout control run (seed 18) while diagnosing, and the keep-or-revert call was made on 11–20, by your design. The untouched 21–30 set is the honest check: false alerts and C hold up, B doesn't.
-- **"Is 8 of 10 for adverse selection stable?"** No (section 2). I haven't investigated why.
+- **"Is the holdout really held out?"** Mostly. 11–20 were held out from tuning; keep/revert was decided on them (D32), by your design, and I inspected one holdout control run (seed 18) while diagnosing. The untouched 21–30 set is the honest check: false alerts and C hold up, B doesn't.
+- **"Is 8 of 10 for adverse selection stable?"** Unknown: 8/10 held-out, 4/10 on a second untouched set; with n=10 each the difference isn't significant (pooled 12/20). A known limit, not investigated.
 - **"Your shrinkage just hides signal."** Partly true. It cost the demo seed 3 weeks of lead on M05. The detector scores on shrunk residuals, but every gap and dollar figure shown is observed (D33).
 - **"Do false alerts hit during the summer dip?"** Not on the holdout (0 of 29). On the untouched set, one 4-week episode did.
 - All of last night's other points still stand (MORNING_REPORT.md section 7, updated to 11–20 numbers).

@@ -24,7 +24,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DBT_BIN = Path(sys.executable).parent / "dbt"
 TUNING_SEEDS = tuple(range(1, 6))
 SEEN_SEEDS = tuple(range(6, 11))  # last night's holdout: its results were seen, so it no longer counts (D30)
-# True holdout (DECISIONS D28, D32): no setting tuned on it; scopes and onset weeks are drawn per seed.
+# True holdout (DECISIONS D28, D32): held out from tuning; keep/revert was decided on it; scopes and onset weeks are drawn per seed.
 TRUE_HOLDOUT_SEEDS = tuple(range(11, 21))
 # Onsets after the first week the drift baseline can score (burn-in 8 + 12 history + 8 eval gap) and early enough
 # for sold-home margin to show the problem before week 78.
