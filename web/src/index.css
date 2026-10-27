@@ -2,35 +2,46 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Survey-sheet palette: cool paper, slate ink, plum reserved for margin risk, steel for the peer baseline. */
+/* Cool gray-blue page, white cards, one calm blue for UI, deep red reserved for risk and alerts. */
 :root {
-  --paper: 243 245 244;   /* #F3F5F4 */
+  --paper: 240 244 248;   /* #F0F4F8 page */
   --panel: 255 255 255;
-  --ink: 29 42 51;        /* #1D2A33 */
-  --muted: 92 108 116;
-  --grid: 201 210 208;    /* #C9D2D0 */
-  --risk: 142 44 72;      /* #8E2C48 plum */
-  --riskwash: 245 228 234;
-  --peer: 91 127 149;     /* #5B7F95 steel */
-  --calm: 46 110 98;
-  --focus: 31 94 180;
+  --ink: 22 35 51;        /* #162333 */
+  --muted: 96 112 132;    /* #607084 */
+  --grid: 222 229 238;    /* #DEE5EE */
+  --accent: 37 99 196;    /* #2563C4 calm blue */
+  --risk: 178 34 52;      /* #B22234 deep red, risk only */
+  --riskwash: 252 233 235;
+  --peer: 37 99 196;      /* peer median uses the accent */
+  --calm: 22 122 94;
+  --focus: 37 99 196;
+  --shadow: 16 24 40;
   color-scheme: light;
 }
 :root.dark {
-  --paper: 23 33 40;      /* #172128 */
-  --panel: 30 43 51;
-  --ink: 228 234 234;     /* #E4EAEA */
-  --muted: 150 167 172;
-  --grid: 52 67 75;
-  --risk: 224 120 154;    /* #E0789A */
-  --riskwash: 70 35 50;
-  --peer: 143 178 198;    /* #8FB2C6 */
-  --calm: 120 190 170;
+  --paper: 14 21 32;      /* #0E1520 */
+  --panel: 22 31 45;      /* #161F2D */
+  --ink: 230 236 243;
+  --muted: 148 162 180;
+  --grid: 41 54 73;
+  --accent: 110 160 240;  /* #6EA0F0 */
+  --risk: 240 116 124;    /* #F0747C */
+  --riskwash: 72 30 38;
+  --peer: 110 160 240;
+  --calm: 98 196 160;
   --focus: 140 180 255;
+  --shadow: 0 0 0;
   color-scheme: dark;
 }
-html { font-family: "Public Sans", system-ui, sans-serif; font-variant-numeric: tabular-nums; }
+/* Tabular numerals come from .num (and tables) only: Inter widens hyphens under tnum. */
+html { font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif; }
+table, .recharts-wrapper { font-variant-numeric: tabular-nums; }
 body { @apply bg-paper text-ink antialiased; }
 :focus-visible { outline: 2px solid rgb(var(--focus)); outline-offset: 2px; border-radius: 3px; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 .num { font-variant-numeric: tabular-nums; }
+
+@layer components {
+  .card { @apply rounded-card border border-grid/70 bg-panel shadow-card; }
+  :root.dark .card { @apply border-grid shadow-none; }
+}
