@@ -18,7 +18,7 @@ export function BriefScreen({ meta }: { meta: Meta }) {
         <div role="tablist" aria-label="Brief week" className="mt-4 flex flex-wrap gap-2">
           {list.data.briefs.map((b) => (
             <button key={b.week} role="tab" aria-selected={b.week === week} onClick={() => setWeek(b.week)}
-                    className={`rounded-panel border px-3 py-1.5 text-sm ${b.week === week ? "border-ink bg-ink text-paper" : "border-grid"}`}>
+                    className={`rounded-panel border px-3 py-1.5 text-sm ${b.week === week ? "border-accent bg-accent text-paper" : "border-grid bg-panel hover:border-accent/50"}`}>
               Week {b.week}{b.status !== "valid" ? ` (${b.status === "no_alerts" ? "no alerts" : b.status})` : ""}
             </button>
           ))}
@@ -34,7 +34,7 @@ export function BriefScreen({ meta }: { meta: Meta }) {
 function BriefView({ b }: { b: Brief }) {
   const cites = new Map(b.citations.map((c) => [c.ref, c]));
   return (
-    <article className="mt-6 max-w-[78ch] rounded-panel border border-grid bg-panel px-6 py-5 leading-relaxed">
+    <article className="mt-6 max-w-[78ch] card px-7 py-6 leading-relaxed">
       <p className="text-sm font-semibold">Synthetic data — not Opendoor data.</p>
       <p className="mt-1 text-sm text-muted">Week {b.week}, from {b.week_start}. Status: {b.status}{b.model ? `, written by ${b.model}` : ""}. {b.grounding.numbers_checked} numbers checked against their facts.</p>
       <div className="mt-4">{renderBody(b.body, cites)}</div>
@@ -90,7 +90,7 @@ function Cite({ id, c }: { id: string; c?: Citation }) {
               onBlur={() => { setFocused(false); setPinned(false); }}
               onClick={() => (pinned || focused ? close() : setPinned(true))}
               onKeyDown={(e) => { if (e.key === "Escape") close(); }}
-              className="mx-0.5 rounded bg-grid/60 px-1 align-super text-[10px] font-semibold text-muted hover:bg-ink hover:text-paper">q</button>
+              className="mx-0.5 rounded bg-grid/60 px-1 align-super text-[10px] font-semibold text-muted hover:bg-accent hover:text-paper">q</button>
       {open && (
         <span id={tipId} role="tooltip" className="absolute left-0 top-6 z-20 block w-[min(30rem,80vw)] rounded-panel border border-grid bg-panel p-3 text-left text-sm shadow-lg">
           {c ? (

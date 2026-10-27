@@ -26,7 +26,7 @@ export function SignalsTimeline({ series, week, open }: { series: Radar[]; week:
   const eps = episodes(window);
   const cols = { gridTemplateColumns: `minmax(9rem, 14rem) repeat(${weeks.length}, minmax(0, 1fr))` };
   return (
-    <section aria-labelledby="signals-title" className="rounded-panel border border-grid bg-panel px-4 py-4 sm:px-5">
+    <section aria-labelledby="signals-title" className="card px-5 py-5 sm:px-6">
       <h2 id="signals-title" className="text-lg font-semibold">Signals this quarter</h2>
       <p className="text-sm text-muted">Weeks {weeks[0]} to {week}. A filled week means the alert was ranked that week; the ring marks its onset.</p>
       <div className="mt-3 overflow-x-auto">
@@ -39,7 +39,7 @@ export function SignalsTimeline({ series, week, open }: { series: Radar[]; week:
             <p className="py-3 text-sm text-muted">No alerts in these weeks. Seasonal swings are not flagged.</p>
           ) : eps.map((e) => (
             <div key={e.id} className="grid items-center gap-x-1 border-b border-grid/60 py-2 last:border-b-0" style={cols}>
-              <button className="truncate text-left text-sm font-semibold text-focus underline-offset-2 hover:underline"
+              <button className="truncate text-left text-sm font-semibold text-accent underline-offset-2 hover:underline"
                       title={`${METRIC_LABEL[e.metric] ?? e.metric}, onset week ${e.onset}`}
                       onClick={() => open("drilldown", { metric: e.metric, dimension: e.dimension === "band" ? "band" : "market", scope: e.scope })}>
                 {e.scope}: {KIND_LABEL[e.kind] ?? e.kind}

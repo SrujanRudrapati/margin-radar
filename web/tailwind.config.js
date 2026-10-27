@@ -7,10 +7,11 @@ export default {
     extend: {
       colors: {
         paper: v("paper"), panel: v("panel"), ink: v("ink"), muted: v("muted"), grid: v("grid"),
-        risk: v("risk"), riskwash: v("riskwash"), peer: v("peer"), calm: v("calm"), focus: v("focus"),
+        accent: v("accent"), risk: v("risk"), riskwash: v("riskwash"), peer: v("peer"), calm: v("calm"), focus: v("focus"),
       },
-      fontFamily: { sans: ['"Public Sans"', "system-ui", "sans-serif"] },
-      borderRadius: { panel: "6px" },
+      fontFamily: { sans: ['"Inter"', "system-ui", "-apple-system", '"Segoe UI"', "sans-serif"] },
+      borderRadius: { panel: "8px", card: "12px" },
+      boxShadow: { card: "0 1px 2px rgb(var(--shadow) / 0.04), 0 2px 8px rgb(var(--shadow) / 0.05)" },
     },
   },
   plugins: [],

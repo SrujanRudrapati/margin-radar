@@ -29,7 +29,8 @@ export function EvaluationScreen() {
       {bHold && bConf && (
         <p className="mt-2 max-w-[72ch] text-muted">Adverse-selection recall before margin: <span className="num">{bHold.detected_before_cm}/{bHold.seeds}</span> held-out, <span className="num">{bConf.detected_before_cm}/{bConf.seeds}</span> on a second untouched set; with n=10 each the difference isn't significant (pooled <span className="num">{bHold.detected_before_cm + bConf.detected_before_cm}/{bHold.seeds + bConf.seeds}</span>). A known limit, not investigated.</p>
       )}
-      <table className="mt-6 w-full max-w-4xl text-left text-[15px]">
+      <div className="card mt-6 overflow-x-auto px-6 py-4">
+      <table className="w-full text-left text-[15px]">
         <caption className="sr-only">Evaluation gates</caption>
         <thead className="border-b border-grid text-sm text-muted"><tr><th className="py-2 pr-3">Gate</th><th className="pr-3">Result</th><th className="pr-3">Measured</th><th>Rule</th></tr></thead>
         <tbody className="divide-y divide-grid">
@@ -43,9 +44,10 @@ export function EvaluationScreen() {
           ))}
         </tbody>
       </table>
+      </div>
       {splits && (["holdout", "confirm", "tuning", "seen"] as const).filter((k) => splits[k]).map((k) => <SplitView key={k} name={k} s={splits[k]} />)}
       {e.llm?.summary && (
-        <div className="mt-10">
+        <div className="card mt-6 px-6 py-5">
           <h2 className="text-xl font-bold">Briefs and questions (seed 42, final model)</h2>
           <dl className="mt-3 grid max-w-3xl grid-cols-[auto_1fr] gap-x-6 gap-y-1 text-[15px]">
             {Object.entries(e.llm.summary).map(([k, v]) => (
@@ -55,7 +57,7 @@ export function EvaluationScreen() {
         </div>
       )}
       {e.cost && (
-        <div className="mt-10">
+        <div className="card mt-6 px-6 py-5">
           <h2 className="text-xl font-bold">Tokens and estimated cost</h2>
           <table className="mt-3 text-left text-[15px]">
             <thead className="border-b border-grid text-sm text-muted"><tr><th className="py-2 pr-4">Scope</th><th className="pr-4">Live calls</th><th className="pr-4">Input tokens</th><th className="pr-4">Output tokens</th><th>Est. cost (USD)</th></tr></thead>
@@ -74,7 +76,7 @@ export function EvaluationScreen() {
 function SplitView({ name, s }: { name: string; s: Split }) {
   const max = 16;
   return (
-    <div className="mt-10">
+    <div className="card mt-6 px-6 py-5">
       <h2 className="text-xl font-bold">Detector, {SPLIT_LABEL[name] ?? name} seeds {s.seeds[0]} to {s.seeds[s.seeds.length - 1]}</h2>
       <p className="mt-1 text-[15px]">
         Control run: {(Math.trunc(s.control_false_alerts_per_week * 1000) / 1000).toFixed(3)} false alerts per week ({s.control_alert_weeks} alert-weeks over {s.control_evaluable_weeks} weeks).
@@ -92,8 +94,8 @@ function SplitView({ name, s }: { name: string; s: Split }) {
                 <svg viewBox={`0 0 ${max * 20 + 40} 48`} className="h-12 w-full max-w-lg" role="img"
                      aria-label={`Lead time ${sc.min_lead_weeks} to ${sc.max_lead_weeks} weeks, median ${sc.median_lead_weeks}`}>
                   <line x1="20" x2={max * 20 + 20} y1="14" y2="14" stroke="rgb(var(--grid))" />
-                  <line x1={20 + (sc.min_lead_weeks ?? 0) * 20} x2={20 + (sc.max_lead_weeks ?? 0) * 20} y1="14" y2="14" stroke="rgb(var(--risk))" strokeWidth="4" strokeLinecap="round" />
-                  <circle cx={20 + sc.median_lead_weeks * 20} cy="14" r="6" fill="rgb(var(--risk))" />
+                  <line x1={20 + (sc.min_lead_weeks ?? 0) * 20} x2={20 + (sc.max_lead_weeks ?? 0) * 20} y1="14" y2="14" stroke="rgb(var(--accent))" strokeWidth="4" strokeLinecap="round" />
+                  <circle cx={20 + sc.median_lead_weeks * 20} cy="14" r="6" fill="rgb(var(--accent))" />
                   <text x={20 + sc.median_lead_weeks * 20} y="31" textAnchor="middle" fontSize="11" fontWeight="600" fill="rgb(var(--ink))">median {sc.median_lead_weeks} wks earlier</text>
                   {[0, 4, 8, 12, 16].map((w) => (
                     <text key={w} x={20 + w * 20} y="45" textAnchor="middle" fontSize="9" fill="rgb(var(--muted))">{w === 0 ? "0 wks" : w}</text>

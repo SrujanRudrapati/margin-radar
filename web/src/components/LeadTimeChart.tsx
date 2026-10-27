@@ -9,7 +9,8 @@ const tooltipStyle = { background: "rgb(var(--panel))", border: "1px solid rgb(v
 const axisTick = { fontSize: 12, fill: "rgb(var(--muted))" };
 
 /**
- * The radar's hero: the alerting indicator against its peers, above sold-home margin, on one week axis.
+ * The radar's hero: the alerting indicator against its peers, above portfolio sold-home margin (context), on one week axis.
+ * The margin marker is when the alerting scope's own cohort margin showed the problem; that series is not plotted.
  * Markers come from the evaluation's lead-time markers (make markers), the same ones the Drilldown shows.
  * Weeks after the selected week are drawn faded as hindsight, so the gap stays visible mid-story.
  */
@@ -41,19 +42,19 @@ export function LeadTimeChart({ d, series, week }: { d: Drill; series: Radar[]; 
   const marginLine = showLead ? <ReferenceLine x={marginWeek!} stroke="rgb(var(--ink))" strokeWidth={1.5} strokeDasharray="5 3" /> : null;
 
   return (
-    <figure className="rounded-panel border border-grid bg-panel px-4 pb-3 pt-4 sm:px-5">
+    <figure className="card px-5 pb-4 pt-5 sm:px-6">
       <figcaption>
         <p className="text-lg font-semibold leading-snug sm:text-xl">
           {showLead
-            ? <>{d.scope} {metric.toLowerCase()} broke from its peers <span className="text-risk">{t!.lead_weeks} weeks</span> before sold-home margin showed it.</>
+            ? <>{d.scope} {metric.toLowerCase()} broke from its peers <span className="text-risk">{t!.lead_weeks} weeks</span> before {d.scope} cohort margin showed it.</>
             : d.alerts.some((a) => a.first_week <= week)
-              ? <>{d.scope} {metric.toLowerCase()} has broken from its peers; sold-home margin has not shown it yet.</>
+              ? <>{d.scope} {metric.toLowerCase()} has broken from its peers; {d.scope} cohort margin has not shown it yet.</>
               : <>{d.scope} {metric.toLowerCase()} is moving with its peers. Seasonal swings show in both lines and are not flagged.</>}
         </p>
         <ul className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-sm text-muted">
           <Key color="var(--risk)">{d.scope} {metric.toLowerCase()}</Key>
           <Key color="var(--peer)">Peer median</Key>
-          <Key color="var(--ink)">Sold-home contribution margin, portfolio, 13-week trailing</Key>
+          <Key color="var(--ink)">Portfolio sold-home margin, 13-week trailing (context)</Key>
         </ul>
       </figcaption>
       <div className="mt-2 h-[190px]">
@@ -70,6 +71,9 @@ export function LeadTimeChart({ d, series, week }: { d: Drill; series: Radar[]; 
           </ComposedChart>
         </ResponsiveContainer>
       </div>
+      <p className="mt-1 text-xs font-medium text-muted">
+        Below: portfolio sold-home margin, shown for context.{showLead ? ` The dashed marker is when ${d.scope} cohort margin showed the problem.` : ""}
+      </p>
       <div className="h-[150px]">
         <ResponsiveContainer>
           <ComposedChart data={rows} syncId="lead" margin={{ top: 22, right: 8, bottom: 0, left: 0 }}>
@@ -77,16 +81,16 @@ export function LeadTimeChart({ d, series, week }: { d: Drill; series: Radar[]; 
             <XAxis {...x} tickFormatter={(w) => `wk ${w}`} />
             <YAxis stroke="rgb(var(--grid))" tick={axisTick} tickFormatter={(v) => pct(v, 0)} width={52} domain={[cmTicks[0], cmTicks[cmTicks.length - 1]]} ticks={cmTicks} />
             <Tooltip formatter={(v: number) => pct(v)} labelFormatter={(w) => `Week ${w}`} contentStyle={tooltipStyle} />
-            <Line dataKey="cm" name="Sold-home margin" stroke="rgb(var(--ink))" dot={false} strokeWidth={2} connectNulls isAnimationActive={false} />
+            <Line dataKey="cm" name="Portfolio sold-home margin" stroke="rgb(var(--ink))" dot={false} strokeWidth={2} connectNulls isAnimationActive={false} />
             {hindsight(false)}{gap}{alertLine}{marginLine}
-            {showLead && <ReferenceLine x={marginWeek!} stroke="none" label={{ value: `Margin shows it (wk ${marginWeek})`, position: "insideTopLeft", offset: 6, fontSize: 12, fontWeight: 600, fill: "rgb(var(--ink))" }} />}
+            {showLead && <ReferenceLine x={marginWeek!} stroke="none" label={{ value: `${d.scope} cohort margin shows it (wk ${marginWeek})`, position: "insideTopLeft", offset: 6, fontSize: 12, fontWeight: 600, fill: "rgb(var(--ink))" }} />}
             {showLead && <ReferenceArea x1={alertWeek!} x2={marginWeek!} fill="none" ifOverflow="hidden"
                                         label={{ value: t!.lead_weeks! >= 5 ? `${t!.lead_weeks}-week lead` : `${t!.lead_weeks} wks`, position: "insideBottom", offset: 4, fontSize: 12, fontWeight: 600, fill: "rgb(var(--risk))" }} />}
           </ComposedChart>
         </ResponsiveContainer>
       </div>
       <p className="mt-1 text-xs text-muted">
-        Portfolio margin includes the expected Q2 to Q3 seasonal dip. Markers are this synthetic run's lead-time markers. Source queries: {d.query_ids.join(", ")}.
+        Portfolio margin includes the expected Q2 to Q3 seasonal dip. Markers are this synthetic run's lead-time markers, the same ones the Drilldown shows. Source queries: {d.query_ids.join(", ")}.
       </p>
     </figure>
   );

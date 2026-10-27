@@ -31,7 +31,7 @@ export function CohortScreen({ run, meta }: { run: Run; meta: Meta }) {
         const [mine, theirs] = state.data;
         const rows = mine.points.map((p, i) => ({ share: `${Math.round(p.sold_share * 100)}%`, [run]: p.cm_pct, [other]: theirs.points[i]?.cm_pct }));
         return (
-          <figure className="mt-6 rounded-panel border border-grid bg-panel p-3">
+          <figure className="mt-6 card p-5">
             <figcaption className="px-2 pt-1 text-sm font-semibold">{scope}: margin of the first homes to sell ({mine.cohort_homes} homes in the cohort)</figcaption>
             <div className="h-[320px]">
               <ResponsiveContainer>

@@ -16,13 +16,13 @@ export function HeatmapScreen({ run, week, meta, open }: HeatmapProps) {
     <section aria-labelledby="heat-title">
       <h1 id="heat-title" className="text-2xl font-bold">Where each segment sits against its peers</h1>
       <p className="mt-1 max-w-[72ch] text-muted">
-        Each cell compares one segment with the same band and product in the other markets, in week {week}. Darker plum means a
+        Each cell compares one segment with the same band and product in the other markets, in week {week}. Darker red means a
         larger move in the direction that costs margin. An outline means the segment's own drift test tripped; alerts themselves are raised on whole markets and price bands. Pick a market to see it against its peers.
       </p>
       <div role="radiogroup" aria-label="Metric" className="mt-5 flex flex-wrap gap-2">
         {meta.trigger_metrics.map((m) => (
           <button key={m} role="radio" aria-checked={metric === m} onClick={() => setMetric(m)}
-                  className={`rounded-panel border px-3 py-1.5 text-sm ${metric === m ? "border-ink bg-ink text-paper" : "border-grid"}`}>
+                  className={`rounded-panel border px-3 py-1.5 text-sm ${metric === m ? "border-accent bg-accent text-paper" : "border-grid bg-panel hover:border-accent/50"}`}>
             {METRIC_LABEL[m] ?? m}
           </button>
         ))}
@@ -30,7 +30,7 @@ export function HeatmapScreen({ run, week, meta, open }: HeatmapProps) {
       {state.status === "loading" && <Loading what="the heatmap" />}
       {state.status === "error" && <div className="mt-6"><ErrorNote what="the heatmap" error={state.error} /></div>}
       {state.status === "ready" && (
-        <div className="mt-6 overflow-x-auto">
+        <div className="card mt-6 overflow-x-auto p-5">
           <HeatLegend />
           <table className="mt-3 w-full max-w-4xl border-separate border-spacing-1">
             <caption className="sr-only">{METRIC_LABEL[metric]} uncalibrated scores by market, band and product</caption>
@@ -44,7 +44,7 @@ export function HeatmapScreen({ run, week, meta, open }: HeatmapProps) {
               {meta.markets.map((market) => (
                 <tr key={market}>
                   <th scope="row" className="px-2 text-left">
-                    <button className="font-semibold text-focus underline-offset-2 hover:underline"
+                    <button className="font-semibold text-accent underline-offset-2 hover:underline"
                             onClick={() => open("drilldown", { metric, dimension: "market", scope: market })}>{market}</button>
                   </th>
                   {columns.map((c) => {

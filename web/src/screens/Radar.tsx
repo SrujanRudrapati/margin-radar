@@ -35,19 +35,14 @@ export function RadarScreen({ run, week, meta, fallback, open }: RadarProps) {
           : <Hero series={series.data} week={week} focus={heroFocus(r, past, fallback)} />}
       </div>
 
-      <dl className="mt-5 grid grid-cols-3 rounded-panel border border-grid bg-panel sm:grid-cols-[1.9fr_1fr_1fr_1fr]">
-        <MarginKpi r={r} past={past} />
-        <Kpi label="Margin at risk" value={usd(r.kpis.usd_at_risk_mid)} risk={r.kpis.usd_at_risk_mid > 0} note="Sample-scale midpoint" />
-        <Kpi label="Share of portfolio margin" value={bps(r.kpis.portfolio_cm_bps_mid)} note="Midpoint" />
-        <Kpi label="Active alerts" value={String(r.kpis.active_alerts)} risk={r.kpis.active_alerts > 0} />
-      </dl>
+      <KpiCards r={r} past={past} />
 
       {r.global_abstention ? (
         <div className="mt-5"><Empty>Not enough history yet to separate drift from seasonality, so the radar abstains this week.</Empty></div>
       ) : r.actions.length === 0 ? (
         <div className="mt-5"><Empty>Every leading indicator is within its normal range against peer segments in the same week. Seasonal swings, like the spring peak and the summer margin dip, are not flagged.</Empty></div>
       ) : (
-        <ol className="mt-5 divide-y divide-grid rounded-panel border border-grid bg-panel">
+        <ol className="mt-5 divide-y divide-grid card">
           {r.actions.map((a) => <ActionRow key={a.alert_id} a={a} scaleMax={scaleMax} open={open} />)}
         </ol>
       )}
@@ -79,46 +74,75 @@ function Hero({ series, week, focus }: { series: Radar[]; week: number; focus: F
   return <LeadTimeChart d={drill.data} series={series} week={week} />;
 }
 
-function MarginKpi({ r, past }: { r: Radar; past: Radar[] }) {
-  const prior = past.find((x) => x.week === r.week - QUARTER_WEEKS)?.kpis.cm_pct ?? null;
-  const change = r.kpis.cm_pct !== null && prior !== null ? r.kpis.cm_pct - prior : null;
-  const spark = past.slice(-SPARK_WEEKS).map((x) => x.kpis.cm_pct);
+type Tone = "good" | "risk" | "neutral";
+const TONE: Record<Tone, string> = {
+  good: "bg-calm/[0.12] text-calm", risk: "bg-riskwash text-risk", neutral: "bg-accent/10 text-accent",
+};
+
+/** Change in a "more is worse" quantity: red when it grew, green when it shrank. */
+const worseIfUp = (delta: number): Tone => (delta > 0 ? "risk" : delta < 0 ? "good" : "neutral");
+
+function KpiCards({ r, past }: { r: Radar; past: Radar[] }) {
+  const at = (w: number) => past.find((x) => x.week === w)?.kpis ?? null;
+  const lastQtr = at(r.week - QUARTER_WEEKS), lastWk = at(r.week - 1);
+  const spark = (pick: (k: Radar["kpis"]) => number | null) => past.slice(-SPARK_WEEKS).map((x) => pick(x.kpis));
+  const k = r.kpis;
+  const cmChange = k.cm_pct !== null && lastQtr?.cm_pct != null ? k.cm_pct - lastQtr.cm_pct : null;
+  const usdChange = lastWk ? k.usd_at_risk_mid - lastWk.usd_at_risk_mid : null;
+  const bpsChange = lastWk ? k.portfolio_cm_bps_mid - lastWk.portfolio_cm_bps_mid : null;
+  const alertChange = lastWk ? k.active_alerts - lastWk.active_alerts : null;
+  const signed = (v: number, f: (x: number) => string) => `${v > 0 ? "+" : v < 0 ? "−" : "±"}${f(Math.abs(v))}`;
   return (
-    <div className="col-span-3 flex items-end justify-between gap-4 border-b border-grid px-4 py-4 sm:col-span-1 sm:border-b-0 sm:border-r">
-      <div>
-        <dt className="text-sm text-muted">Sold-home contribution margin, {r.kpis.cm_window_weeks} wks</dt>
-        <dd className="mt-1 text-[28px] font-semibold leading-none num">{pct(r.kpis.cm_pct)}</dd>
-        {change !== null && <dd className="mt-1.5 text-sm text-muted num">{pts(change)} vs prior quarter (wk {r.week - QUARTER_WEEKS})</dd>}
-      </div>
-      {spark.length > 1 && <Sparkline values={spark} label={`Sold-home margin, last ${spark.length} weeks`} />}
+    <dl className="mt-5 grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <Kpi label="Sold-home margin" value={pct(k.cm_pct)} note={`Contribution margin, ${k.cm_window_weeks}-wk trailing`}
+           chip={cmChange === null ? null : { text: `${pts(cmChange)} vs prior qtr`, tone: cmChange >= 0 ? "good" : "neutral",
+                                             title: `Against week ${r.week - QUARTER_WEEKS}. Includes the expected seasonal swing, which is not flagged.` }}
+           spark={spark((x) => x.cm_pct)} sparkColor="var(--accent)" />
+      <Kpi label="Margin at risk" value={usd(k.usd_at_risk_mid)} risk={k.usd_at_risk_mid > 0} note="Sample-scale midpoint"
+           chip={usdChange === null ? null : { text: `${signed(usdChange, usd)} vs last wk`, tone: worseIfUp(usdChange) }}
+           spark={spark((x) => x.usd_at_risk_mid)} sparkColor={k.usd_at_risk_mid > 0 ? "var(--risk)" : "var(--muted)"} />
+      <Kpi label="Share of portfolio margin" value={bps(k.portfolio_cm_bps_mid)} note="Midpoint"
+           chip={bpsChange === null ? null : { text: `${signed(bpsChange, (x) => bps(x))} vs last wk`, tone: worseIfUp(Math.round(bpsChange)) }}
+           spark={spark((x) => x.portfolio_cm_bps_mid)} sparkColor={k.portfolio_cm_bps_mid > 0 ? "var(--risk)" : "var(--muted)"} />
+      <Kpi label="Active alerts" value={String(k.active_alerts)} risk={k.active_alerts > 0}
+           chip={alertChange === null ? null : { text: `${signed(alertChange, String)} vs last wk`, tone: worseIfUp(alertChange) }}
+           spark={spark((x) => x.active_alerts)} sparkColor={k.active_alerts > 0 ? "var(--risk)" : "var(--muted)"} />
+    </dl>
+  );
+}
+
+interface Chip { text: string; tone: Tone; title?: string }
+interface KpiProps { label: string; value: string; risk?: boolean; note?: string; chip: Chip | null; spark: (number | null)[]; sparkColor: string }
+
+function Kpi({ label, value, risk = false, note, chip, spark, sparkColor }: KpiProps) {
+  return (
+    <div className="card flex flex-col px-5 pb-4 pt-5">
+      <dt className="text-[13px] font-medium text-muted">{label}</dt>
+      <dd className={`mt-2 text-[32px] font-semibold leading-none tracking-[-0.02em] num ${risk ? "text-risk" : ""}`}>{value}</dd>
+      <dd className="mt-2.5 flex min-h-[22px] flex-wrap items-center gap-2">
+        {chip && <span title={chip.title} className={`rounded-full px-2 py-0.5 text-xs font-semibold num ${TONE[chip.tone]}`}>{chip.text}</span>}
+        {note && <span className="text-xs text-muted">{note}</span>}
+      </dd>
+      <dd className="mt-auto pt-3"><Sparkline values={spark} color={sparkColor} label={`${label}, last ${spark.length} weeks`} /></dd>
     </div>
   );
 }
 
-function Sparkline({ values, label }: { values: (number | null)[]; label: string }) {
+function Sparkline({ values, color, label }: { values: (number | null)[]; color: string; label: string }) {
   const known = values.map((v, i) => [i, v] as const).filter((p): p is readonly [number, number] => p[1] !== null);
-  if (known.length < 2) return null;
-  const [w, h, pad] = [112, 40, 3];
+  if (known.length < 2) return <div className="h-9" />;
+  const [w, h, pad] = [200, 36, 3];
   const ys = known.map(([, v]) => v), lo = Math.min(...ys), hi = Math.max(...ys);
   const px = (i: number) => (i / (values.length - 1)) * (w - 2 * pad) + pad;
   const py = (v: number) => h - pad - ((v - lo) / (hi - lo || 1)) * (h - 2 * pad);
   const d = known.map(([i, v], k) => `${k ? "L" : "M"}${px(i).toFixed(1)},${py(v).toFixed(1)}`).join("");
   const [li, lv] = known[known.length - 1];
   return (
-    <svg viewBox={`0 0 ${w} ${h}`} width={w} height={h} role="img" aria-label={label} className="shrink-0">
-      <path d={d} fill="none" stroke="rgb(var(--muted))" strokeWidth={1.5} strokeLinejoin="round" />
-      <circle cx={px(li)} cy={py(lv)} r={2.5} fill="rgb(var(--ink))" />
+    <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" className="h-9 w-full overflow-visible" role="img" aria-label={label}>
+      <path d={`${d}L${px(li).toFixed(1)},${h}L${px(known[0][0]).toFixed(1)},${h}Z`} fill={`rgb(${color} / 0.08)`} />
+      <path d={d} fill="none" stroke={`rgb(${color})`} strokeWidth={1.75} strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+      <circle cx={px(li)} cy={py(lv)} r={2.75} fill={`rgb(${color})`} />
     </svg>
-  );
-}
-
-function Kpi({ label, value, risk = false, note }: { label: string; value: string; risk?: boolean; note?: string }) {
-  return (
-    <div className="border-r border-grid px-4 py-4 last:border-r-0">
-      <dt className="text-sm text-muted">{label}</dt>
-      <dd className={`mt-1 text-[28px] font-semibold leading-none num ${risk ? "text-risk" : ""}`}>{value}</dd>
-      {note && <dd className="mt-1.5 text-xs text-muted">{note}</dd>}
-    </div>
   );
 }
 
@@ -136,7 +160,7 @@ function ActionRow({ a, scaleMax, open }: { a: Action; scaleMax: number; open: (
           uncalibrated score {score(a.signal.score)}, since week {a.onset_week}.
         </p>
         <p className="mt-2 text-[15px]"><span className="font-semibold">{a.owner}:</span> {a.action}</p>
-        <button className="mt-3 text-sm font-semibold text-focus underline-offset-2 hover:underline"
+        <button className="mt-3 text-sm font-semibold text-accent underline-offset-2 hover:underline"
                 onClick={() => open("drilldown", { metric, dimension, scope: a.scope })}>
           See {a.scope} against its peers
         </button>
