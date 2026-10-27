@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
-import { api, STATIC } from "./api";
+import { useEffect, useMemo, useState } from "react";
+import { api } from "./api";
 import { SYNTHETIC_BANNER } from "./banner";
 import { ErrorNote, Loading } from "./components/States";
+import { weekList } from "./components/radarSeries";
 import { useAsync } from "./components/useAsync";
 import type { Meta, Run } from "./types";
 import { RadarScreen } from "./screens/Radar";
@@ -11,6 +12,8 @@ import { CohortScreen } from "./screens/Cohort";
 import { BriefScreen } from "./screens/Briefs";
 import { EvaluationScreen } from "./screens/Evaluation";
 import { DecisionsScreen } from "./screens/Decisions";
+
+const PLAY_STEP_MS = 700;
 
 export type Screen = "radar" | "heatmap" | "drilldown" | "cohort" | "briefs" | "evaluation" | "decisions";
 export interface Focus { metric: string; dimension: "market" | "band"; scope: string }
@@ -74,7 +77,7 @@ export default function App() {
           {meta.status === "ready" && week !== null && (
             <>
               <Controls meta={meta.data} run={run} setRun={setRun} week={week} setWeek={setWeek} dark={dark} setDark={setDark} />
-              {screen === "radar" && <RadarScreen run={run} week={week} meta={meta.data} open={open} />}
+              {screen === "radar" && <RadarScreen run={run} week={week} meta={meta.data} fallback={focus} open={open} />}
               {screen === "heatmap" && <HeatmapScreen run={run} week={week} meta={meta.data} open={open} />}
               {screen === "drilldown" && <DrilldownScreen run={run} week={week} meta={meta.data} focus={focus} setFocus={setFocus} />}
               {screen === "cohort" && <CohortScreen run={run} meta={meta.data} />}
@@ -92,8 +95,20 @@ export default function App() {
 function Controls({ meta, run, setRun, week, setWeek, dark, setDark }: {
   meta: Meta; run: Run; setRun: (r: Run) => void; week: number; setWeek: (w: number) => void; dark: boolean; setDark: (d: boolean) => void;
 }) {
-  const weeks = STATIC && meta.export_weeks ? meta.export_weeks : Array.from({ length: meta.max_week + 1 }, (_, i) => i);
+  const weeks = useMemo(() => weekList(meta), [meta]);
   const [lo, hi] = [weeks[0], weeks[weeks.length - 1]];
+  const [playing, setPlaying] = useState(false);
+  useEffect(() => {  // Play steps one week at a time and stops at the last week
+    if (!playing) return;
+    const i = weeks.indexOf(week);
+    if (i < 0 || i >= weeks.length - 1) { setPlaying(false); return; }
+    const t = setTimeout(() => setWeek(weeks[i + 1]), PLAY_STEP_MS);
+    return () => clearTimeout(t);
+  }, [playing, week, weeks, setWeek]);
+  const togglePlay = () => {
+    if (!playing && week >= hi) setWeek(lo);
+    setPlaying(!playing);
+  };
   return (
     <div className="sticky top-0 z-10 -mx-4 mb-6 flex flex-wrap items-center gap-x-6 gap-y-3 border-b border-grid bg-paper/95 px-4 py-3 backdrop-blur md:-mx-8 md:px-8">
       <div role="radiogroup" aria-label="Run" className="flex rounded-panel border border-grid p-0.5">
@@ -104,12 +119,21 @@ function Controls({ meta, run, setRun, week, setWeek, dark, setDark }: {
           </button>
         ))}
       </div>
-      <label className="flex min-w-[260px] flex-1 items-center gap-3 text-sm">
-        <span className="whitespace-nowrap">Week {week}</span>
-        <input type="range" min={lo} max={hi} value={week} onChange={(e) => setWeek(Number(e.target.value))}
-               className="flex-1 accent-[rgb(var(--ink))]" aria-label="As-of week" />
-        <span className="whitespace-nowrap text-muted">from {meta.week_starts[week]}</span>
-      </label>
+      <div className="flex min-w-[300px] flex-1 items-center gap-3 text-sm">
+        <button onClick={togglePlay} aria-pressed={playing} title="Advance one week every 0.7 seconds"
+                className="flex w-[4.75rem] items-center justify-center gap-1.5 rounded-panel border border-grid px-2 py-1 text-sm">
+          <svg aria-hidden="true" viewBox="0 0 10 10" className="h-2.5 w-2.5 fill-current">
+            {playing ? <path d="M1 1h3v8H1zM6 1h3v8H6z" /> : <path d="M1.5 1l7.5 4-7.5 4z" />}
+          </svg>
+          {playing ? "Pause" : "Play"}
+        </button>
+        <label className="flex flex-1 items-center gap-3">
+          <span className="whitespace-nowrap font-semibold num">Week {week}</span>
+          <input type="range" min={lo} max={hi} value={week} onChange={(e) => { setPlaying(false); setWeek(Number(e.target.value)); }}
+                 className="flex-1 accent-[rgb(var(--ink))]" aria-label="As-of week" />
+          <span className="whitespace-nowrap text-muted">from {meta.week_starts[week]}</span>
+        </label>
+      </div>
       <button onClick={() => setDark(!dark)} className="rounded-panel border border-grid px-3 py-1 text-sm" aria-pressed={dark}>
         {dark ? "Light mode" : "Dark mode"}
       </button>

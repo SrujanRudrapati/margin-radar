@@ -31,7 +31,8 @@ export function HeatmapScreen({ run, week, meta, open }: HeatmapProps) {
       {state.status === "error" && <div className="mt-6"><ErrorNote what="the heatmap" error={state.error} /></div>}
       {state.status === "ready" && (
         <div className="mt-6 overflow-x-auto">
-          <table className="border-separate border-spacing-1">
+          <HeatLegend />
+          <table className="mt-3 w-full max-w-4xl border-separate border-spacing-1">
             <caption className="sr-only">{METRIC_LABEL[metric]} uncalibrated scores by market, band and product</caption>
             <thead>
               <tr>
@@ -61,14 +62,25 @@ export function HeatmapScreen({ run, week, meta, open }: HeatmapProps) {
   );
 }
 
+function HeatLegend() {
+  const swatch = (bg: string) => <span aria-hidden="true" className="inline-block h-3.5 w-6 rounded-sm" style={{ background: bg }} />;
+  return (
+    <ul className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-muted">
+      <li className="flex items-center gap-1.5">{swatch("rgb(var(--peer) / 0.45)")} Moves away from margin risk</li>
+      <li className="flex items-center gap-1.5">{swatch("rgb(var(--risk) / 0.15)")}{swatch("rgb(var(--risk) / 0.5)")}{swatch("rgb(var(--risk) / 0.85)")} Toward margin risk, stronger as it darkens</li>
+      <li className="flex items-center gap-1.5"><span aria-hidden="true" className="inline-block h-3.5 w-6 rounded-sm ring-2 ring-ink" /> Segment drift test tripped</li>
+    </ul>
+  );
+}
+
 function Cell({ cell }: { cell?: HeatCell }) {
-  if (!cell || cell.score === null) return <div className="h-12 w-20 rounded border border-dashed border-grid" aria-label="Too little volume to score" />;
+  if (!cell || cell.score === null) return <div className="h-12 min-w-[4.5rem] rounded border border-dashed border-grid" aria-label="Too little volume to score" />;
   const towardRisk = cell.risk_direction === "+" ? cell.score : -cell.score;
   const strength = Math.min(1, Math.abs(towardRisk) / 4);
   const background = towardRisk > 0 ? `rgb(var(--risk) / ${0.08 + 0.8 * strength})` : `rgb(var(--peer) / ${0.06 + 0.5 * strength})`;
   const light = towardRisk > 0 && strength > 0.55;
   return (
-    <div className={`flex h-12 w-20 items-center justify-center rounded text-sm num ${cell.fired ? "ring-2 ring-ink" : ""} ${light ? "text-white" : ""}`}
+    <div className={`flex h-12 min-w-[4.5rem] items-center justify-center rounded text-sm num ${cell.fired ? "ring-2 ring-ink" : ""} ${light ? "text-white" : ""}`}
          style={{ background }} title={`${cell.segment}: score ${score(cell.score)}${cell.fired ? ", segment drift test tripped" : ""}`}>
       {score(cell.score)}
     </div>

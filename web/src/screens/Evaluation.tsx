@@ -9,6 +9,8 @@ type Split = { seeds: number[]; control_false_alerts_per_week: number; control_a
   wrong_episodes: number; precision: number | null; recall_before_cm: number | null; scenarios: Record<string, Scenario> };
 
 const NAMES: Record<string, string> = { A: "A: buyers slow down (one market)", B: "B: adverse selection (one price band)", C: "C: renovation overrun (one market)" };
+/** Gate and summary values: per-scenario objects read as "A 0/10, B 8/10" instead of raw JSON. */
+const show = (v: unknown) => v !== null && typeof v === "object" ? Object.entries(v as Record<string, unknown>).map(([k, x]) => `${k} ${String(x)}`).join(", ") : String(v);
 const SPLIT_LABEL: Record<string, string> = { holdout: "true holdout", tuning: "tuning", seen: "seen earlier", confirm: "confirmation (leakage check)" };
 
 export function EvaluationScreen() {
@@ -35,7 +37,7 @@ export function EvaluationScreen() {
             <tr key={name}>
               <td className="py-2 pr-3">{name.replace(/_/g, " ")}</td>
               <td className="pr-3"><span className={`rounded px-2 py-0.5 text-sm font-semibold ${g.pass ? "bg-calm/15 text-calm" : "bg-riskwash text-risk"}`}>{g.pass ? "Pass" : "Fail"}</span></td>
-              <td className="pr-3 num">{typeof g.value === "object" ? JSON.stringify(g.value) : String(g.value)}</td>
+              <td className="pr-3 num">{show(g.value)}</td>
               <td className="text-sm text-muted">{g.rule}</td>
             </tr>
           ))}
@@ -47,7 +49,7 @@ export function EvaluationScreen() {
           <h2 className="text-xl font-bold">Briefs and questions (seed 42, final model)</h2>
           <dl className="mt-3 grid max-w-3xl grid-cols-[auto_1fr] gap-x-6 gap-y-1 text-[15px]">
             {Object.entries(e.llm.summary).map(([k, v]) => (
-              <Fragment key={k}><dt className="text-muted">{k.replace(/_/g, " ")}</dt><dd className="num">{typeof v === "object" ? JSON.stringify(v) : String(v)}</dd></Fragment>
+              <Fragment key={k}><dt className="text-muted">{k.replace(/_/g, " ")}</dt><dd className="num">{show(v)}</dd></Fragment>
             ))}
           </dl>
         </div>
@@ -87,12 +89,15 @@ function SplitView({ name, s }: { name: string; s: Split }) {
             </div>
             <div className="self-center">
               {sc.median_lead_weeks === null ? <p className="text-sm text-muted">No early detection in these seeds.</p> : (
-                <svg viewBox={`0 0 ${max * 20 + 40} 34`} className="h-9 w-full max-w-md" role="img"
+                <svg viewBox={`0 0 ${max * 20 + 40} 48`} className="h-12 w-full max-w-lg" role="img"
                      aria-label={`Lead time ${sc.min_lead_weeks} to ${sc.max_lead_weeks} weeks, median ${sc.median_lead_weeks}`}>
                   <line x1="20" x2={max * 20 + 20} y1="14" y2="14" stroke="rgb(var(--grid))" />
                   <line x1={20 + (sc.min_lead_weeks ?? 0) * 20} x2={20 + (sc.max_lead_weeks ?? 0) * 20} y1="14" y2="14" stroke="rgb(var(--risk))" strokeWidth="4" strokeLinecap="round" />
                   <circle cx={20 + sc.median_lead_weeks * 20} cy="14" r="6" fill="rgb(var(--risk))" />
-                  <text x={20 + sc.median_lead_weeks * 20} y="32" textAnchor="middle" fontSize="11" fill="rgb(var(--ink))">{sc.median_lead_weeks} wks earlier</text>
+                  <text x={20 + sc.median_lead_weeks * 20} y="31" textAnchor="middle" fontSize="11" fontWeight="600" fill="rgb(var(--ink))">median {sc.median_lead_weeks} wks earlier</text>
+                  {[0, 4, 8, 12, 16].map((w) => (
+                    <text key={w} x={20 + w * 20} y="45" textAnchor="middle" fontSize="9" fill="rgb(var(--muted))">{w === 0 ? "0 wks" : w}</text>
+                  ))}
                 </svg>
               )}
             </div>
